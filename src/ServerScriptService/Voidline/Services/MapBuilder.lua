@@ -1,447 +1,515 @@
+--!strict
+-- Builds the static world from PlotLayout / HubLayout: hub with the Voidline
+-- Monolith (two halves so it can split), pads, monument, leaderboard boards,
+-- the Void Rift spiral, the quiet star overlook and 12 obsidian-gold plots
+-- with segmented Energy Bridges. Dynamic pieces (belt rocks, citadel,
+-- pedestals, prompts) are added by their services.
 local Workspace = game:GetService("Workspace")
-local ServerStorage = game:GetService("ServerStorage")
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
 local GameConfig = require(Voidline.Config.GameConfig)
+local PlotLayout = require(Voidline.Modules.PlotLayout)
+local HubLayout = require(Voidline.Modules.HubLayout)
 
 local MapBuilder = {}
 
-local function part(props): Part
+local COLORS = GameConfig.Colors
+
+type PartProps = {
+	Name: string?,
+	Parent: Instance?,
+	Size: Vector3?,
+	CFrame: CFrame?,
+	Color: Color3?,
+	Material: Enum.Material?,
+	Transparency: number?,
+	CanCollide: boolean?,
+	CanQuery: boolean?,
+	Shape: Enum.PartType?,
+	CastShadow: boolean?,
+}
+
+local function part(props: PartProps): Part
 	local p = Instance.new("Part")
 	p.Anchored = true
 	p.CanCollide = props.CanCollide ~= false
+	p.CanQuery = props.CanQuery ~= false
+	p.CanTouch = false
+	p.CastShadow = props.CastShadow == true
 	p.Material = props.Material or Enum.Material.SmoothPlastic
-	p.Color = props.Color or GameConfig.Colors.Obsidian
+	p.Color = props.Color or COLORS.Obsidian
 	p.Size = props.Size or Vector3.new(4, 1, 4)
 	p.CFrame = props.CFrame or CFrame.new()
 	p.Name = props.Name or "Part"
 	p.TopSurface = Enum.SurfaceType.Smooth
 	p.BottomSurface = Enum.SurfaceType.Smooth
-	if props.Transparency then
-		p.Transparency = props.Transparency
-	end
+	p.Transparency = props.Transparency or 0
 	if props.Shape then
 		p.Shape = props.Shape
 	end
 	p.Parent = props.Parent
 	return p
 end
+MapBuilder.Part = part
 
-local function billboard(parent: Instance, text: string, color: Color3?, heightStuds: number?, maxDistance: number?)
-	local bb = Instance.new("BillboardGui")
-	bb.Name = "Label_" .. string.gsub(text, "%s+", "_")
-	bb.Size = UDim2.fromOffset(180, 32)
-	bb.StudsOffset = Vector3.new(0, heightStuds or 5, 0)
-	bb.AlwaysOnTop = false -- prevents every hub label stacking on screen
-	bb.MaxDistance = maxDistance or 90
-	bb.LightInfluence = 0
-	bb.Parent = parent
-	local label = Instance.new("TextLabel")
-	label.BackgroundTransparency = 0.35
-	label.BackgroundColor3 = GameConfig.Colors.Obsidian
-	label.Size = UDim2.fromScale(1, 1)
-	label.Font = Enum.Font.GothamBold
-	label.TextScaled = true
-	label.TextColor3 = color or GameConfig.Colors.Gold
-	label.Text = text
-	label.Parent = bb
-	local corner = Instance.new("UICorner")
-	corner.CornerRadius = UDim.new(0, 6)
-	corner.Parent = label
-	local pad = Instance.new("UIPadding")
-	pad.PaddingLeft = UDim.new(0, 6)
-	pad.PaddingRight = UDim.new(0, 6)
-	pad.Parent = label
-	return bb
+local function folder(name: string, parent: Instance): Folder
+	local f = Instance.new("Folder")
+	f.Name = name
+	f.Parent = parent
+	return f
 end
 
-function MapBuilder.Build()
-	if Workspace:FindFirstChild("VoidlineMap") then
-		return Workspace.VoidlineMap
+local function label(parent: Instance, text: string, height: number, maxDistance: number, color: Color3?): BillboardGui
+	local bb = Instance.new("BillboardGui")
+	bb.Name = "Label"
+	bb.Size = UDim2.fromOffset(200, 34)
+	bb.StudsOffset = Vector3.new(0, height, 0)
+	bb.AlwaysOnTop = false
+	bb.MaxDistance = maxDistance
+	bb.LightInfluence = 0
+	bb.Parent = parent
+	local text_ = Instance.new("TextLabel")
+	text_.Name = "Text"
+	text_.BackgroundTransparency = 0.3
+	text_.BackgroundColor3 = COLORS.Obsidian
+	text_.Size = UDim2.fromScale(1, 1)
+	text_.Font = Enum.Font.GothamBold
+	text_.TextScaled = true
+	text_.TextColor3 = color or COLORS.Gold
+	text_.Text = text
+	text_.Parent = bb
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 8)
+	corner.Parent = text_
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = COLORS.Gold
+	stroke.Transparency = 0.5
+	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	stroke.Parent = text_
+	local padding = Instance.new("UIPadding")
+	padding.PaddingLeft = UDim.new(0, 8)
+	padding.PaddingRight = UDim.new(0, 8)
+	padding.Parent = text_
+	return bb
+end
+MapBuilder.Label = label
+
+local function goldTrim(parent: Instance, base: CFrame, size: Vector3)
+	local half = size / 2
+	local edges = {
+		{ Vector3.new(0, half.Y, -half.Z), Vector3.new(size.X, 0.4, 0.6) },
+		{ Vector3.new(0, half.Y, half.Z), Vector3.new(size.X, 0.4, 0.6) },
+		{ Vector3.new(-half.X, half.Y, 0), Vector3.new(0.6, 0.4, size.Z) },
+		{ Vector3.new(half.X, half.Y, 0), Vector3.new(0.6, 0.4, size.Z) },
+	}
+	for i, edge in edges do
+		part({
+			Name = "GoldTrim" .. i,
+			Parent = parent,
+			Size = edge[2],
+			CFrame = base * CFrame.new(edge[1]),
+			Color = COLORS.Gold,
+			Material = Enum.Material.Neon,
+			CanCollide = false,
+			CanQuery = false,
+		})
 	end
+end
 
-	local root = Instance.new("Folder")
-	root.Name = "VoidlineMap"
-	root.Parent = Workspace
-
-	-- Hub floor
-	local hub = Instance.new("Folder")
-	hub.Name = "Hub"
-	hub.Parent = root
-
+local function buildHub(root: Instance)
+	local hub = folder("Hub", root)
+	local hubCFrame = CFrame.new(0, 0, 0)
 	part({
 		Name = "HubPad",
 		Parent = hub,
-		Size = Vector3.new(GameConfig.HubRadius * 2, 2, GameConfig.HubRadius * 2),
-		CFrame = CFrame.new(0, 0, 0),
-		Color = GameConfig.Colors.Obsidian,
-		Material = Enum.Material.Metal,
+		Size = HubLayout.HubSize,
+		CFrame = hubCFrame,
+		Material = Enum.Material.Basalt,
 	})
+	goldTrim(hub, hubCFrame, HubLayout.HubSize)
 
-	-- Voidline Monolith
-	local monolithFolder = Instance.new("Folder")
-	monolithFolder.Name = "VoidlineMonolith"
-	monolithFolder.Parent = hub
-
-	local monolith = part({
-		Name = "MonolithCore",
-		Parent = monolithFolder,
-		Size = Vector3.new(18, 72, 18),
-		CFrame = CFrame.new(0, 37, 0),
-		Color = GameConfig.Colors.Obsidian,
-		Material = Enum.Material.Slate,
-	})
-	-- Gold trim bands
-	for i = 1, 4 do
-		part({
-			Name = "GoldBand" .. i,
-			Parent = monolithFolder,
-			Size = Vector3.new(20, 1.2, 20),
-			CFrame = CFrame.new(0, 10 + i * 14, 0),
-			Color = GameConfig.Colors.Gold,
-			Material = Enum.Material.Neon,
+	-- Monolith: two halves (split along X) plus gold bands and the Void Core.
+	local monolith = folder("VoidlineMonolith", hub)
+	local size = HubLayout.MonolithSize
+	local sides: { [string]: number } = { Left = -1, Right = 1 }
+	for side, sign in sides do
+		local halfSize = Vector3.new(size.X / 2, size.Y, size.Z)
+		local half = part({
+			Name = "Monolith" .. side,
+			Parent = monolith,
+			Size = halfSize,
+			CFrame = CFrame.new(HubLayout.MonolithCenter + Vector3.new(sign * size.X / 4, 0, 0)),
+			Material = Enum.Material.Slate,
+			Color = Color3.fromRGB(14, 12, 20),
+			CastShadow = true,
 		})
+		half:SetAttribute("Side", sign)
+		half:SetAttribute("HomeCFrame", half.CFrame)
+		for i = 1, 4 do
+			local band = part({
+				Name = "GoldBand" .. i,
+				Parent = half,
+				Size = Vector3.new(halfSize.X + 0.6, 1.2, halfSize.Z + 0.6),
+				CFrame = half.CFrame * CFrame.new(0, -size.Y / 2 + 10 + i * 13, 0),
+				Color = COLORS.Gold,
+				Material = Enum.Material.Neon,
+				CanCollide = false,
+				CanQuery = false,
+			})
+			band:SetAttribute("Offset", half.CFrame:ToObjectSpace(band.CFrame))
+		end
 	end
-	billboard(monolith, "THE VOIDLINE MONOLITH", nil, 42, 140)
-
-	part({
-		Name = "RebirthPad",
-		Parent = monolithFolder,
-		Size = Vector3.new(14, 1, 14),
-		CFrame = CFrame.new(16, 1.5, 0),
-		Color = GameConfig.Colors.Gold,
-		Material = Enum.Material.Neon,
-	})
-	billboard(monolithFolder.RebirthPad, "VOID REBIRTH", nil, 4, 60)
-
-	part({
-		Name = "ForgeAnchor",
-		Parent = monolithFolder,
-		Size = Vector3.new(12, 1, 12),
-		CFrame = CFrame.new(-16, 1.5, 0),
-		Color = GameConfig.Colors.VoidAccent,
-		Material = Enum.Material.Neon,
-	})
-	billboard(monolithFolder.ForgeAnchor, "ARTIFACT FORGE", nil, 4, 60)
-
-	part({
-		Name = "CodeTerminal",
-		Parent = monolithFolder,
-		Size = Vector3.new(8, 10, 2),
-		CFrame = CFrame.new(0, 6, 22),
-		Color = GameConfig.Colors.Obsidian,
-		Material = Enum.Material.Metal,
-	})
-	billboard(monolithFolder.CodeTerminal, "VOIDLINE CODES", nil, 8, 55)
-
-	part({
-		Name = "SummonPads",
-		Parent = monolithFolder,
-		Size = Vector3.new(10, 1, 10),
-		CFrame = CFrame.new(0, 1.5, -22),
-		Color = GameConfig.Colors.GoldBright,
-		Material = Enum.Material.Neon,
-	})
-	billboard(monolithFolder.SummonPads, "SERVER SUMMONS", nil, 4, 55)
-
-	part({
-		Name = "EventCore",
-		Parent = monolithFolder,
-		Size = Vector3.new(6, 6, 6),
-		CFrame = CFrame.new(0, 8, 0),
-		Color = GameConfig.Colors.Gold,
+	local core = part({
+		Name = "VoidCore",
+		Parent = monolith,
+		Size = Vector3.new(7, 7, 7),
+		CFrame = CFrame.new(HubLayout.VoidCore),
+		Color = COLORS.VoidAccent,
 		Material = Enum.Material.Neon,
 		Shape = Enum.PartType.Ball,
 		CanCollide = false,
+		Transparency = 1,
 	})
+	core:SetAttribute("Exposed", false)
+	label(monolith:FindFirstChild("MonolithLeft") :: Instance, "THE VOIDLINE MONOLITH", 42, 160)
 
-	local boards = Instance.new("Folder")
-	boards.Name = "LeaderboardAnchors"
-	boards.Parent = hub
-	local boardNames = { "TopCredits", "TopRebirths", "CodexDiscoveries", "TopSummoners" }
-	for i, name in boardNames do
-		local angle = ((i - 1) / #boardNames) * math.pi * 2
-		local anchor = part({
+	local function pad(name: string, position: Vector3, padSize: Vector3, color: Color3, text: string)
+		local p = part({
 			Name = name,
-			Parent = boards,
-			Size = Vector3.new(10, 14, 1),
-			CFrame = CFrame.new(math.cos(angle) * 36, 10, math.sin(angle) * 36)
-				* CFrame.Angles(0, -angle + math.pi / 2, 0),
-			Color = GameConfig.Colors.Obsidian,
+			Parent = hub,
+			Size = padSize,
+			CFrame = CFrame.new(position),
+			Color = color,
+			Material = Enum.Material.Neon,
 		})
-		billboard(anchor, name, nil, 9, 70)
+		label(p, text, 4, 70)
+		return p
 	end
+	pad("RebirthPad", HubLayout.RebirthPad, Vector3.new(12, 1, 12), COLORS.Gold, "VOID REBIRTH")
+	pad("ForgePad", HubLayout.ForgePad, Vector3.new(12, 1, 12), COLORS.VoidAccent, "ARTIFACT FORGE")
+	pad("SummonPad", HubLayout.SummonPad, Vector3.new(12, 1, 12), COLORS.GoldBright, "SERVER SUMMONS")
+	pad("VipLounge", HubLayout.VipLounge, Vector3.new(18, 1, 18), COLORS.Gold, "VOID SOVEREIGN LOUNGE")
+	pad("OverlookGate", HubLayout.OverlookGate, Vector3.new(10, 1, 10), Color3.fromRGB(255, 236, 190), "STAR OVERLOOK")
+	pad("RiftGate", HubLayout.RiftGate, Vector3.new(10, 1, 10), Color3.fromRGB(190, 120, 255), "VOID RIFT")
 
-	part({
-		Name = "VIPLoungePad",
+	local terminal = part({
+		Name = "CodeTerminal",
 		Parent = hub,
-		Size = Vector3.new(20, 1, 20),
-		CFrame = CFrame.new(40, 1.5, 40),
-		Color = GameConfig.Colors.Gold,
-		Material = Enum.Material.Neon,
-	})
-	billboard(hub.VIPLoungePad, "VOID VIP LOUNGE", nil, 4, 50)
-
-	local monument = part({
-		Name = "KillshotMonument",
-		Parent = hub,
-		Size = Vector3.new(6, 16, 6),
-		CFrame = CFrame.new(-40, 9, 40),
-		Color = GameConfig.Colors.Obsidian,
+		Size = Vector3.new(8, 10, 2),
+		CFrame = CFrame.lookAt(HubLayout.CodeTerminal, Vector3.new(0, HubLayout.CodeTerminal.Y, 0)),
 		Material = Enum.Material.Metal,
 	})
-	billboard(monument, "Created by Killshot2336", nil, 10, 70)
+	label(terminal, "CODE TERMINAL", 7, 60)
 
-	-- Deep Space zone
-	local deep = Instance.new("Folder")
-	deep.Name = "DeepSpace"
-	deep.Parent = root
+	-- "Created by Killshot2336" monument: obsidian plinth, gold obelisk, plaque.
+	local monument = folder("CreatorMonument", hub)
+	local plinth = part({
+		Name = "Plinth",
+		Parent = monument,
+		Size = Vector3.new(10, 2, 10),
+		CFrame = CFrame.new(HubLayout.Monument + Vector3.new(0, 1, 0)),
+		Material = Enum.Material.Marble,
+		Color = Color3.fromRGB(20, 18, 26),
+	})
 	part({
-		Name = "SoftContestZone",
-		Parent = deep,
-		Size = Vector3.new(90, 1, 90),
-		CFrame = CFrame.new(0, 0.5, 0),
-		Color = Color3.fromRGB(20, 10, 40),
-		Transparency = 0.35,
+		Name = "Obelisk",
+		Parent = monument,
+		Size = Vector3.new(3, 18, 3),
+		CFrame = plinth.CFrame * CFrame.new(0, 10, 0),
+		Material = Enum.Material.Foil,
+		Color = COLORS.Gold,
+	})
+	part({
+		Name = "Crown",
+		Parent = monument,
+		Size = Vector3.new(4, 4, 4),
+		CFrame = plinth.CFrame * CFrame.new(0, 21, 0) * CFrame.Angles(math.rad(45), 0, math.rad(45)),
+		Material = Enum.Material.Neon,
+		Color = COLORS.GoldBright,
 		CanCollide = false,
 	})
-	local rareSpawns = Instance.new("Folder")
-	rareSpawns.Name = "RareAsteroidSpawns"
-	rareSpawns.Parent = deep
-	for i = 1, 8 do
-		local angle = (i / 8) * math.pi * 2
-		local pos = Vector3.new(math.cos(angle) * 55, 18, math.sin(angle) * 55)
-		local rock = part({
-			Name = "VoidAsteroid_" .. i,
-			Parent = rareSpawns,
-			Size = Vector3.new(10, 10, 10),
-			CFrame = CFrame.new(pos),
-			Color = Color3.fromRGB(40, 20, 70),
-			Material = Enum.Material.Rock,
-			Shape = Enum.PartType.Ball,
+	local plaque = part({
+		Name = "Plaque",
+		Parent = monument,
+		Size = Vector3.new(8, 3, 0.4),
+		CFrame = CFrame.lookAt(plinth.Position + Vector3.new(0, 2.5, 5.2), Vector3.new(0, 3.5, 0)),
+		Material = Enum.Material.Metal,
+	})
+	local surface = Instance.new("SurfaceGui")
+	surface.Name = "PlaqueGui"
+	surface.Face = Enum.NormalId.Front
+	surface.LightInfluence = 0
+	surface.PixelsPerStud = 40
+	surface.Parent = plaque
+	local plaqueText = Instance.new("TextLabel")
+	plaqueText.BackgroundTransparency = 1
+	plaqueText.Size = UDim2.fromScale(1, 1)
+	plaqueText.Font = Enum.Font.GothamBlack
+	plaqueText.TextScaled = true
+	plaqueText.TextColor3 = COLORS.Gold
+	plaqueText.Text = "Created by " .. GameConfig.BrandCreator
+	plaqueText.Parent = surface
+	label(plinth, "Created by " .. GameConfig.BrandCreator, 26, 120)
+
+	-- Leaderboard frames; LeaderboardService draws the holographic lists.
+	local boards = folder("Leaderboards", hub)
+	for _, def in HubLayout.Boards do
+		local board = part({
+			Name = def.Id,
+			Parent = boards,
+			Size = Vector3.new(12, 15, 0.6),
+			CFrame = HubLayout.BoardCFrame(def.Angle),
+			Color = Color3.fromRGB(20, 16, 34),
+			Material = Enum.Material.Glass,
+			Transparency = 0.35,
 		})
-		rock:SetAttribute("Sector", "VoidRim")
-		rock:SetAttribute("MaxHealth", 5000)
-		rock:SetAttribute("Health", 5000)
-		rock:SetAttribute("Shared", true)
+		board:SetAttribute("Title", def.Title)
 	end
+
+	local spawnLocation = Instance.new("SpawnLocation")
+	spawnLocation.Name = "VoidlineSpawn"
+	spawnLocation.Anchored = true
+	spawnLocation.Size = Vector3.new(10, 1, 10)
+	spawnLocation.CFrame = CFrame.new(HubLayout.Spawn)
+	spawnLocation.Color = COLORS.Gold
+	spawnLocation.Material = Enum.Material.Neon
+	spawnLocation.Duration = 0
+	spawnLocation.Transparency = 0.6
+	spawnLocation.Parent = hub
+
+	-- Void Rift spiral: faint and solid only while the Rift event is open.
+	local rift = folder("VoidRift", hub)
+	for i = 1, HubLayout.RiftPlatforms do
+		local p = part({
+			Name = "RiftShard" .. i,
+			Parent = rift,
+			Size = Vector3.new(6, 1, 6),
+			CFrame = CFrame.new(HubLayout.RiftPlatform(i)) * CFrame.Angles(0, i * 0.7, 0),
+			Color = Color3.fromRGB(190, 120, 255),
+			Material = Enum.Material.Neon,
+			Transparency = 0.85,
+			CanCollide = false,
+		})
+		p:SetAttribute("RiftIndex", i)
+	end
+	local cache = part({
+		Name = "RiftCache",
+		Parent = rift,
+		Size = Vector3.new(8, 1, 8),
+		CFrame = CFrame.new(HubLayout.RiftCache),
+		Color = COLORS.GoldBright,
+		Material = Enum.Material.Neon,
+		Transparency = 0.85,
+		CanCollide = false,
+	})
+	cache:SetAttribute("RiftIndex", HubLayout.RiftPlatforms + 1)
+	return hub
+end
+
+local function buildDeepSpace(root: Instance)
+	local deep = folder("DeepSpace", root)
 	part({
-		Name = "EventMeteorAnchor",
+		Name = "ZoneRing",
 		Parent = deep,
-		Size = Vector3.new(2, 2, 2),
-		CFrame = CFrame.new(0, 40, 0),
+		Size = Vector3.new(1, HubLayout.ZoneRadius * 2, HubLayout.ZoneRadius * 2),
+		CFrame = CFrame.new(0, -6, 0) * CFrame.Angles(0, 0, math.rad(90)),
+		Shape = Enum.PartType.Cylinder,
+		Color = Color3.fromRGB(30, 14, 60),
+		Material = Enum.Material.Neon,
+		Transparency = 0.9,
+		CanCollide = false,
+		CanQuery = false,
+	})
+	folder("SharedRocks", deep)
+	folder("EventTargets", deep)
+	folder("Hazards", deep)
+end
+
+local function buildOverlook(root: Instance)
+	local overlook = folder("StarOverlook", root)
+	local platform = part({
+		Name = "OverlookPlatform",
+		Parent = overlook,
+		Size = Vector3.new(22, 1.5, 22),
+		CFrame = CFrame.new(HubLayout.Overlook),
+		Color = Color3.fromRGB(28, 24, 36),
+		Material = Enum.Material.Marble,
+	})
+	goldTrim(overlook, platform.CFrame, platform.Size)
+	local aura = part({
+		Name = "AuraZone",
+		Parent = overlook,
+		Size = Vector3.new(22, 10, 22),
+		CFrame = platform.CFrame * CFrame.new(0, 5.5, 0),
 		Transparency = 1,
 		CanCollide = false,
+		CanQuery = false,
 	})
-
-	-- Kyria overlook (secret)
-	local kyria = Instance.new("Folder")
-	kyria.Name = "KyriaOverlook"
-	kyria.Parent = root
-	local overlook = part({
-		Name = "StarlightOverlook",
-		Parent = kyria,
-		Size = Vector3.new(16, 1, 16),
-		CFrame = CFrame.new(180, 60, -180),
-		Color = Color3.fromRGB(255, 230, 180),
-		Material = Enum.Material.Neon,
-	})
-	overlook:SetAttribute("SecretAura", true)
-	-- Quiet marker only — no Kyria branding in UI
-	billboard(overlook, "…", Color3.fromRGB(255, 240, 200), 3, 40)
-
+	aura:SetAttribute("CalmAura", true)
 	local star = part({
-		Name = "HiddenStar",
-		Parent = kyria,
-		Size = Vector3.new(40, 40, 40),
-		CFrame = CFrame.new(220, 140, -220),
-		Color = Color3.fromRGB(255, 236, 180),
+		Name = "QuietStar",
+		Parent = overlook,
+		Size = Vector3.new(36, 36, 36),
+		CFrame = CFrame.new(HubLayout.Overlook + Vector3.new(60, 70, -60)),
+		Color = Color3.fromRGB(255, 236, 190),
 		Material = Enum.Material.Neon,
 		Shape = Enum.PartType.Ball,
 		CanCollide = false,
+		CanQuery = false,
 	})
-	star.Transparency = 0.15
+	star.Transparency = 0.1
+	local spawnPad = part({
+		Name = "ArrivalPad",
+		Parent = overlook,
+		Size = Vector3.new(6, 0.2, 6),
+		CFrame = platform.CFrame * CFrame.new(0, 0.85, 6),
+		Color = Color3.fromRGB(255, 236, 190),
+		Material = Enum.Material.Neon,
+		CanCollide = false,
+		Transparency = 0.5,
+	})
+	spawnPad:SetAttribute("Arrival", true)
+end
 
-	-- Plots ring
-	local plotsFolder = Instance.new("Folder")
-	plotsFolder.Name = "Plots"
-	plotsFolder.Parent = root
+local function buildPlot(plots: Instance, index: number)
+	local plotCFrame = PlotLayout.PlotCFrame(index)
+	local plot = folder("Plot_" .. index, plots)
+	plot:SetAttribute("PlotIndex", index)
+	plot:SetAttribute("OwnerUserId", 0)
+	plot:SetAttribute("OwnerName", "")
+	plot:SetAttribute("BridgeIgnited", false)
 
-	local templates = ServerStorage:FindFirstChild("Voidline")
-	if not templates then
-		templates = Instance.new("Folder")
-		templates.Name = "Voidline"
-		templates.Parent = ServerStorage
+	local baseCFrame = plotCFrame * CFrame.new(0, PlotLayout.SurfaceY - 1, 0)
+	part({
+		Name = "StationBase",
+		Parent = plot,
+		Size = PlotLayout.BaseSize,
+		CFrame = baseCFrame,
+		Material = Enum.Material.Basalt,
+		Color = COLORS.Obsidian,
+	})
+	goldTrim(plot, baseCFrame, PlotLayout.BaseSize)
+
+	local spawnMarker = part({
+		Name = "PlayerSpawn",
+		Parent = plot,
+		Size = Vector3.new(6, 0.2, 6),
+		CFrame = plotCFrame * CFrame.new(PlotLayout.Spawn),
+		Color = COLORS.GoldBright,
+		Material = Enum.Material.Neon,
+		CanCollide = false,
+		Transparency = 0.6,
+	})
+	spawnMarker:SetAttribute("Spawn", true)
+
+	local station = folder("Station", plot)
+	local refinery = part({
+		Name = "Refinery",
+		Parent = station,
+		Size = PlotLayout.RefinerySize,
+		CFrame = plotCFrame * CFrame.new(PlotLayout.Refinery),
+		Color = COLORS.Gold,
+		Material = Enum.Material.Neon,
+	})
+	label(refinery, "REFINERY", 4, 60)
+	part({
+		Name = "RefineryTower",
+		Parent = station,
+		Size = Vector3.new(8, 12, 6),
+		CFrame = plotCFrame * CFrame.new(PlotLayout.RefineryTower),
+		Material = Enum.Material.Metal,
+		Color = Color3.fromRGB(26, 24, 34),
+	})
+	local grinder = part({
+		Name = "GrinderCore",
+		Parent = station,
+		Size = Vector3.new(9, 9, 9),
+		CFrame = plotCFrame * CFrame.new(PlotLayout.Grinder) * CFrame.Angles(math.rad(45), math.rad(45), 0),
+		Color = Color3.fromRGB(30, 28, 44),
+		Material = Enum.Material.DiamondPlate,
+	})
+	part({
+		Name = "GrinderGlow",
+		Parent = grinder,
+		Size = Vector3.new(4, 4, 4),
+		CFrame = grinder.CFrame,
+		Color = COLORS.GoldBright,
+		Material = Enum.Material.Neon,
+		Shape = Enum.PartType.Ball,
+		CanCollide = false,
+		CanQuery = false,
+	})
+	label(grinder, "GRINDER CORE", 7, 60)
+
+	local pads = folder("UpgradePads", station)
+	for upgradeId, offset in PlotLayout.Pads do
+		local pad = part({
+			Name = upgradeId,
+			Parent = pads,
+			Size = PlotLayout.PadSize,
+			CFrame = plotCFrame * CFrame.new(offset),
+			Color = COLORS.Gold,
+			Material = Enum.Material.Neon,
+			Transparency = 0.1,
+		})
+		pad:SetAttribute("UpgradeId", upgradeId)
 	end
 
-	for i = 1, GameConfig.PlotCount do
-		local angle = ((i - 1) / GameConfig.PlotCount) * math.pi * 2
-		local center =
-			Vector3.new(math.cos(angle) * GameConfig.PlotRingRadius, 0, math.sin(angle) * GameConfig.PlotRingRadius)
-		local plot = Instance.new("Folder")
-		plot.Name = "Plot_" .. i
-		plot.Parent = plotsFolder
-		plot:SetAttribute("PlotIndex", i)
-		plot:SetAttribute("Claimed", false)
+	local tuner = part({
+		Name = "LaserTuner",
+		Parent = station,
+		Size = Vector3.new(6, 1, 6),
+		CFrame = plotCFrame * CFrame.new(PlotLayout.LaserTuner),
+		Color = Color3.fromRGB(90, 220, 255),
+		Material = Enum.Material.Neon,
+	})
+	label(tuner, "LASER TUNER", 3, 40)
 
-		part({
-			Name = "StationBase",
-			Parent = plot,
-			Size = Vector3.new(60, 2, 60),
-			CFrame = CFrame.new(center + Vector3.new(0, 1, 0)),
-			Color = GameConfig.Colors.Obsidian,
-			Material = Enum.Material.Metal,
-		})
+	folder("Pedestals", plot)
+	folder("Citadel", plot)
+	folder("Belt", plot)
 
-		local claim = part({
-			Name = "ClaimPad",
-			Parent = plot,
-			Size = Vector3.new(12, 1, 12),
-			CFrame = CFrame.new(center + Vector3.new(0, 2.2, 18)),
-			Color = GameConfig.Colors.Gold,
-			Material = Enum.Material.Neon,
-		})
-		claim:SetAttribute("PlotIndex", i)
-		-- No claim billboard: plots auto-claim; keeps hub readable
-
-		local station = Instance.new("Folder")
-		station.Name = "Station"
-		station.Parent = plot
-
-		local refinery = part({
-			Name = "Refinery",
-			Parent = station,
-			Size = Vector3.new(14, 8, 14),
-			CFrame = CFrame.new(center + Vector3.new(-16, 5, -8)),
-			Color = GameConfig.Colors.Obsidian,
-			Material = Enum.Material.Metal,
-		})
-		billboard(refinery, "STATION REFINERY", nil, 6, 45)
-
-		local grinder = part({
-			Name = "GrinderCore",
-			Parent = station,
-			Size = Vector3.new(12, 10, 12),
-			CFrame = CFrame.new(center + Vector3.new(16, 6, -8)),
-			Color = Color3.fromRGB(30, 30, 40),
-			Material = Enum.Material.DiamondPlate,
-		})
-		billboard(grinder, "GRINDER CORE", nil, 6, 45)
-
-		local upgrades = Instance.new("Folder")
-		upgrades.Name = "UpgradePads"
-		upgrades.Parent = station
-		local upgradeDefs = {
-			{ "Drill", Vector3.new(-18, 0, 8) },
-			{ "Cargo", Vector3.new(-6, 0, 8) },
-			{ "DroneSlot", Vector3.new(6, 0, 8) },
-			{ "StationTier", Vector3.new(18, 0, 8) },
-		}
-		for _, def in upgradeDefs do
-			local up = part({
-				Name = def[1],
-				Parent = upgrades,
-				Size = Vector3.new(8, 1, 8),
-				CFrame = CFrame.new(center + def[2] + Vector3.new(0, 2.2, 0)),
-				Color = GameConfig.Colors.Gold,
-				Material = Enum.Material.Neon,
-			})
-			up:SetAttribute("UpgradeId", def[1])
-			-- Proximity prompts name the pads; skip world labels to avoid clutter
-		end
-
-		local tuner = part({
-			Name = "LaserTuner",
-			Parent = station,
-			Size = Vector3.new(6, 1, 6),
-			CFrame = CFrame.new(center + Vector3.new(0, 2.2, -18)),
-			Color = Color3.fromRGB(90, 220, 255),
-			Material = Enum.Material.Neon,
-		})
-		billboard(tuner, "LASER COLOR", nil, 3, 35)
-
-		part({
-			Name = "WarpGatePlaceholder",
-			Parent = station,
-			Size = Vector3.new(10, 16, 2),
-			CFrame = CFrame.new(center + Vector3.new(22, 9, 16)),
-			Color = Color3.fromRGB(40, 40, 60),
-			Transparency = 0.4,
-		})
-
-		local relics = Instance.new("Folder")
-		relics.Name = "RelicPedestals"
-		relics.Parent = station
-
-		local spawn = part({
-			Name = "PlayerSpawn",
-			Parent = plot,
-			Size = Vector3.new(6, 1, 6),
-			CFrame = CFrame.new(center + Vector3.new(0, 2.5, 10)),
-			Color = GameConfig.Colors.GoldBright,
-			Material = Enum.Material.Neon,
-			CanCollide = false,
-		})
-		spawn.Transparency = 0.3
-
-		-- Personal asteroid belt
-		local belt = Instance.new("Folder")
-		belt.Name = "PersonalBelt"
-		belt.Parent = plot
-		for a = 1, 6 do
-			local aAng = (a / 6) * math.pi * 2
-			local aPos = center + Vector3.new(math.cos(aAng) * 36, 10, math.sin(aAng) * 36)
-			local asteroid = part({
-				Name = "Asteroid_" .. a,
-				Parent = belt,
-				Size = Vector3.new(7, 7, 7),
-				CFrame = CFrame.new(aPos),
-				Color = Color3.fromRGB(70, 70, 80),
-				Material = Enum.Material.Rock,
-				Shape = Enum.PartType.Ball,
-			})
-			asteroid:SetAttribute("Sector", "Starter")
-			asteroid:SetAttribute("MaxHealth", 40)
-			asteroid:SetAttribute("Health", 40)
-			asteroid:SetAttribute("Shared", false)
-			asteroid:SetAttribute("PlotIndex", i)
-		end
-
-		-- Energy bridge path (visual beam parts)
-		local bridge = Instance.new("Folder")
-		bridge.Name = "BridgeAttach"
-		bridge.Parent = plot
-		local outward = center.Unit
-		local bridgeStart = center - outward * 28
-		local bridgeEnd = outward * (GameConfig.HubRadius + 4)
-		local mid = (bridgeStart + bridgeEnd) / 2
-		local length = (bridgeEnd - bridgeStart).Magnitude
-		local beam = part({
-			Name = "EnergyBridge",
+	-- Energy Bridge: segments from the plot's front edge to the hub ring.
+	local bridge = folder("EnergyBridge", plot)
+	local startPos = plotCFrame:PointToWorldSpace(PlotLayout.BridgeStart)
+	local endPos = PlotLayout.BridgeEnd(index)
+	local span = endPos - startPos
+	local count = PlotLayout.BridgeSegments
+	local segmentLength = span.Magnitude / count
+	for i = 1, count do
+		local center = startPos + span * ((i - 0.5) / count)
+		local segment = part({
+			Name = "Segment" .. i,
 			Parent = bridge,
-			Size = Vector3.new(4, 0.6, length),
-			CFrame = CFrame.lookAt(mid, bridgeEnd) * CFrame.new(0, 2, 0),
-			Color = GameConfig.Colors.Gold,
+			Size = Vector3.new(7, 0.8, segmentLength + 0.05),
+			CFrame = CFrame.lookAt(center, center + span),
+			Color = COLORS.Gold,
 			Material = Enum.Material.Neon,
-			Transparency = 0.65,
+			Transparency = 0.85,
 			CanCollide = false,
 		})
-		beam:SetAttribute("Ignited", false)
+		segment:SetAttribute("SegmentIndex", i)
 	end
+	return plot
+end
 
-	-- Spawn location for unclaimed players near monument
-	local spawnLoc = Instance.new("SpawnLocation")
-	spawnLoc.Name = "VoidlineSpawn"
-	spawnLoc.Anchored = true
-	spawnLoc.Size = Vector3.new(12, 1, 12)
-	spawnLoc.CFrame = CFrame.new(-40, 1.5, 52)
-	spawnLoc.Color = GameConfig.Colors.Gold
-	spawnLoc.Material = Enum.Material.Neon
-	spawnLoc.Duration = 0
-	spawnLoc.Parent = hub
-
-	print("[Voidline] MapBuilder: VoidlineMap ready (12 plots)")
+function MapBuilder.Build(): Instance
+	local existing = Workspace:FindFirstChild("VoidlineMap")
+	if existing then
+		return existing
+	end
+	local root = Instance.new("Folder")
+	root.Name = "VoidlineMap"
+	buildHub(root)
+	buildDeepSpace(root)
+	buildOverlook(root)
+	local plots = folder("Plots", root)
+	for i = 1, GameConfig.PlotCount do
+		buildPlot(plots, i)
+	end
+	root.Parent = Workspace
+	print(("[Voidline] MapBuilder: VoidlineMap ready (%d plots)"):format(GameConfig.PlotCount))
 	return root
 end
 
