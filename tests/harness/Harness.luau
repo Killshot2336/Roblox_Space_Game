@@ -127,13 +127,32 @@ local function makeRandomLib()
 		end
 		return v.Unit
 	end
+	-- Unseeded Random.new() gets a fresh (but reproducible) seed per call,
+	-- like Roblox's entropy seed; every seed is scrambled and warmed up so
+	-- small seeds do not start with tiny outputs.
+	local unseeded = 0
+	local function mul32(a, b)
+		local aLo, aHi = a % 65536, math.floor(a / 65536)
+		local bLo, bHi = b % 65536, math.floor(b / 65536)
+		return ((aHi * bLo + aLo * bHi) % 65536 * 65536 + aLo * bLo) % 4294967296
+	end
 	return {
 		new = function(seed)
-			local s = math.floor(seed or 1) % 4294967296
+			if seed == nil then
+				unseeded += 1
+				seed = unseeded * 2654435761
+			end
+			local s = math.floor(seed) % 4294967296
+			s = bit32.bxor(s, 0x9E3779B9)
+			s = mul32(s, 2246822519)
 			if s == 0 then
 				s = 2463534242
 			end
-			return setmetatable({ _s = s }, RandomMT)
+			local rng = setmetatable({ _s = s }, RandomMT)
+			for _ = 1, 8 do
+				nextState(rng)
+			end
+			return rng
 		end,
 	}
 end
@@ -253,6 +272,10 @@ function World:_buildDataModel()
 			local scriptPath = pickScriptPath(node.filePaths)
 			if scriptPath then
 				rawset(inst, "_filePath", scriptPath)
+				-- Read now, on the main thread: Lune's fs calls are async and
+				-- would escape the fake scheduler if first hit inside a
+				-- coroutine (e.g. a require made by Boot.server.lua).
+				readSource(scriptPath)
 			end
 			if parent == game then
 				local factory = FakeServices[node.className]
