@@ -11,8 +11,7 @@ local CLIENT_WAIT_SECONDS = 60
 -- "Event" = RemoteEvent (reliable). "Unreliable" = UnreliableRemoteEvent for
 -- high-frequency cosmetic state where a dropped packet is harmless.
 local REMOTES: { [string]: "Event" | "Unreliable" } = {
-	-- client -> server
-	ClaimPlot = "Event",
+	-- client -> server (every one is bound through ValidateRemote.Bind)
 	RequestUpgrade = "Event",
 	QuickUpgrade = "Event",
 	SetFormation = "Event",
@@ -29,7 +28,6 @@ local REMOTES: { [string]: "Event" | "Unreliable" } = {
 	SettingsUpdate = "Event",
 	RedeemCode = "Event",
 	RedeemDaily = "Event",
-	SetLaserColor = "Event",
 	EquipCosmetic = "Event",
 	TutorialSkip = "Event",
 	PlayerInput = "Event",
@@ -38,10 +36,8 @@ local REMOTES: { [string]: "Event" | "Unreliable" } = {
 	InspectPilot = "Event",
 	-- server -> client
 	DataSnapshot = "Event",
-	CollectionDelta = "Event",
 	TutorialProgress = "Event",
 	JuiceEvent = "Event",
-	WorldEventState = "Event",
 	StoreState = "Event",
 	SquadUpdate = "Event",
 	InspectResult = "Event",

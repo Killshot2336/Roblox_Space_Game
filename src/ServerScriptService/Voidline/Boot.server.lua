@@ -1,6 +1,8 @@
 --[[
-	Voidline: Deep Space — server boot
-	Init order matches GAME_DESIGN.md architecture.
+	Voidline: Deep Space — server boot.
+	Order: remotes -> map -> services (callbacks registered) -> start loading
+	profiles. A service whose Init throws is logged and skipped so one broken
+	feature cannot take the whole server down.
 ]]
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -11,45 +13,54 @@ Remotes.Ensure()
 
 local Services = script.Parent.Services
 
-local MapBuilder = require(Services.MapBuilder)
-MapBuilder.Build()
+require(Services.MapBuilder).Build()
 
-local PlayerDataService = require(Services.PlayerDataService)
-local PlotService = require(Services.PlotService)
-local EconomyService = require(Services.EconomyService)
-local SoftContestService = require(Services.SoftContestService)
-local TowService = require(Services.TowService)
-local DroneService = require(Services.DroneService)
-local WorldEventService = require(Services.WorldEventService)
-local ForgeService = require(Services.ForgeService)
-local RebirthService = require(Services.RebirthService)
-local SquadService = require(Services.SquadService)
-local MonetizationService = require(Services.MonetizationService)
-local CodeService = require(Services.CodeService)
-local DailyStreakService = require(Services.DailyStreakService)
-local AfkService = require(Services.AfkService)
-local JuiceService = require(Services.JuiceService)
-local LeaderboardService = require(Services.LeaderboardService)
-local CodexService = require(Services.CodexService)
-local WarpService = require(Services.WarpService)
+local ORDER = {
+	"PlayerDataService",
+	"WorldState",
+	"JuiceService",
+	"StatService",
+	"CodexService",
+	"PlotService",
+	"RockService",
+	"TowService",
+	"TutorialService",
+	"EconomyService",
+	"RelicService",
+	"BeltService",
+	"DroneService",
+	"SoftContestService",
+	"RiftService",
+	"WorldEventService",
+	"ForgeService",
+	"RebirthService",
+	"CodeService",
+	"DailyStreakService",
+	"SummonService",
+	"MonetizationService",
+	"LeaderboardService",
+	"AfkService",
+	"SquadService",
+	"WarpService",
+	"CosmeticService",
+	"CitadelService",
+	"InspectService",
+}
 
-PlayerDataService.Init()
-PlotService.Init()
-EconomyService.Init()
-SoftContestService.Init()
-TowService.Init()
-DroneService.Init()
-WorldEventService.Init()
-ForgeService.Init()
-RebirthService.Init()
-SquadService.Init()
-MonetizationService.Init()
-CodeService.Init()
-DailyStreakService.Init()
-AfkService.Init()
-JuiceService.Init()
-LeaderboardService.Init()
-CodexService.Init()
-WarpService.Init()
+local failed = {}
+for _, name in ORDER do
+	local service = require(Services[name])
+	local ok, err = xpcall(service.Init, debug.traceback)
+	if not ok then
+		table.insert(failed, name)
+		warn(("[Voidline] %s.Init failed: %s"):format(name, tostring(err)))
+	end
+end
 
-print("[Voidline] Boot complete — Voidline: Deep Space v1 online")
+require(Services.PlayerDataService).Start()
+
+if #failed == 0 then
+	print("[Voidline] Boot complete — Voidline: Deep Space online")
+else
+	warn("[Voidline] Boot finished with failures: " .. table.concat(failed, ", "))
+end
