@@ -55,8 +55,10 @@ function SquadService.Init()
 		end
 		local target = nil
 		for _, p in Players:GetPlayers() do
-			if string.lower(p.Name) == string.lower(targetName)
-				or string.lower(p.DisplayName) == string.lower(targetName) then
+			if
+				string.lower(p.Name) == string.lower(targetName)
+				or string.lower(p.DisplayName) == string.lower(targetName)
+			then
 				target = p
 				break
 			end

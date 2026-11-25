@@ -88,7 +88,11 @@ local function findNearestAsteroid(player: Player, origin: Vector3): BasePart?
 			return
 		end
 		for _, child in folder:GetDescendants() do
-			if child:IsA("BasePart") and child:GetAttribute("Health") and (child:GetAttribute("Health") :: number) > 0 then
+			if
+				child:IsA("BasePart")
+				and child:GetAttribute("Health")
+				and (child:GetAttribute("Health") :: number) > 0
+			then
 				if child:GetAttribute("Shared") == true then
 					-- deep space handled separately preference when formation beam-link
 				end
@@ -177,7 +181,11 @@ function DroneService.Init()
 					for i, drone in list do
 						local angle = os.clock() + i
 						local pos = hrp.Position
-							+ Vector3.new(math.cos(angle) * DroneConfig.IdleOrbitRadius, 3, math.sin(angle) * DroneConfig.IdleOrbitRadius)
+							+ Vector3.new(
+								math.cos(angle) * DroneConfig.IdleOrbitRadius,
+								3,
+								math.sin(angle) * DroneConfig.IdleOrbitRadius
+							)
 						if drone.PrimaryPart then
 							drone:PivotTo(CFrame.new(pos))
 						end
@@ -224,12 +232,15 @@ function DroneService.Init()
 								pos = hrp.Position + back * 4 + Vector3.new((i - (#list + 1) / 2) * 1.6, 3 + i * 0.2, 0)
 							elseif target then
 								local orbit = (os.clock() * 2 + i) % (math.pi * 2)
-								pos = target.Position
-									+ Vector3.new(math.cos(orbit) * 6, 4, math.sin(orbit) * 6)
+								pos = target.Position + Vector3.new(math.cos(orbit) * 6, 4, math.sin(orbit) * 6)
 							else
 								local angle = os.clock() + i
 								pos = hrp.Position
-									+ Vector3.new(math.cos(angle) * DroneConfig.IdleOrbitRadius, 3, math.sin(angle) * DroneConfig.IdleOrbitRadius)
+									+ Vector3.new(
+										math.cos(angle) * DroneConfig.IdleOrbitRadius,
+										3,
+										math.sin(angle) * DroneConfig.IdleOrbitRadius
+									)
 							end
 							drone:PivotTo(CFrame.new(pos))
 							local trim = drone:FindFirstChild("Trim")

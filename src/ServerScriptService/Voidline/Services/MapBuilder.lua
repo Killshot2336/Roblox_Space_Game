@@ -277,11 +277,8 @@ function MapBuilder.Build()
 
 	for i = 1, GameConfig.PlotCount do
 		local angle = ((i - 1) / GameConfig.PlotCount) * math.pi * 2
-		local center = Vector3.new(
-			math.cos(angle) * GameConfig.PlotRingRadius,
-			0,
-			math.sin(angle) * GameConfig.PlotRingRadius
-		)
+		local center =
+			Vector3.new(math.cos(angle) * GameConfig.PlotRingRadius, 0, math.sin(angle) * GameConfig.PlotRingRadius)
 		local plot = Instance.new("Folder")
 		plot.Name = "Plot_" .. i
 		plot.Parent = plotsFolder
