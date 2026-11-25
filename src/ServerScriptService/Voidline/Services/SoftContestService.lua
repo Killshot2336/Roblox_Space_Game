@@ -19,7 +19,7 @@ function SoftContestService.AddDamage(target: BasePart, player: Player, amount: 
 		SoftContestService._damage[target] = map
 	end
 	map[player.UserId] = (map[player.UserId] or 0) + amount
-	Remotes.Get("SoftContestUpdate"):FireAllClients({
+	Remotes.GetUnreliable("SoftContestUpdate"):FireAllClients({
 		Target = target,
 		Damage = map,
 	})

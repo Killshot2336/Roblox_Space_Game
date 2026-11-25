@@ -7,7 +7,6 @@ local Players = game:GetService("Players")
 
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
 local Remotes = require(Voidline.Remotes)
-Remotes.Ensure()
 
 local Controllers = script.Parent.Controllers
 local HUDController = require(Controllers.HUDController)
