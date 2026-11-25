@@ -145,7 +145,11 @@ function MonetizationConfig.StarfallOdds(): { { Label: string, Chance: number } 
 		{ Label = ("%d meteors, %d ore each (split by contribution)"):format(s.Meteors, s.OrePerMeteor), Chance = 1 },
 		{ Label = ("%d Void Shards per meteor (split by contribution)"):format(s.ShardsPerMeteor), Chance = 1 },
 		{ Label = "Celestial ore variant per meteor", Chance = s.CelestialOreChance },
-		{ Label = "Relic per meteor (top contributor)", Chance = s.RelicChancePerMeteor },
+		{ Label = "Relic per meteor, top contributor (base, before luck boosts)", Chance = s.RelicChancePerMeteor },
+		{
+			Label = "Relic per meteor, other qualifiers (base, before luck boosts)",
+			Chance = s.RelicChancePerMeteor * 0.1,
+		},
 	}
 end
 
