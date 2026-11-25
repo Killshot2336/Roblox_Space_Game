@@ -1,0 +1,1126 @@
+achievement	ach.anomalies.1	Anomaly Witness I
+achievement	ach.anomalies.10	Anomaly Witness III
+achievement	ach.anomalies.25	Anomaly Witness IV
+achievement	ach.anomalies.5	Anomaly Witness II
+achievement	ach.anomalies.50	Anomaly Witness V
+achievement	ach.anomaly.antimatter_void	Witness: Antimatter Void
+achievement	ach.anomaly.cryo_comet_field	Witness: Cryo Comet Field
+achievement	ach.anomaly.crystal_lattice	Witness: Crystal Lattice Belt
+achievement	ach.anomaly.dark_matter_tide	Witness: Dark Matter Tide
+achievement	ach.anomaly.derelict_titan	Witness: Derelict Titan Wreck
+achievement	ach.anomaly.diamond_nebula	Witness: Diamond Nebula
+achievement	ach.anomaly.gas_giant_shadow	Witness: Gas Giant Shadow
+achievement	ach.anomaly.ion_aurora	Witness: Ion Aurora
+achievement	ach.anomaly.magnetar_storm	Witness: Magnetar Storm
+achievement	ach.anomaly.plasma_reef	Witness: Plasma Reef
+achievement	ach.anomaly.pulsar_graveyard	Witness: Pulsar Graveyard
+achievement	ach.anomaly.quantum_foam	Witness: Quantum Foam Shoal
+achievement	ach.anomaly.singularity_rift	Witness: Singularity Rift
+achievement	ach.anomaly.solar_forge	Witness: Solar Forge
+achievement	ach.branch.hauler	Hauler Line
+achievement	ach.branch.miner	Miner Line
+achievement	ach.branch.swarm	Swarm Line
+achievement	ach.cargo.10	Cargo Master II
+achievement	ach.cargo.100	Cargo Master VI
+achievement	ach.cargo.120	Cargo Master VII
+achievement	ach.cargo.25	Cargo Master III
+achievement	ach.cargo.5	Cargo Master I
+achievement	ach.cargo.50	Cargo Master IV
+achievement	ach.cargo.75	Cargo Master V
+achievement	ach.codes.1	Codebreaker I
+achievement	ach.codes.3	Codebreaker II
+achievement	ach.codex.10	Codex Keeper I
+achievement	ach.codex.100	Codex Keeper IV
+achievement	ach.codex.175	Codex Keeper V
+achievement	ach.codex.25	Codex Keeper II
+achievement	ach.codex.250	Codex Keeper VI
+achievement	ach.codex.350	Codex Keeper VII
+achievement	ach.codex.450	Codex Keeper VIII
+achievement	ach.codex.50	Codex Keeper III
+achievement	ach.codex.550	Codex Keeper IX
+achievement	ach.codex.650	Codex Keeper X
+achievement	ach.credits.100	Credit Runner I
+achievement	ach.credits.1000	Credit Runner II
+achievement	ach.credits.10000	Credit Runner III
+achievement	ach.credits.100000	Credit Runner IV
+achievement	ach.credits.1000000	Credit Runner V
+achievement	ach.credits.10000000	Credit Runner VI
+achievement	ach.credits.100000000	Credit Runner VII
+achievement	ach.credits.1000000000	Credit Runner VIII
+achievement	ach.credits.10000000000	Credit Runner IX
+achievement	ach.credits.100000000000	Credit Runner X
+achievement	ach.daily.1	Daily Pilot I
+achievement	ach.daily.100	Daily Pilot IV
+achievement	ach.daily.30	Daily Pilot III
+achievement	ach.daily.365	Daily Pilot V
+achievement	ach.daily.7	Daily Pilot II
+achievement	ach.drill.10	Drill Master II
+achievement	ach.drill.100	Drill Master VI
+achievement	ach.drill.120	Drill Master VII
+achievement	ach.drill.25	Drill Master III
+achievement	ach.drill.5	Drill Master I
+achievement	ach.drill.50	Drill Master IV
+achievement	ach.drill.75	Drill Master V
+achievement	ach.drone_slots.2	Swarm Size I
+achievement	ach.drone_slots.3	Swarm Size II
+achievement	ach.drone_slots.4	Swarm Size III
+achievement	ach.drone_slots.5	Swarm Size IV
+achievement	ach.drone_slots.6	Swarm Size V
+achievement	ach.drone_tier.10	Evolution IX
+achievement	ach.drone_tier.11	Evolution X
+achievement	ach.drone_tier.12	Evolution XI
+achievement	ach.drone_tier.2	Evolution I
+achievement	ach.drone_tier.3	Evolution II
+achievement	ach.drone_tier.4	Evolution III
+achievement	ach.drone_tier.5	Evolution IV
+achievement	ach.drone_tier.6	Evolution V
+achievement	ach.drone_tier.7	Evolution VI
+achievement	ach.drone_tier.8	Evolution VII
+achievement	ach.drone_tier.9	Evolution VIII
+achievement	ach.events.1	Event Chaser I
+achievement	ach.events.100	Event Chaser IV
+achievement	ach.events.25	Event Chaser III
+achievement	ach.events.250	Event Chaser V
+achievement	ach.events.5	Event Chaser II
+achievement	ach.forge.1	Voidsmith I
+achievement	ach.forge.10	Voidsmith II
+achievement	ach.forge.100	Voidsmith IV
+achievement	ach.forge.50	Voidsmith III
+achievement	ach.forge.500	Voidsmith V
+achievement	ach.formation.beam_link	Formation: Orbital Beam-Link
+achievement	ach.formation.halo	Formation: Sovereign Halo
+achievement	ach.formation.scatter	Formation: Scatter
+achievement	ach.hazards.1	Hazard Runner I
+achievement	ach.hazards.10	Hazard Runner II
+achievement	ach.hazards.100	Hazard Runner III
+achievement	ach.meteor_tops.1	Star Breaker I
+achievement	ach.meteor_tops.10	Star Breaker II
+achievement	ach.meteor_tops.100	Star Breaker IV
+achievement	ach.meteor_tops.50	Star Breaker III
+achievement	ach.meteors.1	Meteor Brawler I
+achievement	ach.meteors.10	Meteor Brawler II
+achievement	ach.meteors.100	Meteor Brawler IV
+achievement	ach.meteors.50	Meteor Brawler III
+achievement	ach.meteors.500	Meteor Brawler V
+achievement	ach.ore.10	Ore Hauler I
+achievement	ach.ore.100	Ore Hauler II
+achievement	ach.ore.1000	Ore Hauler III
+achievement	ach.ore.10000	Ore Hauler IV
+achievement	ach.ore.100000	Ore Hauler V
+achievement	ach.ore.1000000	Ore Hauler VI
+achievement	ach.ore.10000000	Ore Hauler VII
+achievement	ach.ore_tier.antimatter	First Antimatter Ore
+achievement	ach.ore_tier.celestial	First Celestial Ore
+achievement	ach.ore_tier.common	First Common Ore
+achievement	ach.ore_tier.isotope	First Isotope Ore
+achievement	ach.ore_tier.refined	First Refined Ore
+achievement	ach.ore_tier.void_touched	First Void-Touched Ore
+achievement	ach.rebirths.1	Reborn I
+achievement	ach.rebirths.10	Reborn V
+achievement	ach.rebirths.100	Reborn XI
+achievement	ach.rebirths.15	Reborn VI
+achievement	ach.rebirths.2	Reborn II
+achievement	ach.rebirths.20	Reborn VII
+achievement	ach.rebirths.25	Reborn VIII
+achievement	ach.rebirths.3	Reborn III
+achievement	ach.rebirths.5	Reborn IV
+achievement	ach.rebirths.50	Reborn IX
+achievement	ach.rebirths.75	Reborn X
+achievement	ach.relic_set.antimatter_cult	Curator: Antimatter Cult
+achievement	ach.relic_set.aurora_court	Curator: Aurora Court
+achievement	ach.relic_set.comet_nomads	Curator: Comet Nomads
+achievement	ach.relic_set.deep_cartographers	Curator: Deep Cartographers
+achievement	ach.relic_set.diamond_nebula	Curator: Diamond Nebula
+achievement	ach.relic_set.eclipse_navy	Curator: Eclipse Navy
+achievement	ach.relic_set.first_expedition	Curator: First Voidline Expedition
+achievement	ach.relic_set.gilded_armada	Curator: Gilded Armada
+achievement	ach.relic_set.magnetar_choir	Curator: Magnetar Choir
+achievement	ach.relic_set.obsidian_guild	Curator: Obsidian Guild
+achievement	ach.relic_set.pulsar_clockmakers	Curator: Pulsar Clockmakers
+achievement	ach.relic_set.quasar_archive	Curator: Quasar Archive
+achievement	ach.relic_set.singularity_monks	Curator: Singularity Monks
+achievement	ach.relic_set.solar_forge	Curator: Solar Forge
+achievement	ach.relic_set.starfall_pilgrims	Curator: Starfall Pilgrims
+achievement	ach.relic_set.titan_wreck	Curator: Titan Wreck
+achievement	ach.relics.1	Relic Hunter I
+achievement	ach.relics.10	Relic Hunter III
+achievement	ach.relics.100	Relic Hunter VII
+achievement	ach.relics.150	Relic Hunter VIII
+achievement	ach.relics.25	Relic Hunter IV
+achievement	ach.relics.5	Relic Hunter II
+achievement	ach.relics.50	Relic Hunter V
+achievement	ach.relics.75	Relic Hunter VI
+achievement	ach.rift.1	Rift Runner I
+achievement	ach.rift.100	Rift Runner IV
+achievement	ach.rift.25	Rift Runner III
+achievement	ach.rift.5	Rift Runner II
+achievement	ach.rocks.1	Rock Breaker I
+achievement	ach.rocks.10	Rock Breaker II
+achievement	ach.rocks.100	Rock Breaker IV
+achievement	ach.rocks.1000	Rock Breaker VI
+achievement	ach.rocks.10000	Rock Breaker VIII
+achievement	ach.rocks.100000	Rock Breaker X
+achievement	ach.rocks.50	Rock Breaker III
+achievement	ach.rocks.500	Rock Breaker V
+achievement	ach.rocks.5000	Rock Breaker VII
+achievement	ach.rocks.50000	Rock Breaker IX
+achievement	ach.sector.celestial	Charted: Celestial Orbit
+achievement	ach.sector.nebula	Charted: Nebula Ring
+achievement	ach.sector.voidrim	Charted: Void Rim
+achievement	ach.sells.1	Refiner I
+achievement	ach.sells.10	Refiner II
+achievement	ach.sells.100	Refiner IV
+achievement	ach.sells.1000	Refiner VI
+achievement	ach.sells.50	Refiner III
+achievement	ach.sells.500	Refiner V
+achievement	ach.sells.5000	Refiner VII
+achievement	ach.shards.1	Shard Seeker I
+achievement	ach.shards.10	Shard Seeker II
+achievement	ach.shards.100	Shard Seeker IV
+achievement	ach.shards.1000	Shard Seeker VI
+achievement	ach.shards.50	Shard Seeker III
+achievement	ach.shards.500	Shard Seeker V
+achievement	ach.shards.5000	Shard Seeker VII
+achievement	ach.squad.10	Wingmate I
+achievement	ach.squad.1000	Wingmate IV
+achievement	ach.squad.300	Wingmate III
+achievement	ach.squad.60	Wingmate II
+achievement	ach.starfalls.1	Starfall Chaser I
+achievement	ach.starfalls.10	Starfall Chaser II
+achievement	ach.station_tier.10	Citadel IX
+achievement	ach.station_tier.11	Citadel X
+achievement	ach.station_tier.12	Citadel XI
+achievement	ach.station_tier.13	Citadel XII
+achievement	ach.station_tier.14	Citadel XIII
+achievement	ach.station_tier.15	Citadel XIV
+achievement	ach.station_tier.16	Citadel XV
+achievement	ach.station_tier.17	Citadel XVI
+achievement	ach.station_tier.18	Citadel XVII
+achievement	ach.station_tier.19	Citadel XVIII
+achievement	ach.station_tier.2	Citadel I
+achievement	ach.station_tier.20	Citadel XIX
+achievement	ach.station_tier.21	Citadel XX
+achievement	ach.station_tier.22	Citadel XXI
+achievement	ach.station_tier.23	Citadel XXII
+achievement	ach.station_tier.24	Citadel XXIII
+achievement	ach.station_tier.25	Citadel XXIV
+achievement	ach.station_tier.26	Citadel XXV
+achievement	ach.station_tier.27	Citadel XXVI
+achievement	ach.station_tier.28	Citadel XXVII
+achievement	ach.station_tier.29	Citadel XXVIII
+achievement	ach.station_tier.3	Citadel II
+achievement	ach.station_tier.30	Citadel XXIX
+achievement	ach.station_tier.4	Citadel III
+achievement	ach.station_tier.5	Citadel IV
+achievement	ach.station_tier.6	Citadel V
+achievement	ach.station_tier.7	Citadel VI
+achievement	ach.station_tier.8	Citadel VII
+achievement	ach.station_tier.9	Citadel VIII
+achievement	ach.tokens.10000	Token Earner IV
+achievement	ach.tokens.2000	Token Earner III
+achievement	ach.tokens.40	Token Earner I
+achievement	ach.tokens.400	Token Earner II
+achievement	ach.warps.1	Warp Jumper I
+achievement	ach.warps.100	Warp Jumper III
+achievement	ach.warps.25	Warp Jumper II
+biome	biome.antimatter_void.1	Antimatter Void RV-380
+biome	biome.antimatter_void.2	Antimatter Void VH-108
+biome	biome.antimatter_void.3	Antimatter Void DP-553
+biome	biome.antimatter_void.4	Antimatter Void HH-297
+biome	biome.cryo_comet_field.1	Cryo Comet Field SL-187
+biome	biome.cryo_comet_field.2	Cryo Comet Field KK-737
+biome	biome.cryo_comet_field.3	Cryo Comet Field LT-983
+biome	biome.cryo_comet_field.4	Cryo Comet Field DJ-205
+biome	biome.crystal_lattice.1	Crystal Lattice Belt SH-821
+biome	biome.crystal_lattice.2	Crystal Lattice Belt DT-295
+biome	biome.crystal_lattice.3	Crystal Lattice Belt ZH-580
+biome	biome.crystal_lattice.4	Crystal Lattice Belt RX-237
+biome	biome.dark_matter_tide.1	Dark Matter Tide EV-901
+biome	biome.dark_matter_tide.2	Dark Matter Tide CN-500
+biome	biome.dark_matter_tide.3	Dark Matter Tide AZ-332
+biome	biome.dark_matter_tide.4	Dark Matter Tide CN-217
+biome	biome.derelict_titan.1	Derelict Titan Wreck TL-420
+biome	biome.derelict_titan.2	Derelict Titan Wreck HN-171
+biome	biome.derelict_titan.3	Derelict Titan Wreck XC-551
+biome	biome.derelict_titan.4	Derelict Titan Wreck DS-595
+biome	biome.diamond_nebula.1	Diamond Nebula HZ-780
+biome	biome.diamond_nebula.2	Diamond Nebula KC-599
+biome	biome.diamond_nebula.3	Diamond Nebula VL-629
+biome	biome.diamond_nebula.4	Diamond Nebula EH-992
+biome	biome.gas_giant_shadow.1	Gas Giant Shadow HA-272
+biome	biome.gas_giant_shadow.2	Gas Giant Shadow NT-123
+biome	biome.gas_giant_shadow.3	Gas Giant Shadow HD-672
+biome	biome.gas_giant_shadow.4	Gas Giant Shadow TP-843
+biome	biome.ion_aurora.1	Ion Aurora ND-307
+biome	biome.ion_aurora.2	Ion Aurora AT-613
+biome	biome.ion_aurora.3	Ion Aurora NE-328
+biome	biome.ion_aurora.4	Ion Aurora JR-496
+biome	biome.magnetar_storm.1	Magnetar Storm KR-551
+biome	biome.magnetar_storm.2	Magnetar Storm XM-596
+biome	biome.magnetar_storm.3	Magnetar Storm KG-534
+biome	biome.magnetar_storm.4	Magnetar Storm EV-205
+biome	biome.plasma_reef.1	Plasma Reef RK-693
+biome	biome.plasma_reef.2	Plasma Reef RL-537
+biome	biome.plasma_reef.3	Plasma Reef HN-407
+biome	biome.plasma_reef.4	Plasma Reef PG-531
+biome	biome.pulsar_graveyard.1	Pulsar Graveyard SS-644
+biome	biome.pulsar_graveyard.2	Pulsar Graveyard MJ-653
+biome	biome.pulsar_graveyard.3	Pulsar Graveyard LD-480
+biome	biome.pulsar_graveyard.4	Pulsar Graveyard LG-487
+biome	biome.quantum_foam.1	Quantum Foam Shoal DJ-163
+biome	biome.quantum_foam.2	Quantum Foam Shoal PP-669
+biome	biome.quantum_foam.3	Quantum Foam Shoal ZR-681
+biome	biome.quantum_foam.4	Quantum Foam Shoal DJ-237
+biome	biome.singularity_rift.1	Singularity Rift PH-634
+biome	biome.singularity_rift.2	Singularity Rift GH-510
+biome	biome.singularity_rift.3	Singularity Rift LK-164
+biome	biome.singularity_rift.4	Singularity Rift NZ-799
+biome	biome.solar_forge.1	Solar Forge RN-392
+biome	biome.solar_forge.2	Solar Forge JP-355
+biome	biome.solar_forge.3	Solar Forge SK-743
+biome	biome.solar_forge.4	Solar Forge KH-742
+citadel	citadel.tier.1	Outpost I
+citadel	citadel.tier.10	Station V
+citadel	citadel.tier.11	Bastion I
+citadel	citadel.tier.12	Bastion II
+citadel	citadel.tier.13	Bastion III
+citadel	citadel.tier.14	Bastion IV
+citadel	citadel.tier.15	Bastion V
+citadel	citadel.tier.16	Citadel I
+citadel	citadel.tier.17	Citadel II
+citadel	citadel.tier.18	Citadel III
+citadel	citadel.tier.19	Citadel IV
+citadel	citadel.tier.2	Outpost II
+citadel	citadel.tier.20	Citadel V
+citadel	citadel.tier.21	Bulwark I
+citadel	citadel.tier.22	Bulwark II
+citadel	citadel.tier.23	Bulwark III
+citadel	citadel.tier.24	Bulwark IV
+citadel	citadel.tier.25	Bulwark V
+citadel	citadel.tier.26	Sovereign Spire I
+citadel	citadel.tier.27	Sovereign Spire II
+citadel	citadel.tier.28	Sovereign Spire III
+citadel	citadel.tier.29	Sovereign Spire IV
+citadel	citadel.tier.3	Outpost III
+citadel	citadel.tier.30	Sovereign Spire V
+citadel	citadel.tier.4	Outpost IV
+citadel	citadel.tier.5	Outpost V
+citadel	citadel.tier.6	Station I
+citadel	citadel.tier.7	Station II
+citadel	citadel.tier.8	Station III
+citadel	citadel.tier.9	Station IV
+drone	drone.evo.hauler.10	Warp Barge
+drone	drone.evo.hauler.11	Event Horizon Hauler
+drone	drone.evo.hauler.6	Tug Hauler
+drone	drone.evo.hauler.7	Gravity Mule
+drone	drone.evo.hauler.8	Tether Titan
+drone	drone.evo.hauler.9	Orbit Freighter
+drone	drone.evo.miner.10	Nova Bore
+drone	drone.evo.miner.11	Singularity Bore
+drone	drone.evo.miner.6	Core Breaker
+drone	drone.evo.miner.7	Magma Lancer
+drone	drone.evo.miner.8	Quasar Drill
+drone	drone.evo.miner.9	Pulsar Ram
+drone	drone.evo.mk1	Mk.I Prospector
+drone	drone.evo.mk2	Mk.II Cutter
+drone	drone.evo.mk3	Mk.III Borer
+drone	drone.evo.mk4	Mk.IV Lancer
+drone	drone.evo.mk5	Mk.V Vanguard
+drone	drone.evo.omega	Omega Antimatter
+drone	drone.evo.swarm.10	Star Choir
+drone	drone.evo.swarm.11	Legion Prime
+drone	drone.evo.swarm.6	Hive Spark
+drone	drone.evo.swarm.7	Swarm Wisp
+drone	drone.evo.swarm.8	Locust Array
+drone	drone.evo.swarm.9	Murmuration
+drone	drone.mut.crystalline	Crystalline
+drone	drone.mut.frostbitten	Frostbitten
+drone	drone.mut.golden	Golden
+drone	drone.mut.nebula_born	Nebula-Born
+drone	drone.mut.obsidian	Obsidian
+drone	drone.mut.prismatic	Prismatic
+drone	drone.mut.quantum	Quantum
+drone	drone.mut.shiny	Shiny
+drone	drone.mut.solar_kissed	Solar-Kissed
+drone	drone.mut.spectral	Spectral
+drone	drone.mut.starforged	Starforged
+drone	drone.mut.void_corrupted	Void-Corrupted
+drone	hit.bloom.crimson	Bloom · Crimson
+drone	hit.bloom.cyan	Bloom · Cyan
+drone	hit.bloom.emerald	Bloom · Emerald
+drone	hit.bloom.gold	Bloom · Gold
+drone	hit.bloom.solar	Bloom · Solar
+drone	hit.bloom.void	Bloom · Void
+drone	hit.ripple.crimson	Ripple · Crimson
+drone	hit.ripple.cyan	Ripple · Cyan
+drone	hit.ripple.emerald	Ripple · Emerald
+drone	hit.ripple.gold	Ripple · Gold
+drone	hit.ripple.solar	Ripple · Solar
+drone	hit.ripple.void	Ripple · Void
+drone	hit.shatter.crimson	Shatter · Crimson
+drone	hit.shatter.cyan	Shatter · Cyan
+drone	hit.shatter.emerald	Shatter · Emerald
+drone	hit.shatter.gold	Shatter · Gold
+drone	hit.shatter.solar	Shatter · Solar
+drone	hit.shatter.void	Shatter · Void
+drone	hit.sparks.crimson	Sparks · Crimson
+drone	hit.sparks.cyan	Sparks · Cyan
+drone	hit.sparks.emerald	Sparks · Emerald
+drone	hit.sparks.gold	Sparks · Gold
+drone	hit.sparks.solar	Sparks · Solar
+drone	hit.sparks.void	Sparks · Void
+drone	laser.flare.aurora	Flare · Aurora
+drone	laser.flare.crimson	Flare · Crimson
+drone	laser.flare.cyan	Flare · Cyan
+drone	laser.flare.emerald	Flare · Emerald
+drone	laser.flare.gold	Flare · Gold
+drone	laser.flare.plasma	Flare · Plasma
+drone	laser.flare.solar	Flare · Solar
+drone	laser.flare.void	Flare · Void
+drone	laser.helix.aurora	Helix · Aurora
+drone	laser.helix.crimson	Helix · Crimson
+drone	laser.helix.cyan	Helix · Cyan
+drone	laser.helix.emerald	Helix · Emerald
+drone	laser.helix.gold	Helix · Gold
+drone	laser.helix.plasma	Helix · Plasma
+drone	laser.helix.solar	Helix · Solar
+drone	laser.helix.void	Helix · Void
+drone	laser.lattice.aurora	Lattice · Aurora
+drone	laser.lattice.crimson	Lattice · Crimson
+drone	laser.lattice.cyan	Lattice · Cyan
+drone	laser.lattice.emerald	Lattice · Emerald
+drone	laser.lattice.gold	Lattice · Gold
+drone	laser.lattice.plasma	Lattice · Plasma
+drone	laser.lattice.solar	Lattice · Solar
+drone	laser.lattice.void	Lattice · Void
+drone	laser.needle.aurora	Needle · Aurora
+drone	laser.needle.crimson	Needle · Crimson
+drone	laser.needle.cyan	Needle · Cyan
+drone	laser.needle.emerald	Needle · Emerald
+drone	laser.needle.gold	Needle · Gold
+drone	laser.needle.plasma	Needle · Plasma
+drone	laser.needle.solar	Needle · Solar
+drone	laser.needle.void	Needle · Void
+drone	laser.overclock	Overclock
+drone	laser.pulse.aurora	Pulse · Aurora
+drone	laser.pulse.crimson	Pulse · Crimson
+drone	laser.pulse.cyan	Pulse · Cyan
+drone	laser.pulse.emerald	Pulse · Emerald
+drone	laser.pulse.gold	Pulse · Gold
+drone	laser.pulse.plasma	Pulse · Plasma
+drone	laser.pulse.solar	Pulse · Solar
+drone	laser.pulse.void	Pulse · Void
+drone	laser.ribbon.aurora	Ribbon · Aurora
+drone	laser.ribbon.crimson	Ribbon · Crimson
+drone	laser.ribbon.cyan	Ribbon · Cyan
+drone	laser.ribbon.emerald	Ribbon · Emerald
+drone	laser.ribbon.gold	Ribbon · Gold
+drone	laser.ribbon.plasma	Ribbon · Plasma
+drone	laser.ribbon.solar	Ribbon · Solar
+drone	laser.ribbon.void	Ribbon · Void
+drone	thruster.comet.crimson	Comet · Crimson
+drone	thruster.comet.cyan	Comet · Cyan
+drone	thruster.comet.emerald	Comet · Emerald
+drone	thruster.comet.gold	Comet · Gold
+drone	thruster.comet.solar	Comet · Solar
+drone	thruster.comet.void	Comet · Void
+drone	thruster.ember.crimson	Ember · Crimson
+drone	thruster.ember.cyan	Ember · Cyan
+drone	thruster.ember.emerald	Ember · Emerald
+drone	thruster.ember.gold	Ember · Gold
+drone	thruster.ember.solar	Ember · Solar
+drone	thruster.ember.void	Ember · Void
+drone	thruster.gold_comet	Gold Comet
+drone	thruster.ion.crimson	Ion · Crimson
+drone	thruster.ion.cyan	Ion · Cyan
+drone	thruster.ion.emerald	Ion · Emerald
+drone	thruster.ion.gold	Ion · Gold
+drone	thruster.ion.solar	Ion · Solar
+drone	thruster.ion.void	Ion · Void
+drone	thruster.plasma.crimson	Plasma · Crimson
+drone	thruster.plasma.cyan	Plasma · Cyan
+drone	thruster.plasma.emerald	Plasma · Emerald
+drone	thruster.plasma.gold	Plasma · Gold
+drone	thruster.plasma.solar	Plasma · Solar
+drone	thruster.plasma.void	Plasma · Void
+event	event.comet_pass	Comet Pass
+event	event.derelict_titan	Derelict Titan Drift
+event	event.gravity_inversion	Gravity Inversion
+event	event.ion_storm	Ion Storm
+event	event.meteor_shower	Boss Meteor Shower
+event	event.monolith_split	Monolith Split
+event	event.solar_tide	Solar Tide
+event	event.void_rift	Void Rift Opens
+hazard	hazard.cryo_burst	Cryo Burst
+hazard	hazard.dark_matter_tide	Dark Matter Tide
+hazard	hazard.gravity_well	Gravity Well
+hazard	hazard.ion_squall	Ion Squall
+hazard	hazard.magnetic_reversal	Magnetic Reversal
+hazard	hazard.meteor_hail	Meteor Hail
+hazard	hazard.plasma_geyser	Plasma Geyser
+hazard	hazard.quantum_flicker	Quantum Flicker
+hazard	hazard.radiation_bloom	Radiation Bloom
+hazard	hazard.solar_flare	Solar Flare
+hazard	hazard.tachyon_wake	Tachyon Wake
+hazard	hazard.void_lightning	Void Lightning
+ore	ore.antimatter.annihilite	Annihilite
+ore	ore.antimatter.annihilite.charged	Charged Annihilite
+ore	ore.antimatter.annihilite.dense	Dense Annihilite
+ore	ore.antimatter.annihilite.fractured	Fractured Annihilite
+ore	ore.antimatter.annihilite.glacial	Glacial Annihilite
+ore	ore.antimatter.annihilite.molten	Molten Annihilite
+ore	ore.antimatter.annihilite.porous	Porous Annihilite
+ore	ore.antimatter.annihilite.prismatic	Prismatic Annihilite
+ore	ore.antimatter.antiferrite	Antiferrite
+ore	ore.antimatter.antiferrite.charged	Charged Antiferrite
+ore	ore.antimatter.antiferrite.dense	Dense Antiferrite
+ore	ore.antimatter.antiferrite.fractured	Fractured Antiferrite
+ore	ore.antimatter.antiferrite.ionized	Ionized Antiferrite
+ore	ore.antimatter.antiproton	Antiproton
+ore	ore.antimatter.antiproton.charged	Charged Antiproton
+ore	ore.antimatter.antiproton.gilded	Gilded Antiproton
+ore	ore.antimatter.exotic_matter	Exotic Matter
+ore	ore.antimatter.exotic_matter.ancient	Ancient Exotic Matter
+ore	ore.antimatter.exotic_matter.dense	Dense Exotic Matter
+ore	ore.antimatter.exotic_matter.ionized	Ionized Exotic Matter
+ore	ore.antimatter.exotic_matter.porous	Porous Exotic Matter
+ore	ore.antimatter.mirrorium	Mirrorium
+ore	ore.antimatter.mirrorium.ancient	Ancient Mirrorium
+ore	ore.antimatter.mirrorium.dense	Dense Mirrorium
+ore	ore.antimatter.mirrorium.ionized	Ionized Mirrorium
+ore	ore.antimatter.mirrorium.porous	Porous Mirrorium
+ore	ore.antimatter.mirrorium.radiant	Radiant Mirrorium
+ore	ore.antimatter.mirrorium.shimmering	Shimmering Mirrorium
+ore	ore.antimatter.positronium	Positronium
+ore	ore.antimatter.positronium.ancient	Ancient Positronium
+ore	ore.antimatter.positronium.charged	Charged Positronium
+ore	ore.antimatter.positronium.molten	Molten Positronium
+ore	ore.antimatter.positronium.porous	Porous Positronium
+ore	ore.antimatter.positronium.prismatic	Prismatic Positronium
+ore	ore.celestial.aurorium	Aurorium
+ore	ore.celestial.aurorium.glacial	Glacial Aurorium
+ore	ore.celestial.aurorium.ionized	Ionized Aurorium
+ore	ore.celestial.aurorium.molten	Molten Aurorium
+ore	ore.celestial.aurorium.porous	Porous Aurorium
+ore	ore.celestial.cometite	Cometite
+ore	ore.celestial.cometite.ancient	Ancient Cometite
+ore	ore.celestial.cometite.gilded	Gilded Cometite
+ore	ore.celestial.cometite.porous	Porous Cometite
+ore	ore.celestial.lumenite	Lumenite
+ore	ore.celestial.lumenite.ancient	Ancient Lumenite
+ore	ore.celestial.lumenite.fractured	Fractured Lumenite
+ore	ore.celestial.lumenite.molten	Molten Lumenite
+ore	ore.celestial.lumenite.prismatic	Prismatic Lumenite
+ore	ore.celestial.lumenite.radiant	Radiant Lumenite
+ore	ore.celestial.lumenite.shimmering	Shimmering Lumenite
+ore	ore.celestial.nebulite	Nebulite
+ore	ore.celestial.nebulite.ancient	Ancient Nebulite
+ore	ore.celestial.nebulite.charged	Charged Nebulite
+ore	ore.celestial.nebulite.dense	Dense Nebulite
+ore	ore.celestial.nebulite.fractured	Fractured Nebulite
+ore	ore.celestial.nebulite.glacial	Glacial Nebulite
+ore	ore.celestial.nebulite.ionized	Ionized Nebulite
+ore	ore.celestial.nebulite.porous	Porous Nebulite
+ore	ore.celestial.nebulite.shimmering	Shimmering Nebulite
+ore	ore.celestial.pulsarine	Pulsarine
+ore	ore.celestial.pulsarine.charged	Charged Pulsarine
+ore	ore.celestial.pulsarine.gilded	Gilded Pulsarine
+ore	ore.celestial.pulsarine.prismatic	Prismatic Pulsarine
+ore	ore.celestial.pulsarine.shimmering	Shimmering Pulsarine
+ore	ore.celestial.quasarite	Quasarite
+ore	ore.celestial.quasarite.ancient	Ancient Quasarite
+ore	ore.celestial.quasarite.dense	Dense Quasarite
+ore	ore.celestial.quasarite.fractured	Fractured Quasarite
+ore	ore.celestial.quasarite.glacial	Glacial Quasarite
+ore	ore.celestial.quasarite.shimmering	Shimmering Quasarite
+ore	ore.celestial.solarium	Solarium
+ore	ore.celestial.solarium.charged	Charged Solarium
+ore	ore.celestial.solarium.dense	Dense Solarium
+ore	ore.celestial.solarium.fractured	Fractured Solarium
+ore	ore.celestial.solarium.radiant	Radiant Solarium
+ore	ore.celestial.starfire	Starfire
+ore	ore.celestial.starfire.ionized	Ionized Starfire
+ore	ore.celestial.starfire.porous	Porous Starfire
+ore	ore.common.basalt	Basalt
+ore	ore.common.basalt.ancient	Ancient Basalt
+ore	ore.common.basalt.charged	Charged Basalt
+ore	ore.common.basalt.fractured	Fractured Basalt
+ore	ore.common.basalt.gilded	Gilded Basalt
+ore	ore.common.basalt.glacial	Glacial Basalt
+ore	ore.common.basalt.molten	Molten Basalt
+ore	ore.common.basalt.porous	Porous Basalt
+ore	ore.common.bauxite	Bauxite
+ore	ore.common.bauxite.dense	Dense Bauxite
+ore	ore.common.bauxite.fractured	Fractured Bauxite
+ore	ore.common.bauxite.gilded	Gilded Bauxite
+ore	ore.common.bauxite.prismatic	Prismatic Bauxite
+ore	ore.common.bauxite.radiant	Radiant Bauxite
+ore	ore.common.cobalt	Cobalt
+ore	ore.common.cobalt.dense	Dense Cobalt
+ore	ore.common.cobalt.glacial	Glacial Cobalt
+ore	ore.common.cobalt.ionized	Ionized Cobalt
+ore	ore.common.cobalt.prismatic	Prismatic Cobalt
+ore	ore.common.ferrite	Ferrite
+ore	ore.common.ferrite.charged	Charged Ferrite
+ore	ore.common.ferrite.fractured	Fractured Ferrite
+ore	ore.common.ferrite.molten	Molten Ferrite
+ore	ore.common.ferrite.prismatic	Prismatic Ferrite
+ore	ore.common.graphite	Graphite
+ore	ore.common.graphite.charged	Charged Graphite
+ore	ore.common.graphite.glacial	Glacial Graphite
+ore	ore.common.graphite.molten	Molten Graphite
+ore	ore.common.graphite.shimmering	Shimmering Graphite
+ore	ore.common.hematite	Hematite
+ore	ore.common.hematite.charged	Charged Hematite
+ore	ore.common.hematite.glacial	Glacial Hematite
+ore	ore.common.hematite.molten	Molten Hematite
+ore	ore.common.hematite.porous	Porous Hematite
+ore	ore.common.magnetite	Magnetite
+ore	ore.common.magnetite.dense	Dense Magnetite
+ore	ore.common.magnetite.gilded	Gilded Magnetite
+ore	ore.common.magnetite.prismatic	Prismatic Magnetite
+ore	ore.common.magnetite.shimmering	Shimmering Magnetite
+ore	ore.common.nickel	Nickel
+ore	ore.common.nickel.dense	Dense Nickel
+ore	ore.common.nickel.fractured	Fractured Nickel
+ore	ore.common.nickel.glacial	Glacial Nickel
+ore	ore.common.nickel.ionized	Ionized Nickel
+ore	ore.common.nickel.molten	Molten Nickel
+ore	ore.common.nickel.porous	Porous Nickel
+ore	ore.common.olivine	Olivine
+ore	ore.common.olivine.charged	Charged Olivine
+ore	ore.common.olivine.gilded	Gilded Olivine
+ore	ore.common.olivine.glacial	Glacial Olivine
+ore	ore.common.olivine.shimmering	Shimmering Olivine
+ore	ore.common.pyroxene	Pyroxene
+ore	ore.common.pyroxene.charged	Charged Pyroxene
+ore	ore.common.pyroxene.gilded	Gilded Pyroxene
+ore	ore.common.pyroxene.molten	Molten Pyroxene
+ore	ore.common.quartzite	Quartzite
+ore	ore.common.quartzite.charged	Charged Quartzite
+ore	ore.common.quartzite.fractured	Fractured Quartzite
+ore	ore.common.quartzite.glacial	Glacial Quartzite
+ore	ore.common.quartzite.radiant	Radiant Quartzite
+ore	ore.common.silicate	Silicate
+ore	ore.common.silicate.charged	Charged Silicate
+ore	ore.common.silicate.dense	Dense Silicate
+ore	ore.common.silicate.fractured	Fractured Silicate
+ore	ore.common.silicate.gilded	Gilded Silicate
+ore	ore.common.silicate.ionized	Ionized Silicate
+ore	ore.common.silicate.radiant	Radiant Silicate
+ore	ore.isotope.cesium	Cesium
+ore	ore.isotope.cesium.charged	Charged Cesium
+ore	ore.isotope.cesium.fractured	Fractured Cesium
+ore	ore.isotope.cesium.ionized	Ionized Cesium
+ore	ore.isotope.cesium.prismatic	Prismatic Cesium
+ore	ore.isotope.cesium.radiant	Radiant Cesium
+ore	ore.isotope.cesium.shimmering	Shimmering Cesium
+ore	ore.isotope.deuterium	Deuterium
+ore	ore.isotope.deuterium.ancient	Ancient Deuterium
+ore	ore.isotope.deuterium.charged	Charged Deuterium
+ore	ore.isotope.deuterium.fractured	Fractured Deuterium
+ore	ore.isotope.deuterium.gilded	Gilded Deuterium
+ore	ore.isotope.deuterium.prismatic	Prismatic Deuterium
+ore	ore.isotope.deuterium.shimmering	Shimmering Deuterium
+ore	ore.isotope.helium_3	Helium-3
+ore	ore.isotope.helium_3.charged	Charged Helium-3
+ore	ore.isotope.helium_3.dense	Dense Helium-3
+ore	ore.isotope.helium_3.fractured	Fractured Helium-3
+ore	ore.isotope.helium_3.gilded	Gilded Helium-3
+ore	ore.isotope.helium_3.glacial	Glacial Helium-3
+ore	ore.isotope.helium_3.prismatic	Prismatic Helium-3
+ore	ore.isotope.plutonium	Plutonium
+ore	ore.isotope.plutonium.ancient	Ancient Plutonium
+ore	ore.isotope.plutonium.charged	Charged Plutonium
+ore	ore.isotope.plutonium.dense	Dense Plutonium
+ore	ore.isotope.plutonium.gilded	Gilded Plutonium
+ore	ore.isotope.plutonium.molten	Molten Plutonium
+ore	ore.isotope.plutonium.prismatic	Prismatic Plutonium
+ore	ore.isotope.polonium	Polonium
+ore	ore.isotope.polonium.ancient	Ancient Polonium
+ore	ore.isotope.polonium.charged	Charged Polonium
+ore	ore.isotope.polonium.glacial	Glacial Polonium
+ore	ore.isotope.polonium.ionized	Ionized Polonium
+ore	ore.isotope.polonium.molten	Molten Polonium
+ore	ore.isotope.polonium.prismatic	Prismatic Polonium
+ore	ore.isotope.polonium.shimmering	Shimmering Polonium
+ore	ore.isotope.radium	Radium
+ore	ore.isotope.radium.dense	Dense Radium
+ore	ore.isotope.radium.gilded	Gilded Radium
+ore	ore.isotope.radium.glacial	Glacial Radium
+ore	ore.isotope.radium.prismatic	Prismatic Radium
+ore	ore.isotope.strontium	Strontium
+ore	ore.isotope.strontium.dense	Dense Strontium
+ore	ore.isotope.strontium.fractured	Fractured Strontium
+ore	ore.isotope.strontium.gilded	Gilded Strontium
+ore	ore.isotope.strontium.prismatic	Prismatic Strontium
+ore	ore.isotope.thorium	Thorium
+ore	ore.isotope.thorium.charged	Charged Thorium
+ore	ore.isotope.thorium.dense	Dense Thorium
+ore	ore.isotope.thorium.gilded	Gilded Thorium
+ore	ore.isotope.thorium.shimmering	Shimmering Thorium
+ore	ore.isotope.tritium	Tritium
+ore	ore.isotope.tritium.gilded	Gilded Tritium
+ore	ore.isotope.tritium.glacial	Glacial Tritium
+ore	ore.isotope.tritium.prismatic	Prismatic Tritium
+ore	ore.isotope.tritium.shimmering	Shimmering Tritium
+ore	ore.isotope.uranium	Uranium
+ore	ore.isotope.uranium.charged	Charged Uranium
+ore	ore.isotope.uranium.dense	Dense Uranium
+ore	ore.isotope.uranium.fractured	Fractured Uranium
+ore	ore.isotope.uranium.ionized	Ionized Uranium
+ore	ore.isotope.uranium.porous	Porous Uranium
+ore	ore.isotope.uranium.radiant	Radiant Uranium
+ore	ore.refined.beryllium	Beryllium
+ore	ore.refined.beryllium.ancient	Ancient Beryllium
+ore	ore.refined.beryllium.charged	Charged Beryllium
+ore	ore.refined.beryllium.dense	Dense Beryllium
+ore	ore.refined.beryllium.fractured	Fractured Beryllium
+ore	ore.refined.beryllium.gilded	Gilded Beryllium
+ore	ore.refined.beryllium.prismatic	Prismatic Beryllium
+ore	ore.refined.beryllium.radiant	Radiant Beryllium
+ore	ore.refined.beryllium.shimmering	Shimmering Beryllium
+ore	ore.refined.chromium	Chromium
+ore	ore.refined.chromium.ancient	Ancient Chromium
+ore	ore.refined.chromium.charged	Charged Chromium
+ore	ore.refined.chromium.dense	Dense Chromium
+ore	ore.refined.chromium.fractured	Fractured Chromium
+ore	ore.refined.chromium.ionized	Ionized Chromium
+ore	ore.refined.chromium.prismatic	Prismatic Chromium
+ore	ore.refined.iridium	Iridium
+ore	ore.refined.iridium.charged	Charged Iridium
+ore	ore.refined.iridium.fractured	Fractured Iridium
+ore	ore.refined.iridium.glacial	Glacial Iridium
+ore	ore.refined.iridium.molten	Molten Iridium
+ore	ore.refined.iridium.prismatic	Prismatic Iridium
+ore	ore.refined.osmium	Osmium
+ore	ore.refined.osmium.charged	Charged Osmium
+ore	ore.refined.osmium.fractured	Fractured Osmium
+ore	ore.refined.osmium.glacial	Glacial Osmium
+ore	ore.refined.osmium.ionized	Ionized Osmium
+ore	ore.refined.osmium.molten	Molten Osmium
+ore	ore.refined.osmium.porous	Porous Osmium
+ore	ore.refined.osmium.radiant	Radiant Osmium
+ore	ore.refined.osmium.shimmering	Shimmering Osmium
+ore	ore.refined.palladium	Palladium
+ore	ore.refined.palladium.charged	Charged Palladium
+ore	ore.refined.palladium.dense	Dense Palladium
+ore	ore.refined.palladium.ionized	Ionized Palladium
+ore	ore.refined.palladium.molten	Molten Palladium
+ore	ore.refined.palladium.prismatic	Prismatic Palladium
+ore	ore.refined.palladium.radiant	Radiant Palladium
+ore	ore.refined.platinum	Platinum
+ore	ore.refined.platinum.ancient	Ancient Platinum
+ore	ore.refined.platinum.charged	Charged Platinum
+ore	ore.refined.platinum.fractured	Fractured Platinum
+ore	ore.refined.platinum.gilded	Gilded Platinum
+ore	ore.refined.platinum.shimmering	Shimmering Platinum
+ore	ore.refined.rhodium	Rhodium
+ore	ore.refined.rhodium.ancient	Ancient Rhodium
+ore	ore.refined.rhodium.glacial	Glacial Rhodium
+ore	ore.refined.rhodium.porous	Porous Rhodium
+ore	ore.refined.titanium	Titanium
+ore	ore.refined.titanium.dense	Dense Titanium
+ore	ore.refined.titanium.fractured	Fractured Titanium
+ore	ore.refined.titanium.gilded	Gilded Titanium
+ore	ore.refined.titanium.ionized	Ionized Titanium
+ore	ore.refined.titanium.molten	Molten Titanium
+ore	ore.refined.titanium.porous	Porous Titanium
+ore	ore.refined.titanium.radiant	Radiant Titanium
+ore	ore.refined.tungsten	Tungsten
+ore	ore.refined.tungsten.ancient	Ancient Tungsten
+ore	ore.refined.tungsten.dense	Dense Tungsten
+ore	ore.refined.tungsten.ionized	Ionized Tungsten
+ore	ore.refined.tungsten.molten	Molten Tungsten
+ore	ore.refined.tungsten.porous	Porous Tungsten
+ore	ore.refined.vanadium	Vanadium
+ore	ore.refined.vanadium.ancient	Ancient Vanadium
+ore	ore.refined.vanadium.fractured	Fractured Vanadium
+ore	ore.refined.vanadium.gilded	Gilded Vanadium
+ore	ore.refined.vanadium.ionized	Ionized Vanadium
+ore	ore.refined.vanadium.molten	Molten Vanadium
+ore	ore.refined.vanadium.prismatic	Prismatic Vanadium
+ore	ore.refined.vanadium.shimmering	Shimmering Vanadium
+ore	ore.void_touched.abyssite	Abyssite
+ore	ore.void_touched.abyssite.charged	Charged Abyssite
+ore	ore.void_touched.abyssite.gilded	Gilded Abyssite
+ore	ore.void_touched.abyssite.ionized	Ionized Abyssite
+ore	ore.void_touched.abyssite.radiant	Radiant Abyssite
+ore	ore.void_touched.duskium	Duskium
+ore	ore.void_touched.eclipsite	Eclipsite
+ore	ore.void_touched.eclipsite.charged	Charged Eclipsite
+ore	ore.void_touched.eclipsite.fractured	Fractured Eclipsite
+ore	ore.void_touched.eclipsite.gilded	Gilded Eclipsite
+ore	ore.void_touched.eclipsite.molten	Molten Eclipsite
+ore	ore.void_touched.eclipsite.porous	Porous Eclipsite
+ore	ore.void_touched.eclipsite.shimmering	Shimmering Eclipsite
+ore	ore.void_touched.gloomite	Gloomite
+ore	ore.void_touched.gloomite.ancient	Ancient Gloomite
+ore	ore.void_touched.gloomite.fractured	Fractured Gloomite
+ore	ore.void_touched.gloomite.gilded	Gilded Gloomite
+ore	ore.void_touched.gloomite.glacial	Glacial Gloomite
+ore	ore.void_touched.gloomite.ionized	Ionized Gloomite
+ore	ore.void_touched.gloomite.prismatic	Prismatic Gloomite
+ore	ore.void_touched.gloomite.shimmering	Shimmering Gloomite
+ore	ore.void_touched.nullstone	Nullstone
+ore	ore.void_touched.nullstone.dense	Dense Nullstone
+ore	ore.void_touched.nullstone.gilded	Gilded Nullstone
+ore	ore.void_touched.nullstone.glacial	Glacial Nullstone
+ore	ore.void_touched.nullstone.ionized	Ionized Nullstone
+ore	ore.void_touched.nullstone.shimmering	Shimmering Nullstone
+ore	ore.void_touched.shadeglass	Shadeglass
+ore	ore.void_touched.shadeglass.ancient	Ancient Shadeglass
+ore	ore.void_touched.shadeglass.fractured	Fractured Shadeglass
+ore	ore.void_touched.shadeglass.glacial	Glacial Shadeglass
+ore	ore.void_touched.shadeglass.prismatic	Prismatic Shadeglass
+ore	ore.void_touched.shadeglass.radiant	Radiant Shadeglass
+ore	ore.void_touched.shadeglass.shimmering	Shimmering Shadeglass
+ore	ore.void_touched.umbral	Umbral
+ore	ore.void_touched.umbral.charged	Charged Umbral
+ore	ore.void_touched.umbral.glacial	Glacial Umbral
+ore	ore.void_touched.umbral.porous	Porous Umbral
+ore	ore.void_touched.umbral.radiant	Radiant Umbral
+ore	ore.void_touched.vantaite	Vantaite
+ore	ore.void_touched.vantaite.charged	Charged Vantaite
+ore	ore.void_touched.vantaite.dense	Dense Vantaite
+ore	ore.void_touched.vantaite.glacial	Glacial Vantaite
+quest	quest.daily.anomaliesseen.1	Witness an anomaly
+quest	quest.daily.artifactsforged.1	Forge an artifact
+quest	quest.daily.artifactsforged.2	Forge 2 artifacts
+quest	quest.daily.creditsearned.1500	Earn 1.5K Credits
+quest	quest.daily.creditsearned.200	Earn 200 Credits
+quest	quest.daily.creditsearned.600	Earn 600 Credits
+quest	quest.daily.eventsjoined.1	Join a world event
+quest	quest.daily.eventsjoined.2	Join 2 world events
+quest	quest.daily.hazardssurvived.1	Fly through a hazard
+quest	quest.daily.hazardssurvived.3	Fly through 3 hazards
+quest	quest.daily.meteorscontested.1	Qualify on a boss meteor
+quest	quest.daily.meteorscontested.3	Qualify on 3 boss meteors
+quest	quest.daily.orestored.100	Store 100 ore
+quest	quest.daily.orestored.250	Store 250 ore
+quest	quest.daily.orestored.500	Store 500 ore
+quest	quest.daily.playtimeminutes.10	Fly for 10 minutes
+quest	quest.daily.playtimeminutes.20	Fly for 20 minutes
+quest	quest.daily.playtimeminutes.30	Fly for 30 minutes
+quest	quest.daily.riftclears.1	Clear the Void Rift
+quest	quest.daily.rocksmined.100	Break 100 rocks
+quest	quest.daily.rocksmined.25	Break 25 rocks
+quest	quest.daily.rocksmined.50	Break 50 rocks
+quest	quest.daily.sells.10	Refine cargo 10 times
+quest	quest.daily.sells.20	Refine cargo 20 times
+quest	quest.daily.sells.5	Refine cargo 5 times
+quest	quest.daily.shardsfound.1	Find a Void Shard
+quest	quest.daily.shardsfound.3	Find 3 Void Shards
+quest	quest.daily.shardsfound.5	Find 5 Void Shards
+quest	quest.daily.squadminutes.15	Fly 15 minutes in a squad
+quest	quest.daily.squadminutes.5	Fly 5 minutes in a squad
+quest	quest.daily.upgradesbought.10	Buy 10 upgrades
+quest	quest.daily.upgradesbought.3	Buy 3 upgrades
+quest	quest.daily.upgradesbought.5	Buy 5 upgrades
+quest	quest.daily.warps.1	Warp once
+quest	quest.daily.warps.3	Warp 3 times
+quest	quest.weekly.artifactsforged.10	Forge 10 artifacts
+quest	quest.weekly.creditsearned.15000	Earn 15K Credits
+quest	quest.weekly.creditsearned.40000	Earn 40K Credits
+quest	quest.weekly.creditsearned.5000	Earn 5K Credits
+quest	quest.weekly.eventsjoined.10	Join 10 world events
+quest	quest.weekly.hazardssurvived.25	Fly through 25 hazards
+quest	quest.weekly.meteorscontested.10	Qualify on 10 boss meteors
+quest	quest.weekly.meteorscontested.25	Qualify on 25 boss meteors
+quest	quest.weekly.playtimeminutes.180	Fly for 180 minutes
+quest	quest.weekly.riftclears.5	Clear the Void Rift 5 times
+quest	quest.weekly.rocksmined.1000	Break 1K rocks
+quest	quest.weekly.rocksmined.2500	Break 2.5K rocks
+quest	quest.weekly.rocksmined.500	Break 500 rocks
+quest	quest.weekly.sells.100	Refine cargo 100 times
+quest	quest.weekly.sells.250	Refine cargo 250 times
+quest	quest.weekly.shardsfound.20	Find 20 Void Shards
+quest	quest.weekly.shardsfound.50	Find 50 Void Shards
+quest	quest.weekly.squadminutes.120	Fly 120 minutes in a squad
+quest	quest.weekly.upgradesbought.50	Buy 50 upgrades
+relic	relic.antimatter_cult.01	Mirror Priest's Codex Page
+relic	relic.antimatter_cult.02	Mirror Priest's Idol
+relic	relic.antimatter_cult.03	Mirror Priest's Star Chart
+relic	relic.antimatter_cult.04	Mirror Priest's Hourglass
+relic	relic.antimatter_cult.05	Mirror Priest's Map Fragment
+relic	relic.antimatter_cult.06	Mirror Priest's Signet Ring
+relic	relic.antimatter_cult.07	Mirror Priest's Spindle
+relic	relic.antimatter_cult.08	Mirror Priest's Compass
+relic	relic.antimatter_cult.09	Mirror Priest's Medal
+relic	relic.antimatter_cult.10	Mirror Priest's Censer
+relic	relic.aurora_court.01	Aurora Regent's Crown
+relic	relic.aurora_court.02	Aurora Regent's Anchor
+relic	relic.aurora_court.03	Aurora Regent's Spindle
+relic	relic.aurora_court.04	Aurora Regent's Tuning Fork
+relic	relic.aurora_court.05	Aurora Regent's Key
+relic	relic.aurora_court.06	Aurora Regent's Idol
+relic	relic.aurora_court.07	Aurora Regent's Signet Ring
+relic	relic.aurora_court.08	Aurora Regent's Hourglass
+relic	relic.aurora_court.09	Aurora Regent's Scepter
+relic	relic.aurora_court.10	Aurora Regent's Circlet
+relic	relic.comet_nomads.01	Nomad's Censer
+relic	relic.comet_nomads.02	Nomad's Mask
+relic	relic.comet_nomads.03	Nomad's Anchor
+relic	relic.comet_nomads.04	Nomad's Astrolabe
+relic	relic.comet_nomads.05	Nomad's Key
+relic	relic.comet_nomads.06	Nomad's Medal
+relic	relic.comet_nomads.07	Nomad's Seal
+relic	relic.comet_nomads.08	Nomad's Dial
+relic	relic.comet_nomads.09	Nomad's Gauntlet
+relic	relic.comet_nomads.10	Nomad's Signet Ring
+relic	relic.deep_cartographers.01	Cartographer's Star Chart
+relic	relic.deep_cartographers.02	Cartographer's Totem
+relic	relic.deep_cartographers.03	Cartographer's Mask
+relic	relic.deep_cartographers.04	Cartographer's Quill
+relic	relic.deep_cartographers.05	Cartographer's Seal
+relic	relic.deep_cartographers.06	Cartographer's Anchor
+relic	relic.deep_cartographers.07	Cartographer's Lantern
+relic	relic.deep_cartographers.08	Cartographer's Scepter
+relic	relic.deep_cartographers.09	Cartographer's Medal
+relic	relic.deep_cartographers.10	Cartographer's Mirror
+relic	relic.diamond_nebula.01	Gemcutter's Chalice
+relic	relic.diamond_nebula.02	Gemcutter's Lens
+relic	relic.diamond_nebula.03	Gemcutter's Anchor
+relic	relic.diamond_nebula.04	Gemcutter's Reliquary
+relic	relic.diamond_nebula.05	Gemcutter's Locket
+relic	relic.diamond_nebula.06	Gemcutter's Spindle
+relic	relic.diamond_nebula.07	Gemcutter's Horn
+relic	relic.diamond_nebula.08	Gemcutter's Lantern
+relic	relic.diamond_nebula.09	Gemcutter's Compass
+relic	relic.diamond_nebula.10	Gemcutter's Censer
+relic	relic.eclipse_navy.01	Eclipse Admiral's Reliquary
+relic	relic.eclipse_navy.02	Eclipse Admiral's Circlet
+relic	relic.eclipse_navy.03	Eclipse Admiral's Anchor
+relic	relic.eclipse_navy.04	Eclipse Admiral's Key
+relic	relic.eclipse_navy.05	Eclipse Admiral's Locket
+relic	relic.eclipse_navy.06	Eclipse Admiral's Bell
+relic	relic.eclipse_navy.07	Eclipse Admiral's Hourglass
+relic	relic.eclipse_navy.08	Eclipse Admiral's Prism
+relic	relic.eclipse_navy.09	Eclipse Admiral's Quill
+relic	relic.eclipse_navy.10	Eclipse Admiral's Lens
+relic	relic.first_expedition.01	Pathfinder's Astrolabe
+relic	relic.first_expedition.02	Pathfinder's Engine Core
+relic	relic.first_expedition.03	Pathfinder's Tuning Fork
+relic	relic.first_expedition.04	Pathfinder's Circlet
+relic	relic.first_expedition.05	Pathfinder's Signet Ring
+relic	relic.first_expedition.06	Pathfinder's Spindle
+relic	relic.first_expedition.07	Pathfinder's Map Fragment
+relic	relic.first_expedition.08	Pathfinder's Sextant
+relic	relic.first_expedition.09	Pathfinder's Seal
+relic	relic.first_expedition.10	Pathfinder's Medal
+relic	relic.gilded_armada.01	Armada Captain's Quill
+relic	relic.gilded_armada.02	Armada Captain's Hourglass
+relic	relic.gilded_armada.03	Armada Captain's Spindle
+relic	relic.gilded_armada.04	Armada Captain's Engine Core
+relic	relic.gilded_armada.05	Armada Captain's Circlet
+relic	relic.gilded_armada.06	Armada Captain's Signet Ring
+relic	relic.gilded_armada.07	Armada Captain's Crown
+relic	relic.gilded_armada.08	Armada Captain's Chalice
+relic	relic.gilded_armada.09	Armada Captain's Astrolabe
+relic	relic.gilded_armada.10	Armada Captain's Medal
+relic	relic.magnetar_choir.01	Choirwarden's Censer
+relic	relic.magnetar_choir.02	Choirwarden's Heartstone
+relic	relic.magnetar_choir.03	Choirwarden's Map Fragment
+relic	relic.magnetar_choir.04	Choirwarden's Reliquary
+relic	relic.magnetar_choir.05	Choirwarden's Beacon
+relic	relic.magnetar_choir.06	Choirwarden's Scepter
+relic	relic.magnetar_choir.07	Choirwarden's Gauntlet
+relic	relic.magnetar_choir.08	Choirwarden's Lantern
+relic	relic.magnetar_choir.09	Choirwarden's Spindle
+relic	relic.magnetar_choir.10	Choirwarden's Star Chart
+relic	relic.mythic.antimatter_teardrop	Antimatter Teardrop
+relic	relic.mythic.comet_rider_s_spur	Comet Rider's Spur
+relic	relic.mythic.creator_s_golden_blueprint	Creator's Golden Blueprint
+relic	relic.mythic.event_horizon_compass	Event Horizon Compass
+relic	relic.mythic.first_voidline_beacon	First Voidline Beacon
+relic	relic.mythic.heart_of_the_monolith	Heart of the Monolith
+relic	relic.mythic.obsidian_gate_key	Obsidian Gate Key
+relic	relic.mythic.silent_choir_bell	Silent Choir Bell
+relic	relic.mythic.sovereign_halo_fragment	Sovereign Halo Fragment
+relic	relic.mythic.starforged_crown	Starforged Crown
+relic	relic.obsidian_guild.01	Guildmaster's Engine Core
+relic	relic.obsidian_guild.02	Guildmaster's Lantern
+relic	relic.obsidian_guild.03	Guildmaster's Lens
+relic	relic.obsidian_guild.04	Guildmaster's Chalice
+relic	relic.obsidian_guild.05	Guildmaster's Astrolabe
+relic	relic.obsidian_guild.06	Guildmaster's Reliquary
+relic	relic.obsidian_guild.07	Guildmaster's Quill
+relic	relic.obsidian_guild.08	Guildmaster's Gyroscope
+relic	relic.obsidian_guild.09	Guildmaster's Circlet
+relic	relic.obsidian_guild.10	Guildmaster's Tuning Fork
+relic	relic.pulsar_clockmakers.01	Clockmaker's Spindle
+relic	relic.pulsar_clockmakers.02	Clockmaker's Lantern
+relic	relic.pulsar_clockmakers.03	Clockmaker's Prism
+relic	relic.pulsar_clockmakers.04	Clockmaker's Sextant
+relic	relic.pulsar_clockmakers.05	Clockmaker's Quill
+relic	relic.pulsar_clockmakers.06	Clockmaker's Idol
+relic	relic.pulsar_clockmakers.07	Clockmaker's Fossil
+relic	relic.pulsar_clockmakers.08	Clockmaker's Codex Page
+relic	relic.pulsar_clockmakers.09	Clockmaker's Mirror
+relic	relic.pulsar_clockmakers.10	Clockmaker's Censer
+relic	relic.quasar_archive.01	Archivist's Map Fragment
+relic	relic.quasar_archive.02	Archivist's Gauntlet
+relic	relic.quasar_archive.03	Archivist's Fossil
+relic	relic.quasar_archive.04	Archivist's Helm
+relic	relic.quasar_archive.05	Archivist's Prism
+relic	relic.quasar_archive.06	Archivist's Reliquary
+relic	relic.quasar_archive.07	Archivist's Engine Core
+relic	relic.quasar_archive.08	Archivist's Bell
+relic	relic.quasar_archive.09	Archivist's Circlet
+relic	relic.quasar_archive.10	Archivist's Sextant
+relic	relic.singularity_monks.01	Horizon Monk's Gauntlet
+relic	relic.singularity_monks.02	Horizon Monk's Beacon
+relic	relic.singularity_monks.03	Horizon Monk's Lens
+relic	relic.singularity_monks.04	Horizon Monk's Circlet
+relic	relic.singularity_monks.05	Horizon Monk's Crown
+relic	relic.singularity_monks.06	Horizon Monk's Medal
+relic	relic.singularity_monks.07	Horizon Monk's Tuning Fork
+relic	relic.singularity_monks.08	Horizon Monk's Sextant
+relic	relic.singularity_monks.09	Horizon Monk's Chalice
+relic	relic.singularity_monks.10	Horizon Monk's Helm
+relic	relic.solar_forge.01	Forgemaster's Seal
+relic	relic.solar_forge.02	Forgemaster's Lantern
+relic	relic.solar_forge.03	Forgemaster's Dial
+relic	relic.solar_forge.04	Forgemaster's Codex Page
+relic	relic.solar_forge.05	Forgemaster's Signet Ring
+relic	relic.solar_forge.06	Forgemaster's Sextant
+relic	relic.solar_forge.07	Forgemaster's Spindle
+relic	relic.solar_forge.08	Forgemaster's Totem
+relic	relic.solar_forge.09	Forgemaster's Key
+relic	relic.solar_forge.10	Forgemaster's Horn
+relic	relic.starfall_pilgrims.01	Pilgrim's Map Fragment
+relic	relic.starfall_pilgrims.02	Pilgrim's Reliquary
+relic	relic.starfall_pilgrims.03	Pilgrim's Totem
+relic	relic.starfall_pilgrims.04	Pilgrim's Anchor
+relic	relic.starfall_pilgrims.05	Pilgrim's Lens
+relic	relic.starfall_pilgrims.06	Pilgrim's Medal
+relic	relic.starfall_pilgrims.07	Pilgrim's Scepter
+relic	relic.starfall_pilgrims.08	Pilgrim's Circlet
+relic	relic.starfall_pilgrims.09	Pilgrim's Gyroscope
+relic	relic.starfall_pilgrims.10	Pilgrim's Heartstone
+relic	relic.titan_wreck.01	Titan Navigator's Locket
+relic	relic.titan_wreck.02	Titan Navigator's Key
+relic	relic.titan_wreck.03	Titan Navigator's Scepter
+relic	relic.titan_wreck.04	Titan Navigator's Dial
+relic	relic.titan_wreck.05	Titan Navigator's Lens
+relic	relic.titan_wreck.06	Titan Navigator's Totem
+relic	relic.titan_wreck.07	Titan Navigator's Hourglass
+relic	relic.titan_wreck.08	Titan Navigator's Engine Core
+relic	relic.titan_wreck.09	Titan Navigator's Seal
+relic	relic.titan_wreck.10	Titan Navigator's Idol
+title	title.branch.hauler	GRAVITY HAULER
+title	title.branch.miner	DEEP DRILLER
+title	title.branch.swarm	SWARM MIND
+title	title.code.killshot	KILLSHOT'S CREW
+title	title.code.launch	LAUNCH CREW
+title	title.code.voidline	VOIDLINER
+title	title.codex.archivist	GRAND ARCHIVIST
+title	title.codex.scholar	CODEX SCHOLAR
+title	title.curator.antimatter_cult	ANTIMATTER CULT CURATOR
+title	title.curator.aurora_court	AURORA COURT CURATOR
+title	title.curator.comet_nomads	COMET NOMADS CURATOR
+title	title.curator.deep_cartographers	DEEP CARTOGRAPHERS CURATOR
+title	title.curator.diamond_nebula	DIAMOND NEBULA CURATOR
+title	title.curator.eclipse_navy	ECLIPSE NAVY CURATOR
+title	title.curator.first_expedition	FIRST VOIDLINE EXPEDITION CURATOR
+title	title.curator.gilded_armada	GILDED ARMADA CURATOR
+title	title.curator.magnetar_choir	MAGNETAR CHOIR CURATOR
+title	title.curator.obsidian_guild	OBSIDIAN GUILD CURATOR
+title	title.curator.pulsar_clockmakers	PULSAR CLOCKMAKERS CURATOR
+title	title.curator.quasar_archive	QUASAR ARCHIVE CURATOR
+title	title.curator.singularity_monks	SINGULARITY MONKS CURATOR
+title	title.curator.solar_forge	SOLAR FORGE CURATOR
+title	title.curator.starfall_pilgrims	STARFALL PILGRIMS CURATOR
+title	title.curator.titan_wreck	TITAN WRECK CURATOR
+title	title.event.rift	RIFT RUNNER
+title	title.event.starfall	STARFALL CHASER
+title	title.event_horizon	EVENT HORIZON
+title	title.forge.smith	VOIDSMITH
+title	title.formation.beam_link	BEAM-LINKED
+title	title.formation.halo	HALO BEARER
+title	title.formation.scatter	SCATTERSHOT
+title	title.ladder.credits.1	CREDIT BARON
+title	title.ladder.credits.2	TYCOON
+title	title.ladder.credits.3	STAR MAGNATE
+title	title.ladder.meteors.1	METEOR BRAWLER
+title	title.ladder.relics.1	RELIC HUNTER
+title	title.ladder.relics.2	RELIC LORD
+title	title.ladder.rocks.1	ROCK BREAKER
+title	title.ladder.rocks.2	BELT BANE
+title	title.ladder.rocks.3	ASTEROID REAPER
+title	title.ladder.shards.1	SHARD SEEKER
+title	title.ladder.shards.2	SHARD HOARDER
+title	title.monolith_architect	MONOLITH ARCHITECT
+title	title.pass.eternal_architect	ETERNAL ARCHITECT
+title	title.pass.pioneer	PIONEER
+title	title.pass.void_sovereign	VOID SOVEREIGN
+title	title.sector.celestial	CELESTIAL
+title	title.sector.nebula	NEBULA DRIFTER
+title	title.sector.voidrim	RIM WALKER
+title	title.squad.captain	SQUAD CAPTAIN
+title	title.star_breaker	STAR BREAKER
+title	title.streak.seven	SEVEN SUNS
+title	title.void.1	VOID I
+title	title.void.10	VOID X
+title	title.void.11	VOID XI
+title	title.void.12	VOID XII
+title	title.void.13	VOID XIII
+title	title.void.14	VOID XIV
+title	title.void.15	VOID XV
+title	title.void.16	VOID XVI
+title	title.void.17	VOID XVII
+title	title.void.18	VOID XVIII
+title	title.void.19	VOID XIX
+title	title.void.2	VOID II
+title	title.void.20	VOID XX
+title	title.void.21	VOID XXI
+title	title.void.22	VOID XXII
+title	title.void.23	VOID XXIII
+title	title.void.24	VOID XXIV
+title	title.void.25	VOID XXV
+title	title.void.26	VOID XXVI
+title	title.void.27	VOID XXVII
+title	title.void.28	VOID XXVIII
+title	title.void.29	VOID XXIX
+title	title.void.3	VOID III
+title	title.void.30	VOID XXX
+title	title.void.31	VOID XXXI
+title	title.void.32	VOID XXXII
+title	title.void.33	VOID XXXIII
+title	title.void.34	VOID XXXIV
+title	title.void.35	VOID XXXV
+title	title.void.36	VOID XXXVI
+title	title.void.37	VOID XXXVII
+title	title.void.38	VOID XXXVIII
+title	title.void.39	VOID XXXIX
+title	title.void.4	VOID IV
+title	title.void.40	VOID XL
+title	title.void.41	VOID XLI
+title	title.void.42	VOID XLII
+title	title.void.43	VOID XLIII
+title	title.void.44	VOID XLIV
+title	title.void.45	VOID XLV
+title	title.void.46	VOID XLVI
+title	title.void.47	VOID XLVII
+title	title.void.48	VOID XLVIII
+title	title.void.49	VOID XLIX
+title	title.void.5	VOID V
+title	title.void.50	VOID L
+title	title.void.6	VOID VI
+title	title.void.7	VOID VII
+title	title.void.8	VOID VIII
+title	title.void.9	VOID IX
+title	title.witness.antimatter_void	ANTIMATTER VOID WITNESS
+title	title.witness.cryo_comet_field	CRYO COMET FIELD WITNESS
+title	title.witness.crystal_lattice	CRYSTAL LATTICE BELT WITNESS
+title	title.witness.dark_matter_tide	DARK MATTER TIDE WITNESS
+title	title.witness.derelict_titan	DERELICT TITAN WRECK WITNESS
+title	title.witness.diamond_nebula	DIAMOND NEBULA WITNESS
+title	title.witness.gas_giant_shadow	GAS GIANT SHADOW WITNESS
+title	title.witness.ion_aurora	ION AURORA WITNESS
+title	title.witness.magnetar_storm	MAGNETAR STORM WITNESS
+title	title.witness.plasma_reef	PLASMA REEF WITNESS
+title	title.witness.pulsar_graveyard	PULSAR GRAVEYARD WITNESS
+title	title.witness.quantum_foam	QUANTUM FOAM SHOAL WITNESS
+title	title.witness.singularity_rift	SINGULARITY RIFT WITNESS
+title	title.witness.solar_forge	SOLAR FORGE WITNESS
