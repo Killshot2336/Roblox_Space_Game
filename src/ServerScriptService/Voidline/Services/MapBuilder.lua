@@ -28,20 +28,31 @@ local function part(props): Part
 	return p
 end
 
-local function billboard(parent: Instance, text: string, color: Color3?)
+local function billboard(parent: Instance, text: string, color: Color3?, heightStuds: number?, maxDistance: number?)
 	local bb = Instance.new("BillboardGui")
-	bb.Size = UDim2.fromOffset(220, 40)
-	bb.StudsOffset = Vector3.new(0, 6, 0)
-	bb.AlwaysOnTop = true
+	bb.Name = "Label_" .. string.gsub(text, "%s+", "_")
+	bb.Size = UDim2.fromOffset(180, 32)
+	bb.StudsOffset = Vector3.new(0, heightStuds or 5, 0)
+	bb.AlwaysOnTop = false -- prevents every hub label stacking on screen
+	bb.MaxDistance = maxDistance or 90
+	bb.LightInfluence = 0
 	bb.Parent = parent
 	local label = Instance.new("TextLabel")
-	label.BackgroundTransparency = 1
+	label.BackgroundTransparency = 0.35
+	label.BackgroundColor3 = GameConfig.Colors.Obsidian
 	label.Size = UDim2.fromScale(1, 1)
 	label.Font = Enum.Font.GothamBold
 	label.TextScaled = true
 	label.TextColor3 = color or GameConfig.Colors.Gold
 	label.Text = text
 	label.Parent = bb
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 6)
+	corner.Parent = label
+	local pad = Instance.new("UIPadding")
+	pad.PaddingLeft = UDim.new(0, 6)
+	pad.PaddingRight = UDim.new(0, 6)
+	pad.Parent = label
 	return bb
 end
 
@@ -92,7 +103,7 @@ function MapBuilder.Build()
 			Material = Enum.Material.Neon,
 		})
 	end
-	billboard(monolith, "THE VOIDLINE MONOLITH")
+	billboard(monolith, "THE VOIDLINE MONOLITH", nil, 42, 140)
 
 	part({
 		Name = "RebirthPad",
@@ -102,7 +113,7 @@ function MapBuilder.Build()
 		Color = GameConfig.Colors.Gold,
 		Material = Enum.Material.Neon,
 	})
-	billboard(monolithFolder.RebirthPad, "VOID REBIRTH")
+	billboard(monolithFolder.RebirthPad, "VOID REBIRTH", nil, 4, 60)
 
 	part({
 		Name = "ForgeAnchor",
@@ -112,7 +123,7 @@ function MapBuilder.Build()
 		Color = GameConfig.Colors.VoidAccent,
 		Material = Enum.Material.Neon,
 	})
-	billboard(monolithFolder.ForgeAnchor, "ARTIFACT FORGE")
+	billboard(monolithFolder.ForgeAnchor, "ARTIFACT FORGE", nil, 4, 60)
 
 	part({
 		Name = "CodeTerminal",
@@ -122,7 +133,7 @@ function MapBuilder.Build()
 		Color = GameConfig.Colors.Obsidian,
 		Material = Enum.Material.Metal,
 	})
-	billboard(monolithFolder.CodeTerminal, "VOIDLINE CODES")
+	billboard(monolithFolder.CodeTerminal, "VOIDLINE CODES", nil, 8, 55)
 
 	part({
 		Name = "SummonPads",
@@ -132,7 +143,7 @@ function MapBuilder.Build()
 		Color = GameConfig.Colors.GoldBright,
 		Material = Enum.Material.Neon,
 	})
-	billboard(monolithFolder.SummonPads, "SERVER SUMMONS")
+	billboard(monolithFolder.SummonPads, "SERVER SUMMONS", nil, 4, 55)
 
 	part({
 		Name = "EventCore",
@@ -148,15 +159,18 @@ function MapBuilder.Build()
 	local boards = Instance.new("Folder")
 	boards.Name = "LeaderboardAnchors"
 	boards.Parent = hub
-	for i, name in { "TopCredits", "TopRebirths", "CodexDiscoveries", "TopSummoners" } do
+	local boardNames = { "TopCredits", "TopRebirths", "CodexDiscoveries", "TopSummoners" }
+	for i, name in boardNames do
+		local angle = ((i - 1) / #boardNames) * math.pi * 2
 		local anchor = part({
 			Name = name,
 			Parent = boards,
 			Size = Vector3.new(10, 14, 1),
-			CFrame = CFrame.new(math.cos(i) * 28, 10, math.sin(i) * 28),
+			CFrame = CFrame.new(math.cos(angle) * 36, 10, math.sin(angle) * 36)
+				* CFrame.Angles(0, -angle + math.pi / 2, 0),
 			Color = GameConfig.Colors.Obsidian,
 		})
-		billboard(anchor, name)
+		billboard(anchor, name, nil, 9, 70)
 	end
 
 	part({
@@ -167,7 +181,7 @@ function MapBuilder.Build()
 		Color = GameConfig.Colors.Gold,
 		Material = Enum.Material.Neon,
 	})
-	billboard(hub.VIPLoungePad, "VOID VIP LOUNGE")
+	billboard(hub.VIPLoungePad, "VOID VIP LOUNGE", nil, 4, 50)
 
 	local monument = part({
 		Name = "KillshotMonument",
@@ -177,7 +191,7 @@ function MapBuilder.Build()
 		Color = GameConfig.Colors.Obsidian,
 		Material = Enum.Material.Metal,
 	})
-	billboard(monument, "Created by Killshot2336")
+	billboard(monument, "Created by Killshot2336", nil, 10, 70)
 
 	-- Deep Space zone
 	local deep = Instance.new("Folder")
@@ -235,7 +249,7 @@ function MapBuilder.Build()
 	})
 	overlook:SetAttribute("SecretAura", true)
 	-- Quiet marker only — no Kyria branding in UI
-	billboard(overlook, "…", Color3.fromRGB(255, 240, 200))
+	billboard(overlook, "…", Color3.fromRGB(255, 240, 200), 3, 40)
 
 	local star = part({
 		Name = "HiddenStar",
@@ -292,7 +306,7 @@ function MapBuilder.Build()
 			Material = Enum.Material.Neon,
 		})
 		claim:SetAttribute("PlotIndex", i)
-		billboard(claim, "CLAIM STATION " .. i)
+		-- No claim billboard: plots auto-claim; keeps hub readable
 
 		local station = Instance.new("Folder")
 		station.Name = "Station"
@@ -306,7 +320,7 @@ function MapBuilder.Build()
 			Color = GameConfig.Colors.Obsidian,
 			Material = Enum.Material.Metal,
 		})
-		billboard(refinery, "STATION REFINERY")
+		billboard(refinery, "STATION REFINERY", nil, 6, 45)
 
 		local grinder = part({
 			Name = "GrinderCore",
@@ -316,7 +330,7 @@ function MapBuilder.Build()
 			Color = Color3.fromRGB(30, 30, 40),
 			Material = Enum.Material.DiamondPlate,
 		})
-		billboard(grinder, "GRINDER CORE")
+		billboard(grinder, "GRINDER CORE", nil, 6, 45)
 
 		local upgrades = Instance.new("Folder")
 		upgrades.Name = "UpgradePads"
@@ -337,7 +351,7 @@ function MapBuilder.Build()
 				Material = Enum.Material.Neon,
 			})
 			up:SetAttribute("UpgradeId", def[1])
-			billboard(up, def[1])
+			-- Proximity prompts name the pads; skip world labels to avoid clutter
 		end
 
 		local tuner = part({
@@ -348,7 +362,7 @@ function MapBuilder.Build()
 			Color = Color3.fromRGB(90, 220, 255),
 			Material = Enum.Material.Neon,
 		})
-		billboard(tuner, "LASER COLOR")
+		billboard(tuner, "LASER COLOR", nil, 3, 35)
 
 		part({
 			Name = "WarpGatePlaceholder",
