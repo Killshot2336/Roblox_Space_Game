@@ -14,10 +14,11 @@ function CodeService.Init()
 		if not CodeService._limiter:Allow(player.UserId) then
 			return
 		end
-		if typeof(code) ~= "string" then
+		if typeof(code) ~= "string" or #code > 32 then
 			return
 		end
-		code = string.upper(string.gsub(code, "%s+", ""))
+		local stripped = string.gsub(code, "%s+", "")
+		code = string.upper(stripped)
 		local reward = CodesConfig.Codes[code]
 		local data = PlayerDataService.Get(player)
 		if not reward or not data then
