@@ -1,0 +1,51 @@
+{
+  "name": "VoidlineDeepSpace",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "Voidline": {
+        "$path": "src/ReplicatedStorage/Voidline"
+      }
+    },
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "Voidline": {
+        "$path": "src/ServerScriptService/Voidline"
+      }
+    },
+    "ServerStorage": {
+      "$className": "ServerStorage",
+      "Voidline": {
+        "$path": "src/ServerStorage/Voidline"
+      }
+    },
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+      "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
+        "Voidline": {
+          "$path": "src/StarterPlayer/StarterPlayerScripts/Voidline"
+        }
+      }
+    },
+    "Workspace": {
+      "$className": "Workspace",
+      "$properties": {
+        "Gravity": 60
+      }
+    },
+    "Lighting": {
+      "$className": "Lighting",
+      "$properties": {
+        "Ambient": [0.05, 0.05, 0.12],
+        "Brightness": 2,
+        "ClockTime": 0,
+        "FogColor": [0.05, 0.02, 0.12],
+        "FogEnd": 2000,
+        "FogStart": 400,
+        "OutdoorAmbient": [0.08, 0.06, 0.18]
+      }
+    }
+  }
+}

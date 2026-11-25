@@ -1,0 +1,4148 @@
+<roblox version="4">
+  <Item class="Lighting" referent="0">
+    <Properties>
+      <string name="Name">Lighting</string>
+      <Color3 name="Ambient">
+        <R>0.05</R>
+        <G>0.05</G>
+        <B>0.12</B>
+      </Color3>
+      <float name="Brightness">2</float>
+      <float name="ClockTime">0</float>
+      <Color3 name="FogColor">
+        <R>0.05</R>
+        <G>0.02</G>
+        <B>0.12</B>
+      </Color3>
+      <float name="FogEnd">2000</float>
+      <float name="FogStart">400</float>
+      <Color3 name="OutdoorAmbient">
+        <R>0.08</R>
+        <G>0.06</G>
+        <B>0.18</B>
+      </Color3>
+    </Properties>
+  </Item>
+  <Item class="ReplicatedStorage" referent="1">
+    <Properties>
+      <string name="Name">ReplicatedStorage</string>
+    </Properties>
+    <Item class="Folder" referent="2">
+      <Properties>
+        <string name="Name">Voidline</string>
+      </Properties>
+      <Item class="Folder" referent="3">
+        <Properties>
+          <string name="Name">Assets</string>
+        </Properties>
+        <Item class="Folder" referent="4">
+          <Properties>
+            <string name="Name">Audio</string>
+          </Properties>
+        </Item>
+        <Item class="Folder" referent="5">
+          <Properties>
+            <string name="Name">Cosmetics</string>
+          </Properties>
+        </Item>
+        <Item class="Folder" referent="6">
+          <Properties>
+            <string name="Name">Drones</string>
+          </Properties>
+        </Item>
+        <Item class="Folder" referent="7">
+          <Properties>
+            <string name="Name">UI</string>
+          </Properties>
+        </Item>
+        <Item class="Folder" referent="8">
+          <Properties>
+            <string name="Name">VFX</string>
+          </Properties>
+        </Item>
+      </Item>
+      <Item class="Folder" referent="9">
+        <Properties>
+          <string name="Name">Config</string>
+        </Properties>
+        <Item class="ModuleScript" referent="10">
+          <Properties>
+            <string name="Name">CodesConfig</string>
+            <string name="Source"><![CDATA[local CodesConfig = {
+	Codes = {
+		VOIDLINE = {
+			Credits = 250,
+			VoidShards = 5,
+			OneTime = true,
+			Message = "Welcome to Voidline.",
+		},
+		KILLSHOT = {
+			Credits = 500,
+			VoidShards = 10,
+			OneTime = true,
+			Message = "Created by Killshot2336.",
+		},
+		LAUNCH = {
+			Credits = 1000,
+			VoidShards = 15,
+			DroneSlotsBonus = 0,
+			OneTime = true,
+			Message = "Launch week boost unlocked.",
+		},
+	},
+}
+
+return CodesConfig
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="11">
+          <Properties>
+            <string name="Name">DroneConfig</string>
+            <string name="Source"><![CDATA[local DroneConfig = {
+	StarterSlots = 1,
+	MaxBaseSlots = 6,
+	Formations = {
+		[1] = "Scatter",
+		[2] = "OrbitalBeamLink",
+		[3] = "SovereignHalo",
+	},
+	IdleOrbitRadius = 8,
+	MineRange = 42,
+	TowSpeed = 28,
+	BaseDamagePerSecond = 8,
+	DamagePerDrillLevel = 4,
+	LaserColors = {
+		Gold = Color3.fromRGB(255, 210, 90),
+		Cyan = Color3.fromRGB(90, 220, 255),
+		Void = Color3.fromRGB(170, 110, 255),
+		Crimson = Color3.fromRGB(255, 90, 110),
+		Emerald = Color3.fromRGB(90, 255, 160),
+	},
+	DefaultLaserColor = "Gold",
+}
+
+return DroneConfig
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="12">
+          <Properties>
+            <string name="Name">EconomyConfig</string>
+            <string name="Source"><![CDATA[local EconomyConfig = {
+	StarterCargoCapacity = 10,
+	StarterOrePerAsteroid = 10,
+	FirstSellCredits = 30, -- refining 10 starter ore
+	CreditsPerOreBase = 3,
+
+	StarterUpgrades = {
+		{ Id = "Drill", Label = "+Drill Power", Cost = 20, Stat = "DrillLevel", Amount = 1 },
+		{ Id = "Cargo", Label = "+Cargo Capacity", Cost = 35, Stat = "CargoLevel", Amount = 1 },
+		{ Id = "Drone2", Label = "+2nd Drone Slot", Cost = 50, Stat = "DroneSlots", Amount = 1 },
+	},
+
+	-- Exponential curve after starter hooks
+	DrillCost = function(level: number): number
+		return math.floor(20 * (1.55 ^ math.max(0, level - 1)))
+	end,
+	CargoCost = function(level: number): number
+		return math.floor(35 * (1.55 ^ math.max(0, level - 1)))
+	end,
+	DroneSlotCost = function(slots: number): number
+		return math.floor(50 * (1.75 ^ math.max(0, slots - 1)))
+	end,
+	StationTierCost = function(tier: number): number
+		return math.floor(150 * (1.85 ^ math.max(0, tier - 1)))
+	end,
+
+	CargoCapacityForLevel = function(level: number): number
+		return 10 + (level - 1) * 8
+	end,
+
+	OreValueBySector = {
+		Starter = 3,
+		Nebula = 8,
+		VoidRim = 22,
+		Celestial = 55,
+	},
+}
+
+return EconomyConfig
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="13">
+          <Properties>
+            <string name="Name">ForgeConfig</string>
+            <string name="Source"><![CDATA[local ForgeConfig = {
+	ShardsPerArtifact = 25,
+	TokensPerArtifact = 40,
+	ForgeDurationSeconds = 10,
+	DailyTokenSoftCap = 500,
+	CoolingMultiplier = 0.35, -- forge speed after soft cap
+}
+
+return ForgeConfig
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="14">
+          <Properties>
+            <string name="Name">GalaxyConfig</string>
+            <string name="Source"><![CDATA[local GalaxyConfig = {
+	Sectors = {
+		{ Id = "Starter", Label = "Starter Belt", StationTier = 0, DroneTier = 0 },
+		{ Id = "Nebula", Label = "Nebula Ring", StationTier = 3, DroneTier = 0 },
+		{ Id = "VoidRim", Label = "Void Rim", StationTier = 6, DroneTier = 2 },
+		{ Id = "Celestial", Label = "Celestial Orbit", StationTier = 10, DroneTier = 2, RequiresRebirthReady = true },
+	},
+}
+
+function GalaxyConfig.IsUnlocked(sectorId: string, data): boolean
+	for _, sector in GalaxyConfig.Sectors do
+		if sector.Id == sectorId then
+			if data.StationTier < sector.StationTier then
+				return false
+			end
+			if data.DroneTier < sector.DroneTier then
+				return false
+			end
+			if sector.RequiresRebirthReady and data.StationTier < 10 then
+				return false
+			end
+			return true
+		end
+	end
+	return false
+end
+
+return GalaxyConfig
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="15">
+          <Properties>
+            <string name="Name">GameConfig</string>
+            <string name="Source"><![CDATA[-- Voidline: Deep Space — global game constants
+local GameConfig = {
+	MaxPlayers = 12,
+	PlotCount = 12,
+	PlotRingRadius = 220,
+	HubRadius = 48,
+	AutosaveSeconds = 60,
+	AfkIdleSeconds = 8 * 60,
+	WorldEventIntervalSeconds = 6 * 60,
+	WorldEventDurationSeconds = 90,
+	BridgeIgnitionTutorialStep = 4,
+	TutorialCompleteBonusCredits = 100,
+	BrandCreator = "Killshot2336",
+	GameDisplayName = "Voidline: Deep Space",
+	Colors = {
+		Obsidian = Color3.fromRGB(12, 12, 18),
+		Gold = Color3.fromRGB(232, 186, 74),
+		GoldBright = Color3.fromRGB(255, 220, 120),
+		Nebula = Color3.fromRGB(48, 24, 96),
+		VoidAccent = Color3.fromRGB(120, 80, 255),
+	},
+}
+
+return GameConfig
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="16">
+          <Properties>
+            <string name="Name">JuiceConfig</string>
+            <string name="Source"><![CDATA[local JuiceConfig = {
+	EventBannerSeconds = 3,
+	HitStopSeconds = 0.08,
+	ScreenShakeMax = 1.2,
+	BridgePulseSeconds = 1.4,
+	TutorialBeamColor = Color3.fromRGB(232, 186, 74),
+}
+
+return JuiceConfig
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="17">
+          <Properties>
+            <string name="Name">MonetizationConfig</string>
+            <string name="Source"><![CDATA[-- Placeholder GamePass / DevProduct IDs = 0 until Creator Dashboard wiring
+local MonetizationConfig = {
+	Passes = {
+		{
+			Id = "StarterBundle",
+			Name = "Starter Bundle",
+			Robux = 79,
+			Tokens = 65,
+			GamePassId = 0,
+		},
+		{
+			Id = "AutoSellWarpLink",
+			Name = "Auto-Sell Warp Link",
+			Robux = 249,
+			Tokens = 200,
+			GamePassId = 0,
+		},
+		{
+			Id = "Credits2x",
+			Name = "2x Credits",
+			Robux = 449,
+			Tokens = 370,
+			GamePassId = 0,
+		},
+		{
+			Id = "ShardRelicLuck2x",
+			Name = "2x Shard & Relic Luck",
+			Robux = 499,
+			Tokens = 410,
+			GamePassId = 0,
+		},
+		{
+			Id = "DroneSlots3",
+			Name = "+3 Drone Slots",
+			Robux = 599,
+			Tokens = 490,
+			GamePassId = 0,
+		},
+		{
+			Id = "MegaSwarm5",
+			Name = "+5 Mega Swarm Slots",
+			Robux = 999,
+			Tokens = 820,
+			GamePassId = 0,
+		},
+		{
+			Id = "LaserOverclock",
+			Name = "Laser Overclock",
+			Robux = 349,
+			Tokens = 285,
+			GamePassId = 0,
+		},
+		{
+			Id = "DeepSpaceWarpPass",
+			Name = "Deep-Space Warp Pass",
+			Robux = 399,
+			Tokens = 325,
+			GamePassId = 0,
+		},
+		{
+			Id = "VoidSovereignVIP",
+			Name = "Void Sovereign VIP",
+			Robux = 899,
+			Tokens = 740,
+			GamePassId = 0,
+		},
+		{
+			Id = "EternalArchitect",
+			Name = "Eternal Architect",
+			Robux = 1499,
+			Tokens = 1230,
+			GamePassId = 0,
+		},
+	},
+	DevProducts = {
+		{ Id = "SummonVoidStarfall", Name = "Summon Void Starfall", Robux = 199, ProductId = 0 },
+		{ Id = "ServerLuckSurge", Name = "Server Luck Surge", Robux = 149, ProductId = 0 },
+	},
+}
+
+function MonetizationConfig.GetPass(passId: string)
+	for _, pass in MonetizationConfig.Passes do
+		if pass.Id == passId then
+			return pass
+		end
+	end
+	return nil
+end
+
+return MonetizationConfig
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="18">
+          <Properties>
+            <string name="Name">PerformanceConfig</string>
+            <string name="Source"><![CDATA[local PerformanceConfig = {
+	DefaultPerfMode = false,
+	PerfDisables = {
+		AmbientParticles = true,
+		ExtraBloom = true,
+		DistantNebulaDetail = true,
+	},
+}
+
+return PerformanceConfig
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="19">
+          <Properties>
+            <string name="Name">RebirthConfig</string>
+            <string name="Source"><![CDATA[local RebirthConfig = {
+	RequiredStationTier = 10,
+	CreditMultPerRebirth = 0.25,
+	ShardBase = 10,
+	ShardPerRebirth = 5,
+}
+
+function RebirthConfig.CreditMultiplier(rebirths: number): number
+	return 1 + RebirthConfig.CreditMultPerRebirth * rebirths
+end
+
+function RebirthConfig.ShardPayout(rebirthNumber: number): number
+	return RebirthConfig.ShardBase + RebirthConfig.ShardPerRebirth * rebirthNumber
+end
+
+return RebirthConfig
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="20">
+          <Properties>
+            <string name="Name">SoftContestConfig</string>
+            <string name="Source"><![CDATA[local SoftContestConfig = {
+	MinDamagePercent = 0.05,
+	TopContributorPool = 0.40,
+	ProportionalPool = 0.60,
+	MeteorBaseHealth = 5000,
+	EventCoreHealth = 12000,
+}
+
+return SoftContestConfig
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="21">
+          <Properties>
+            <string name="Name">SquadConfig</string>
+            <string name="Source"><![CDATA[local SquadConfig = {
+	MinSize = 2,
+	MaxSize = 4,
+	LinkedShardLuckBonus = 0.10, -- +10% Void Shard luck
+}
+
+return SquadConfig
+]]></string>
+          </Properties>
+        </Item>
+      </Item>
+      <Item class="Folder" referent="22">
+        <Properties>
+          <string name="Name">Modules</string>
+        </Properties>
+        <Item class="ModuleScript" referent="23">
+          <Properties>
+            <string name="Name">ContributionSplit</string>
+            <string name="Source"><![CDATA[local SoftContestConfig = require(script.Parent.Parent.Config.SoftContestConfig)
+
+local ContributionSplit = {}
+
+-- damageMap: { [playerUserId]: number }
+-- returns { [userId]: shareFraction } that sum to ~1 among qualifiers
+function ContributionSplit.Compute(damageMap: { [number]: number }): { [number]: number }
+	local total = 0
+	for _, dmg in damageMap do
+		total += dmg
+	end
+	if total <= 0 then
+		return {}
+	end
+
+	local qualifiers: { [number]: number } = {}
+	local topId: number? = nil
+	local topDmg = -1
+	for userId, dmg in damageMap do
+		local pct = dmg / total
+		if pct >= SoftContestConfig.MinDamagePercent then
+			qualifiers[userId] = dmg
+			if dmg > topDmg then
+				topDmg = dmg
+				topId = userId
+			end
+		end
+	end
+
+	local shares: { [number]: number } = {}
+	local qualTotal = 0
+	for _, dmg in qualifiers do
+		qualTotal += dmg
+	end
+	if qualTotal <= 0 or not topId then
+		return {}
+	end
+
+	-- Top gets exclusive 40% pool + share of remaining 60%
+	for userId, dmg in qualifiers do
+		local prop = (dmg / qualTotal) * SoftContestConfig.ProportionalPool
+		shares[userId] = prop
+	end
+	shares[topId] = (shares[topId] or 0) + SoftContestConfig.TopContributorPool
+	return shares
+end
+
+return ContributionSplit
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="24">
+          <Properties>
+            <string name="Name">FormatNumber</string>
+            <string name="Source"><![CDATA[local FormatNumber = {}
+
+function FormatNumber.Compact(n: number): string
+	n = math.floor(n)
+	if n >= 1_000_000_000 then
+		return string.format("%.2fB", n / 1_000_000_000)
+	elseif n >= 1_000_000 then
+		return string.format("%.2fM", n / 1_000_000)
+	elseif n >= 1_000 then
+		return string.format("%.1fK", n / 1_000)
+	end
+	return tostring(n)
+end
+
+return FormatNumber
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="25">
+          <Properties>
+            <string name="Name">OreMath</string>
+            <string name="Source"><![CDATA[local EconomyConfig = require(script.Parent.Parent.Config.EconomyConfig)
+
+local OreMath = {}
+
+function OreMath.SellValue(oreAmount: number, sectorId: string, creditMult: number, has2x: boolean): number
+	local per = EconomyConfig.OreValueBySector[sectorId] or EconomyConfig.CreditsPerOreBase
+	local value = oreAmount * per * creditMult
+	if has2x then
+		value *= 2
+	end
+	return math.floor(value)
+end
+
+function OreMath.CargoCap(cargoLevel: number): number
+	return EconomyConfig.CargoCapacityForLevel(cargoLevel)
+end
+
+return OreMath
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="26">
+          <Properties>
+            <string name="Name">RateLimiter</string>
+            <string name="Source"><![CDATA[local RateLimiter = {}
+RateLimiter.__index = RateLimiter
+
+function RateLimiter.new(minInterval: number)
+	return setmetatable({
+		_minInterval = minInterval,
+		_last = {} :: { [number]: number },
+	}, RateLimiter)
+end
+
+function RateLimiter:Allow(userId: number): boolean
+	local now = os.clock()
+	local last = self._last[userId]
+	if last and (now - last) < self._minInterval then
+		return false
+	end
+	self._last[userId] = now
+	return true
+end
+
+function RateLimiter:Clear(userId: number)
+	self._last[userId] = nil
+end
+
+return RateLimiter
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="27">
+          <Properties>
+            <string name="Name">Types</string>
+            <string name="Source"><![CDATA[-- Shared type documentation (Luau). Runtime tables use these shapes.
+export type GalaxyFlags = {
+	Starter: boolean,
+	Nebula: boolean,
+	VoidRim: boolean,
+	Celestial: boolean,
+}
+
+export type PlayerProfile = {
+	Credits: number,
+	Ore: number,
+	VoidShards: number,
+	VoidlineTokens: number,
+	Rebirths: number,
+	CreditMult: number,
+	StationTier: number,
+	DrillLevel: number,
+	CargoLevel: number,
+	DroneSlots: number,
+	DroneTier: number,
+	GalaxyFlags: GalaxyFlags,
+	OwnedPerks: { [string]: boolean },
+	RedeemedCodes: { [string]: boolean },
+	TutorialStep: number,
+	TutorialComplete: boolean,
+	Settings: {
+		PerfMode: boolean,
+		HideJetpack: boolean,
+		ClipMode: boolean,
+		LaserColor: string,
+	},
+	Cosmetics: { Title: string? },
+	ForgeTokensEarnedToday: number,
+	ForgeDayKey: string,
+	DailyStreak: number,
+	LastLoginDay: string,
+	TrialVouchers: { [string]: number }, -- perkId -> expiry os.time
+	Codex: { [string]: boolean },
+	Relics: { [string]: boolean },
+	PlotIndex: number?,
+	Formation: number,
+	Version: number,
+}
+
+return {}
+]]></string>
+          </Properties>
+        </Item>
+      </Item>
+      <Item class="ModuleScript" referent="28">
+        <Properties>
+          <string name="Name">Remotes</string>
+          <string name="Source"><![CDATA[-- Remotes folder bootstrap. Server calls Ensure() once at boot.
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local REMOTE_NAMES = {
+	"ClaimPlot",
+	"RequestUpgrade",
+	"SetFormation",
+	"SellOre",
+	"RequestRebirth",
+	"RequestForge",
+	"TurnInArtifact",
+	"PurchaseWithTokens",
+	"PromptRobuxPurchase",
+	"SquadInvite",
+	"SquadLeave",
+	"SquadKick",
+	"SquadUpdate",
+	"WorldEventState",
+	"SoftContestUpdate",
+	"SettingsUpdate",
+	"TutorialProgress",
+	"JuiceEvent",
+	"DataSnapshot",
+	"RedeemCode",
+	"RedeemDaily",
+	"QuickUpgrade",
+	"SetLaserColor",
+	"PlayerInput", -- AFK heartbeat / input ping
+}
+
+local Remotes = {}
+
+function Remotes.Ensure(): Folder
+	local voidline = ReplicatedStorage:WaitForChild("Voidline")
+	local folder = voidline:FindFirstChild("Remotes")
+	if not folder then
+		folder = Instance.new("Folder")
+		folder.Name = "Remotes"
+		folder.Parent = voidline
+	end
+
+	for _, name in REMOTE_NAMES do
+		if not folder:FindFirstChild(name) then
+			local remote = Instance.new("RemoteEvent")
+			remote.Name = name
+			remote.Parent = folder
+		end
+	end
+	return folder :: Folder
+end
+
+function Remotes.Get(name: string): RemoteEvent
+	local folder = Remotes.Ensure()
+	local remote = folder:WaitForChild(name, 10)
+	assert(remote and remote:IsA("RemoteEvent"), "Missing remote " .. name)
+	return remote
+end
+
+return Remotes
+]]></string>
+        </Properties>
+      </Item>
+    </Item>
+  </Item>
+  <Item class="ServerScriptService" referent="29">
+    <Properties>
+      <string name="Name">ServerScriptService</string>
+    </Properties>
+    <Item class="Folder" referent="30">
+      <Properties>
+        <string name="Name">Voidline</string>
+      </Properties>
+      <Item class="Script" referent="31">
+        <Properties>
+          <string name="Name">Boot</string>
+          <token name="RunContext">0</token>
+          <string name="Source"><![CDATA[--[[
+	Voidline: Deep Space — server boot
+	Init order matches GAME_DESIGN.md architecture.
+]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local Remotes = require(Voidline.Remotes)
+Remotes.Ensure()
+
+local Services = script.Parent.Services
+
+local MapBuilder = require(Services.MapBuilder)
+MapBuilder.Build()
+
+local PlayerDataService = require(Services.PlayerDataService)
+local PlotService = require(Services.PlotService)
+local EconomyService = require(Services.EconomyService)
+local SoftContestService = require(Services.SoftContestService)
+local TowService = require(Services.TowService)
+local DroneService = require(Services.DroneService)
+local WorldEventService = require(Services.WorldEventService)
+local ForgeService = require(Services.ForgeService)
+local RebirthService = require(Services.RebirthService)
+local SquadService = require(Services.SquadService)
+local MonetizationService = require(Services.MonetizationService)
+local CodeService = require(Services.CodeService)
+local DailyStreakService = require(Services.DailyStreakService)
+local AfkService = require(Services.AfkService)
+local JuiceService = require(Services.JuiceService)
+local LeaderboardService = require(Services.LeaderboardService)
+local CodexService = require(Services.CodexService)
+local WarpService = require(Services.WarpService)
+
+PlayerDataService.Init()
+PlotService.Init()
+EconomyService.Init()
+SoftContestService.Init()
+TowService.Init()
+DroneService.Init()
+WorldEventService.Init()
+ForgeService.Init()
+RebirthService.Init()
+SquadService.Init()
+MonetizationService.Init()
+CodeService.Init()
+DailyStreakService.Init()
+AfkService.Init()
+JuiceService.Init()
+LeaderboardService.Init()
+CodexService.Init()
+WarpService.Init()
+
+print("[Voidline] Boot complete — Voidline: Deep Space v1 online")
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="Folder" referent="32">
+        <Properties>
+          <string name="Name">Components</string>
+        </Properties>
+      </Item>
+      <Item class="Folder" referent="33">
+        <Properties>
+          <string name="Name">Security</string>
+        </Properties>
+        <Item class="ModuleScript" referent="34">
+          <Properties>
+            <string name="Name">ValidateRemote</string>
+            <string name="Source"><![CDATA[local ValidateRemote = {}
+
+function ValidateRemote.AlivePlayer(player: Player?): boolean
+	return player ~= nil and player.Parent ~= nil and player.Character ~= nil
+end
+
+function ValidateRemote.OwnsPlot(player: Player, plotIndex: number, plotOwners: { [number]: Player }): boolean
+	return plotOwners[plotIndex] == player
+end
+
+function ValidateRemote.NearPart(player: Player, part: BasePart, maxDistance: number): boolean
+	local char = player.Character
+	local hrp = char and char:FindFirstChild("HumanoidRootPart")
+	if not hrp or not hrp:IsA("BasePart") then
+		return false
+	end
+	return (hrp.Position - part.Position).Magnitude <= maxDistance
+end
+
+return ValidateRemote
+]]></string>
+          </Properties>
+        </Item>
+      </Item>
+      <Item class="Folder" referent="35">
+        <Properties>
+          <string name="Name">Services</string>
+        </Properties>
+        <Item class="ModuleScript" referent="36">
+          <Properties>
+            <string name="Name">AfkService</string>
+            <string name="Source"><![CDATA[local Players = game:GetService("Players")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local GameConfig = require(Voidline.Config.GameConfig)
+local Remotes = require(Voidline.Remotes)
+local DroneService = require(script.Parent.DroneService)
+
+local AfkService = {
+	_lastInput = {} :: { [number]: number },
+}
+
+function AfkService.Init()
+	Remotes.Get("PlayerInput").OnServerEvent:Connect(function(player)
+		AfkService._lastInput[player.UserId] = os.clock()
+		DroneService.SetAfk(player, false)
+	end)
+
+	Players.PlayerAdded:Connect(function(player)
+		AfkService._lastInput[player.UserId] = os.clock()
+	end)
+	Players.PlayerRemoving:Connect(function(player)
+		AfkService._lastInput[player.UserId] = nil
+	end)
+
+	task.spawn(function()
+		while true do
+			task.wait(5)
+			local now = os.clock()
+			for _, player in Players:GetPlayers() do
+				local last = AfkService._lastInput[player.UserId] or now
+				if now - last >= GameConfig.AfkIdleSeconds then
+					DroneService.SetAfk(player, true)
+					Remotes.Get("JuiceEvent"):FireClient(player, { Kind = "AfkIdle" })
+				end
+			end
+		end
+	end)
+end
+
+return AfkService
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="37">
+          <Properties>
+            <string name="Name">CodeService</string>
+            <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local CodesConfig = require(Voidline.Config.CodesConfig)
+local Remotes = require(Voidline.Remotes)
+local RateLimiter = require(Voidline.Modules.RateLimiter)
+local PlayerDataService = require(script.Parent.PlayerDataService)
+
+local CodeService = {
+	_limiter = RateLimiter.new(1),
+}
+
+function CodeService.Init()
+	Remotes.Get("RedeemCode").OnServerEvent:Connect(function(player, code)
+		if not CodeService._limiter:Allow(player.UserId) then
+			return
+		end
+		if typeof(code) ~= "string" then
+			return
+		end
+		code = string.upper(string.gsub(code, "%s+", ""))
+		local reward = CodesConfig.Codes[code]
+		local data = PlayerDataService.Get(player)
+		if not reward or not data then
+			Remotes.Get("JuiceEvent"):FireClient(player, { Kind = "CodeFail", Message = "Invalid code" })
+			return
+		end
+		if reward.OneTime and data.RedeemedCodes[code] then
+			Remotes.Get("JuiceEvent"):FireClient(player, { Kind = "CodeFail", Message = "Already redeemed" })
+			return
+		end
+		PlayerDataService.Mutate(player, function(d)
+			d.RedeemedCodes[code] = true
+			d.Credits += reward.Credits or 0
+			d.VoidShards += reward.VoidShards or 0
+		end)
+		PlayerDataService.Save(player)
+		Remotes.Get("JuiceEvent"):FireClient(player, {
+			Kind = "CodeSuccess",
+			Message = reward.Message,
+			Credits = reward.Credits,
+			VoidShards = reward.VoidShards,
+		})
+	end)
+end
+
+return CodeService
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="38">
+          <Properties>
+            <string name="Name">CodexService</string>
+            <string name="Source"><![CDATA[-- v1.5 stub: Voidline Codex discovery log
+local CodexService = {}
+
+function CodexService.Init()
+	print("[Voidline] CodexService stub ready (v1.5)")
+end
+
+return CodexService
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="39">
+          <Properties>
+            <string name="Name">DailyStreakService</string>
+            <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local Remotes = require(Voidline.Remotes)
+local RateLimiter = require(Voidline.Modules.RateLimiter)
+local PlayerDataService = require(script.Parent.PlayerDataService)
+
+-- 7-day streak rewards; day 7 grants 24h trial voucher for Credits2x
+local DAY_REWARDS = {
+	[1] = { Credits = 50 },
+	[2] = { Credits = 75, VoidShards = 2 },
+	[3] = { Credits = 100, VoidShards = 3 },
+	[4] = { Credits = 150, VoidShards = 4 },
+	[5] = { Credits = 200, VoidShards = 5 },
+	[6] = { Credits = 300, VoidShards = 8 },
+	[7] = { Credits = 500, VoidShards = 10, TrialPerk = "Credits2x", TrialHours = 24 },
+}
+
+local DailyStreakService = {
+	_limiter = RateLimiter.new(2),
+	_claimedToday = {} :: { [number]: boolean },
+}
+
+function DailyStreakService.Init()
+	Remotes.Get("RedeemDaily").OnServerEvent:Connect(function(player)
+		if not DailyStreakService._limiter:Allow(player.UserId) then
+			return
+		end
+		if DailyStreakService._claimedToday[player.UserId] then
+			Remotes.Get("JuiceEvent"):FireClient(player, { Kind = "DailyFail", Message = "Already claimed today" })
+			return
+		end
+		local data = PlayerDataService.Get(player)
+		if not data then
+			return
+		end
+		local day = math.clamp(data.DailyStreak or 1, 1, 7)
+		local reward = DAY_REWARDS[day]
+		PlayerDataService.Mutate(player, function(d)
+			d.Credits += reward.Credits or 0
+			d.VoidShards += reward.VoidShards or 0
+			if reward.TrialPerk then
+				d.TrialVouchers[reward.TrialPerk] = os.time() + (reward.TrialHours or 24) * 3600
+			end
+		end)
+		DailyStreakService._claimedToday[player.UserId] = true
+		PlayerDataService.Save(player)
+		Remotes.Get("JuiceEvent"):FireClient(player, {
+			Kind = "DailySuccess",
+			Day = day,
+			Reward = reward,
+		})
+	end)
+end
+
+return DailyStreakService
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="40">
+          <Properties>
+            <string name="Name">DroneService</string>
+            <string name="Source"><![CDATA[local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local DroneConfig = require(Voidline.Config.DroneConfig)
+local Remotes = require(Voidline.Remotes)
+local PlayerDataService = require(script.Parent.PlayerDataService)
+local PlotService = require(script.Parent.PlotService)
+local EconomyService = require(script.Parent.EconomyService)
+
+local DroneService = {
+	_drones = {} :: { [number]: { Model } },
+	_targets = {} :: { [number]: BasePart? },
+	_afk = {} :: { [number]: boolean },
+	_towing = {} :: { [number]: BasePart? },
+}
+
+local function laserColorFor(player: Player): Color3
+	local data = PlayerDataService.Get(player)
+	local key = (data and data.Settings.LaserColor) or DroneConfig.DefaultLaserColor
+	return DroneConfig.LaserColors[key] or DroneConfig.LaserColors.Gold
+end
+
+local function makeDrone(player: Player, index: number): Model
+	local model = Instance.new("Model")
+	model.Name = "VoidlineDrone_" .. index
+	local body = Instance.new("Part")
+	body.Name = "Body"
+	body.Shape = Enum.PartType.Ball
+	body.Size = Vector3.new(2.2, 2.2, 2.2)
+	body.Material = Enum.Material.Metal
+	body.Color = Color3.fromRGB(18, 18, 24)
+	body.Anchored = true
+	body.CanCollide = false
+	body.Parent = model
+	local trim = Instance.new("Part")
+	trim.Name = "Trim"
+	trim.Size = Vector3.new(2.6, 0.3, 2.6)
+	trim.Material = Enum.Material.Neon
+	trim.Color = Color3.fromRGB(232, 186, 74)
+	trim.Anchored = true
+	trim.CanCollide = false
+	trim.Parent = model
+	model.PrimaryPart = body
+	model:SetAttribute("OwnerUserId", player.UserId)
+	model:SetAttribute("Index", index)
+	model.Parent = Workspace:FindFirstChild("VoidlineMap") or Workspace
+	return model
+end
+
+function DroneService.SyncCount(player: Player)
+	local data = PlayerDataService.Get(player)
+	if not data then
+		return
+	end
+	local list = DroneService._drones[player.UserId]
+	if not list then
+		list = {}
+		DroneService._drones[player.UserId] = list
+	end
+	local bonus = 0
+	if PlayerDataService.HasPerk(player, "DroneSlots3") then
+		bonus += 3
+	end
+	if PlayerDataService.HasPerk(player, "MegaSwarm5") then
+		bonus += 5
+	end
+	local want = data.DroneSlots + bonus
+	while #list < want do
+		table.insert(list, makeDrone(player, #list + 1))
+	end
+	while #list > want do
+		local d = table.remove(list)
+		if d then
+			d:Destroy()
+		end
+	end
+end
+
+local function findNearestAsteroid(player: Player, origin: Vector3): BasePart?
+	local plot = PlotService.GetPlayerPlot(player)
+	local best: BasePart? = nil
+	local bestDist = math.huge
+	local function consider(folder: Instance?)
+		if not folder then
+			return
+		end
+		for _, child in folder:GetDescendants() do
+			if child:IsA("BasePart") and child:GetAttribute("Health") and (child:GetAttribute("Health") :: number) > 0 then
+				if child:GetAttribute("Shared") == true then
+					-- deep space handled separately preference when formation beam-link
+				end
+				local dist = (child.Position - origin).Magnitude
+				if dist < bestDist and dist <= DroneConfig.MineRange * 3 then
+					best = child
+					bestDist = dist
+				end
+			end
+		end
+	end
+	if plot then
+		consider(plot:FindFirstChild("PersonalBelt"))
+	end
+	local map = Workspace:FindFirstChild("VoidlineMap")
+	local deep = map and map:FindFirstChild("DeepSpace")
+	consider(deep and deep:FindFirstChild("RareAsteroidSpawns"))
+	consider(deep and deep:FindFirstChild("EventMeteors"))
+	return best
+end
+
+function DroneService.SetAfk(player: Player, isAfk: boolean)
+	DroneService._afk[player.UserId] = isAfk
+end
+
+function DroneService.Init()
+	Remotes.Get("SetFormation").OnServerEvent:Connect(function(player, formation)
+		if typeof(formation) ~= "number" then
+			return
+		end
+		formation = math.clamp(math.floor(formation), 1, 3)
+		PlayerDataService.Mutate(player, function(d)
+			d.Formation = formation
+		end)
+	end)
+
+	Remotes.Get("SetLaserColor").OnServerEvent:Connect(function(player, colorName)
+		if typeof(colorName) ~= "string" then
+			return
+		end
+		if not DroneConfig.LaserColors[colorName] then
+			return
+		end
+		PlayerDataService.Mutate(player, function(d)
+			d.Settings.LaserColor = colorName
+		end)
+	end)
+
+	Players.PlayerAdded:Connect(function(player)
+		player:GetAttributeChangedSignal("VoidlineDroneSlots"):Connect(function()
+			DroneService.SyncCount(player)
+		end)
+		task.defer(function()
+			task.wait(1)
+			DroneService.SyncCount(player)
+		end)
+	end)
+
+	Players.PlayerRemoving:Connect(function(player)
+		local list = DroneService._drones[player.UserId]
+		if list then
+			for _, d in list do
+				d:Destroy()
+			end
+		end
+		DroneService._drones[player.UserId] = nil
+		DroneService._targets[player.UserId] = nil
+		DroneService._afk[player.UserId] = nil
+	end)
+
+	local acc = 0
+	RunService.Heartbeat:Connect(function(dt)
+		acc += dt
+		if acc < 0.1 then
+			return
+		end
+		local step = acc
+		acc = 0
+		for _, player in Players:GetPlayers() do
+			if DroneService._afk[player.UserId] then
+				local data = PlayerDataService.Get(player)
+				local char = player.Character
+				local hrp = char and char:FindFirstChild("HumanoidRootPart")
+				local list = DroneService._drones[player.UserId]
+				if data and hrp and list then
+					for i, drone in list do
+						local angle = os.clock() + i
+						local pos = hrp.Position
+							+ Vector3.new(math.cos(angle) * DroneConfig.IdleOrbitRadius, 3, math.sin(angle) * DroneConfig.IdleOrbitRadius)
+						if drone.PrimaryPart then
+							drone:PivotTo(CFrame.new(pos))
+						end
+					end
+				end
+			else
+				DroneService.SyncCount(player)
+				local data = PlayerDataService.Get(player)
+				local list = DroneService._drones[player.UserId]
+				local char = player.Character
+				local hrp = char and char:FindFirstChild("HumanoidRootPart")
+				if data and list and hrp then
+					local formation = data.Formation or 1
+					local target = DroneService._targets[player.UserId]
+					if not target or not target.Parent or (target:GetAttribute("Health") :: number) <= 0 then
+						target = findNearestAsteroid(player, hrp.Position)
+						DroneService._targets[player.UserId] = target
+						if data.TutorialStep == 1 and target then
+							PlayerDataService.Mutate(player, function(d)
+								if d.TutorialStep == 1 then
+									d.TutorialStep = 2
+								end
+							end)
+							Remotes.Get("TutorialProgress"):FireClient(player, 2)
+						end
+					end
+
+					local dps = DroneConfig.BaseDamagePerSecond
+						+ (data.DrillLevel - 1) * DroneConfig.DamagePerDrillLevel
+					if PlayerDataService.HasPerk(player, "LaserOverclock") then
+						dps *= 1.35
+					end
+					if formation == 2 then
+						dps *= 1.5
+					end
+					dps *= #list
+
+					for i, drone in list do
+						local body = drone.PrimaryPart
+						if body then
+							local pos
+							if formation == 3 then
+								local back = -hrp.CFrame.LookVector
+								pos = hrp.Position + back * 4 + Vector3.new((i - (#list + 1) / 2) * 1.6, 3 + i * 0.2, 0)
+							elseif target then
+								local orbit = (os.clock() * 2 + i) % (math.pi * 2)
+								pos = target.Position
+									+ Vector3.new(math.cos(orbit) * 6, 4, math.sin(orbit) * 6)
+							else
+								local angle = os.clock() + i
+								pos = hrp.Position
+									+ Vector3.new(math.cos(angle) * DroneConfig.IdleOrbitRadius, 3, math.sin(angle) * DroneConfig.IdleOrbitRadius)
+							end
+							drone:PivotTo(CFrame.new(pos))
+							local trim = drone:FindFirstChild("Trim")
+							if trim and trim:IsA("BasePart") then
+								trim.Color = laserColorFor(player)
+								trim.CFrame = body.CFrame
+							end
+						end
+					end
+
+					if target and formation ~= 3 then
+						local hp = target:GetAttribute("Health") :: number
+						local maxHp = target:GetAttribute("MaxHealth") :: number
+						hp = math.max(0, hp - dps * step)
+						target:SetAttribute("Health", hp)
+						Remotes.Get("JuiceEvent"):FireClient(player, {
+							Kind = "Laser",
+							Target = target,
+							Color = laserColorFor(player),
+							Formation = formation,
+						})
+						if target:GetAttribute("Shared") == true then
+							local SoftContestService = require(script.Parent.SoftContestService)
+							SoftContestService.AddDamage(target, player, dps * step)
+						end
+						if hp <= 0 then
+							local sector = target:GetAttribute("Sector") or "Starter"
+							local oreGain = if sector == "Starter" then 10 else 25
+							if target:GetAttribute("Shared") == true then
+								local SoftContestService = require(script.Parent.SoftContestService)
+								SoftContestService.Resolve(target)
+							else
+								EconomyService.AddOre(player, oreGain)
+								Remotes.Get("JuiceEvent"):FireClient(player, {
+									Kind = "Shatter",
+									Position = target.Position,
+									Ore = oreGain,
+								})
+								target:SetAttribute("Health", maxHp)
+								target.Transparency = 0
+								target.CFrame = target.CFrame * CFrame.Angles(0, math.rad(40), 0)
+								if PlayerDataService.HasPerk(player, "AutoSellWarpLink") then
+									EconomyService.Sell(player)
+								end
+							end
+							DroneService._targets[player.UserId] = nil
+						end
+					end
+				end
+			end
+		end
+	end)
+end
+
+return DroneService
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="41">
+          <Properties>
+            <string name="Name">EconomyService</string>
+            <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local EconomyConfig = require(Voidline.Config.EconomyConfig)
+local OreMath = require(Voidline.Modules.OreMath)
+local Remotes = require(Voidline.Remotes)
+local RateLimiter = require(Voidline.Modules.RateLimiter)
+local PlayerDataService = require(script.Parent.PlayerDataService)
+local PlotService = require(script.Parent.PlotService)
+
+local EconomyService = {
+	_limiter = RateLimiter.new(0.25),
+}
+
+local function has2x(player: Player): boolean
+	return PlayerDataService.HasPerk(player, "Credits2x")
+end
+
+function EconomyService.AddOre(player: Player, amount: number)
+	PlayerDataService.Mutate(player, function(data)
+		local cap = OreMath.CargoCap(data.CargoLevel)
+		data.Ore = math.min(cap, data.Ore + amount)
+	end)
+end
+
+function EconomyService.Sell(player: Player): boolean
+	local data = PlayerDataService.Get(player)
+	if not data or data.Ore <= 0 then
+		return false
+	end
+	local sector = "Starter"
+	if data.GalaxyFlags.Celestial then
+		sector = "Celestial"
+	elseif data.GalaxyFlags.VoidRim then
+		sector = "VoidRim"
+	elseif data.GalaxyFlags.Nebula then
+		sector = "Nebula"
+	end
+	local payout = OreMath.SellValue(data.Ore, sector, data.CreditMult, has2x(player))
+	-- First tutorial sell locked to 30 for starter cargo of 10
+	if not data.TutorialComplete and data.TutorialStep <= 2 and data.Ore >= 10 then
+		payout = EconomyConfig.FirstSellCredits * data.CreditMult
+		if has2x(player) then
+			payout *= 2
+		end
+		payout = math.floor(payout)
+	end
+	PlayerDataService.Mutate(player, function(d)
+		d.Credits += payout
+		d.Ore = 0
+		if d.TutorialStep == 2 then
+			d.TutorialStep = 3
+		end
+	end)
+	Remotes.Get("JuiceEvent"):FireClient(player, { Kind = "Sold", Amount = payout })
+	Remotes.Get("TutorialProgress"):FireClient(player, PlayerDataService.Get(player).TutorialStep)
+	return true
+end
+
+function EconomyService.TryUpgrade(player: Player, upgradeId: string): boolean
+	local data = PlayerDataService.Get(player)
+	if not data then
+		return false
+	end
+
+	local cost = 0
+	local apply: (any) -> () = function() end
+
+	if upgradeId == "Drill" then
+		cost = EconomyConfig.DrillCost(data.DrillLevel)
+		-- First drill upgrade exact 20
+		if data.DrillLevel == 1 then
+			cost = 20
+		end
+		apply = function(d)
+			d.DrillLevel += 1
+			d.Credits -= cost
+			if d.TutorialStep == 3 and d.DrillLevel >= 2 then
+				-- stay on step 3 until drone bought; mark drill done via juice only
+			end
+		end
+	elseif upgradeId == "Cargo" then
+		cost = EconomyConfig.CargoCost(data.CargoLevel)
+		if data.CargoLevel == 1 then
+			cost = 35
+		end
+		apply = function(d)
+			d.CargoLevel += 1
+			d.Credits -= cost
+		end
+	elseif upgradeId == "DroneSlot" or upgradeId == "Drone2" then
+		cost = EconomyConfig.DroneSlotCost(data.DroneSlots)
+		if data.DroneSlots == 1 then
+			cost = 50
+		end
+		apply = function(d)
+			d.DroneSlots += 1
+			d.Credits -= cost
+			if not d.TutorialComplete and d.DroneSlots >= 2 then
+				d.TutorialStep = 4
+				d.TutorialComplete = true
+				d.Credits += 100
+			end
+		end
+	elseif upgradeId == "StationTier" then
+		cost = EconomyConfig.StationTierCost(data.StationTier)
+		apply = function(d)
+			d.StationTier += 1
+			d.Credits -= cost
+			if d.StationTier >= 3 then
+				d.GalaxyFlags.Nebula = true
+			end
+			if d.StationTier >= 6 and d.DroneTier >= 2 then
+				d.GalaxyFlags.VoidRim = true
+			end
+			if d.StationTier >= 10 then
+				d.GalaxyFlags.Celestial = true
+			end
+			if d.DrillLevel >= 5 then
+				d.DroneTier = math.max(d.DroneTier, 2)
+			end
+		end
+	else
+		return false
+	end
+
+	if data.Credits < cost then
+		return false
+	end
+	PlayerDataService.Mutate(player, apply)
+	local after = PlayerDataService.Get(player)
+	if after and after.TutorialComplete and after.TutorialStep == 4 then
+		PlotService.IgniteBridge(player)
+		Remotes.Get("JuiceEvent"):FireClient(player, { Kind = "TutorialComplete", Bonus = 100 })
+	end
+	Remotes.Get("JuiceEvent"):FireClient(player, { Kind = "Upgrade", Id = upgradeId })
+	-- Notify drone service via bindable attribute
+	player:SetAttribute("VoidlineDroneSlots", after and after.DroneSlots or 1)
+	player:SetAttribute("VoidlineDrillLevel", after and after.DrillLevel or 1)
+	return true
+end
+
+function EconomyService.Init()
+	Remotes.Get("SellOre").OnServerEvent:Connect(function(player)
+		if not EconomyService._limiter:Allow(player.UserId) then
+			return
+		end
+		EconomyService.Sell(player)
+	end)
+
+	Remotes.Get("RequestUpgrade").OnServerEvent:Connect(function(player, upgradeId)
+		if not EconomyService._limiter:Allow(player.UserId) then
+			return
+		end
+		if typeof(upgradeId) ~= "string" then
+			return
+		end
+		EconomyService.TryUpgrade(player, upgradeId)
+	end)
+
+	Remotes.Get("QuickUpgrade").OnServerEvent:Connect(function(player)
+		if not EconomyService._limiter:Allow(player.UserId) then
+			return
+		end
+		-- Prefer cheapest affordable starter-path upgrade
+		local data = PlayerDataService.Get(player)
+		if not data then
+			return
+		end
+		local order = { "Drill", "Cargo", "DroneSlot", "StationTier" }
+		for _, id in order do
+			if EconomyService.TryUpgrade(player, id) then
+				return
+			end
+		end
+	end)
+end
+
+return EconomyService
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="42">
+          <Properties>
+            <string name="Name">ForgeService</string>
+            <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local ForgeConfig = require(Voidline.Config.ForgeConfig)
+local Remotes = require(Voidline.Remotes)
+local RateLimiter = require(Voidline.Modules.RateLimiter)
+local PlayerDataService = require(script.Parent.PlayerDataService)
+
+local ForgeService = {
+	_limiter = RateLimiter.new(1),
+	_forging = {} :: { [number]: boolean },
+}
+
+function ForgeService.Init()
+	Remotes.Get("RequestForge").OnServerEvent:Connect(function(player)
+		if not ForgeService._limiter:Allow(player.UserId) then
+			return
+		end
+		if ForgeService._forging[player.UserId] then
+			return
+		end
+		local data = PlayerDataService.Get(player)
+		if not data or data.VoidShards < ForgeConfig.ShardsPerArtifact then
+			return
+		end
+		local duration = ForgeConfig.ForgeDurationSeconds
+		if data.ForgeTokensEarnedToday >= ForgeConfig.DailyTokenSoftCap then
+			duration /= ForgeConfig.CoolingMultiplier
+			Remotes.Get("JuiceEvent"):FireClient(player, { Kind = "ForgeCooling" })
+		end
+		ForgeService._forging[player.UserId] = true
+		PlayerDataService.Mutate(player, function(d)
+			d.VoidShards -= ForgeConfig.ShardsPerArtifact
+		end)
+		Remotes.Get("JuiceEvent"):FireClient(player, { Kind = "ForgeStart", Duration = duration })
+		task.delay(duration, function()
+			ForgeService._forging[player.UserId] = false
+			PlayerDataService.Mutate(player, function(d)
+				d.Artifacts = (d.Artifacts or 0) + 1
+			end)
+			Remotes.Get("JuiceEvent"):FireClient(player, { Kind = "ForgeComplete" })
+			PlayerDataService.Save(player)
+		end)
+	end)
+
+	Remotes.Get("TurnInArtifact").OnServerEvent:Connect(function(player)
+		if not ForgeService._limiter:Allow(player.UserId) then
+			return
+		end
+		local data = PlayerDataService.Get(player)
+		if not data or (data.Artifacts or 0) < 1 then
+			return
+		end
+		PlayerDataService.Mutate(player, function(d)
+			d.Artifacts -= 1
+			d.VoidlineTokens += ForgeConfig.TokensPerArtifact
+			d.ForgeTokensEarnedToday += ForgeConfig.TokensPerArtifact
+		end)
+		PlayerDataService.Save(player)
+		Remotes.Get("JuiceEvent"):FireClient(player, {
+			Kind = "TokensGranted",
+			Amount = ForgeConfig.TokensPerArtifact,
+		})
+	end)
+end
+
+return ForgeService
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="43">
+          <Properties>
+            <string name="Name">JuiceService</string>
+            <string name="Source"><![CDATA[-- Server-side juice is emitted by other services via Remotes.JuiceEvent.
+local JuiceService = {}
+
+function JuiceService.Init()
+end
+
+return JuiceService
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="44">
+          <Properties>
+            <string name="Name">LeaderboardService</string>
+            <string name="Source"><![CDATA[-- v1.5 stub: 4 OrderedDataStore boards on Monolith anchors
+local LeaderboardService = {}
+
+function LeaderboardService.Init()
+	print("[Voidline] LeaderboardService stub ready (v1.5)")
+end
+
+return LeaderboardService
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="45">
+          <Properties>
+            <string name="Name">MapBuilder</string>
+            <string name="Source"><![CDATA[local Workspace = game:GetService("Workspace")
+local ServerStorage = game:GetService("ServerStorage")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local GameConfig = require(Voidline.Config.GameConfig)
+
+local MapBuilder = {}
+
+local function part(props): Part
+	local p = Instance.new("Part")
+	p.Anchored = true
+	p.CanCollide = props.CanCollide ~= false
+	p.Material = props.Material or Enum.Material.SmoothPlastic
+	p.Color = props.Color or GameConfig.Colors.Obsidian
+	p.Size = props.Size or Vector3.new(4, 1, 4)
+	p.CFrame = props.CFrame or CFrame.new()
+	p.Name = props.Name or "Part"
+	p.TopSurface = Enum.SurfaceType.Smooth
+	p.BottomSurface = Enum.SurfaceType.Smooth
+	if props.Transparency then
+		p.Transparency = props.Transparency
+	end
+	if props.Shape then
+		p.Shape = props.Shape
+	end
+	p.Parent = props.Parent
+	return p
+end
+
+local function billboard(parent: Instance, text: string, color: Color3?)
+	local bb = Instance.new("BillboardGui")
+	bb.Size = UDim2.fromOffset(220, 40)
+	bb.StudsOffset = Vector3.new(0, 6, 0)
+	bb.AlwaysOnTop = true
+	bb.Parent = parent
+	local label = Instance.new("TextLabel")
+	label.BackgroundTransparency = 1
+	label.Size = UDim2.fromScale(1, 1)
+	label.Font = Enum.Font.GothamBold
+	label.TextScaled = true
+	label.TextColor3 = color or GameConfig.Colors.Gold
+	label.Text = text
+	label.Parent = bb
+	return bb
+end
+
+function MapBuilder.Build()
+	if Workspace:FindFirstChild("VoidlineMap") then
+		return Workspace.VoidlineMap
+	end
+
+	local root = Instance.new("Folder")
+	root.Name = "VoidlineMap"
+	root.Parent = Workspace
+
+	-- Hub floor
+	local hub = Instance.new("Folder")
+	hub.Name = "Hub"
+	hub.Parent = root
+
+	part({
+		Name = "HubPad",
+		Parent = hub,
+		Size = Vector3.new(GameConfig.HubRadius * 2, 2, GameConfig.HubRadius * 2),
+		CFrame = CFrame.new(0, 0, 0),
+		Color = GameConfig.Colors.Obsidian,
+		Material = Enum.Material.Metal,
+	})
+
+	-- Voidline Monolith
+	local monolithFolder = Instance.new("Folder")
+	monolithFolder.Name = "VoidlineMonolith"
+	monolithFolder.Parent = hub
+
+	local monolith = part({
+		Name = "MonolithCore",
+		Parent = monolithFolder,
+		Size = Vector3.new(18, 72, 18),
+		CFrame = CFrame.new(0, 37, 0),
+		Color = GameConfig.Colors.Obsidian,
+		Material = Enum.Material.Slate,
+	})
+	-- Gold trim bands
+	for i = 1, 4 do
+		part({
+			Name = "GoldBand" .. i,
+			Parent = monolithFolder,
+			Size = Vector3.new(20, 1.2, 20),
+			CFrame = CFrame.new(0, 10 + i * 14, 0),
+			Color = GameConfig.Colors.Gold,
+			Material = Enum.Material.Neon,
+		})
+	end
+	billboard(monolith, "THE VOIDLINE MONOLITH")
+
+	part({
+		Name = "RebirthPad",
+		Parent = monolithFolder,
+		Size = Vector3.new(14, 1, 14),
+		CFrame = CFrame.new(16, 1.5, 0),
+		Color = GameConfig.Colors.Gold,
+		Material = Enum.Material.Neon,
+	})
+	billboard(monolithFolder.RebirthPad, "VOID REBIRTH")
+
+	part({
+		Name = "ForgeAnchor",
+		Parent = monolithFolder,
+		Size = Vector3.new(12, 1, 12),
+		CFrame = CFrame.new(-16, 1.5, 0),
+		Color = GameConfig.Colors.VoidAccent,
+		Material = Enum.Material.Neon,
+	})
+	billboard(monolithFolder.ForgeAnchor, "ARTIFACT FORGE")
+
+	part({
+		Name = "CodeTerminal",
+		Parent = monolithFolder,
+		Size = Vector3.new(8, 10, 2),
+		CFrame = CFrame.new(0, 6, 22),
+		Color = GameConfig.Colors.Obsidian,
+		Material = Enum.Material.Metal,
+	})
+	billboard(monolithFolder.CodeTerminal, "VOIDLINE CODES")
+
+	part({
+		Name = "SummonPads",
+		Parent = monolithFolder,
+		Size = Vector3.new(10, 1, 10),
+		CFrame = CFrame.new(0, 1.5, -22),
+		Color = GameConfig.Colors.GoldBright,
+		Material = Enum.Material.Neon,
+	})
+	billboard(monolithFolder.SummonPads, "SERVER SUMMONS")
+
+	part({
+		Name = "EventCore",
+		Parent = monolithFolder,
+		Size = Vector3.new(6, 6, 6),
+		CFrame = CFrame.new(0, 8, 0),
+		Color = GameConfig.Colors.Gold,
+		Material = Enum.Material.Neon,
+		Shape = Enum.PartType.Ball,
+		CanCollide = false,
+	})
+
+	local boards = Instance.new("Folder")
+	boards.Name = "LeaderboardAnchors"
+	boards.Parent = hub
+	for i, name in { "TopCredits", "TopRebirths", "CodexDiscoveries", "TopSummoners" } do
+		local anchor = part({
+			Name = name,
+			Parent = boards,
+			Size = Vector3.new(10, 14, 1),
+			CFrame = CFrame.new(math.cos(i) * 28, 10, math.sin(i) * 28),
+			Color = GameConfig.Colors.Obsidian,
+		})
+		billboard(anchor, name)
+	end
+
+	part({
+		Name = "VIPLoungePad",
+		Parent = hub,
+		Size = Vector3.new(20, 1, 20),
+		CFrame = CFrame.new(40, 1.5, 40),
+		Color = GameConfig.Colors.Gold,
+		Material = Enum.Material.Neon,
+	})
+	billboard(hub.VIPLoungePad, "VOID VIP LOUNGE")
+
+	local monument = part({
+		Name = "KillshotMonument",
+		Parent = hub,
+		Size = Vector3.new(6, 16, 6),
+		CFrame = CFrame.new(-40, 9, 40),
+		Color = GameConfig.Colors.Obsidian,
+		Material = Enum.Material.Metal,
+	})
+	billboard(monument, "Created by Killshot2336")
+
+	-- Deep Space zone
+	local deep = Instance.new("Folder")
+	deep.Name = "DeepSpace"
+	deep.Parent = root
+	part({
+		Name = "SoftContestZone",
+		Parent = deep,
+		Size = Vector3.new(90, 1, 90),
+		CFrame = CFrame.new(0, 0.5, 0),
+		Color = Color3.fromRGB(20, 10, 40),
+		Transparency = 0.35,
+		CanCollide = false,
+	})
+	local rareSpawns = Instance.new("Folder")
+	rareSpawns.Name = "RareAsteroidSpawns"
+	rareSpawns.Parent = deep
+	for i = 1, 8 do
+		local angle = (i / 8) * math.pi * 2
+		local pos = Vector3.new(math.cos(angle) * 55, 18, math.sin(angle) * 55)
+		local rock = part({
+			Name = "VoidAsteroid_" .. i,
+			Parent = rareSpawns,
+			Size = Vector3.new(10, 10, 10),
+			CFrame = CFrame.new(pos),
+			Color = Color3.fromRGB(40, 20, 70),
+			Material = Enum.Material.Rock,
+			Shape = Enum.PartType.Ball,
+		})
+		rock:SetAttribute("Sector", "VoidRim")
+		rock:SetAttribute("MaxHealth", 5000)
+		rock:SetAttribute("Health", 5000)
+		rock:SetAttribute("Shared", true)
+	end
+	part({
+		Name = "EventMeteorAnchor",
+		Parent = deep,
+		Size = Vector3.new(2, 2, 2),
+		CFrame = CFrame.new(0, 40, 0),
+		Transparency = 1,
+		CanCollide = false,
+	})
+
+	-- Kyria overlook (secret)
+	local kyria = Instance.new("Folder")
+	kyria.Name = "KyriaOverlook"
+	kyria.Parent = root
+	local overlook = part({
+		Name = "StarlightOverlook",
+		Parent = kyria,
+		Size = Vector3.new(16, 1, 16),
+		CFrame = CFrame.new(180, 60, -180),
+		Color = Color3.fromRGB(255, 230, 180),
+		Material = Enum.Material.Neon,
+	})
+	overlook:SetAttribute("SecretAura", true)
+	-- Quiet marker only — no Kyria branding in UI
+	billboard(overlook, "…", Color3.fromRGB(255, 240, 200))
+
+	local star = part({
+		Name = "HiddenStar",
+		Parent = kyria,
+		Size = Vector3.new(40, 40, 40),
+		CFrame = CFrame.new(220, 140, -220),
+		Color = Color3.fromRGB(255, 236, 180),
+		Material = Enum.Material.Neon,
+		Shape = Enum.PartType.Ball,
+		CanCollide = false,
+	})
+	star.Transparency = 0.15
+
+	-- Plots ring
+	local plotsFolder = Instance.new("Folder")
+	plotsFolder.Name = "Plots"
+	plotsFolder.Parent = root
+
+	local templates = ServerStorage:FindFirstChild("Voidline")
+	if not templates then
+		templates = Instance.new("Folder")
+		templates.Name = "Voidline"
+		templates.Parent = ServerStorage
+	end
+
+	for i = 1, GameConfig.PlotCount do
+		local angle = ((i - 1) / GameConfig.PlotCount) * math.pi * 2
+		local center = Vector3.new(
+			math.cos(angle) * GameConfig.PlotRingRadius,
+			0,
+			math.sin(angle) * GameConfig.PlotRingRadius
+		)
+		local plot = Instance.new("Folder")
+		plot.Name = "Plot_" .. i
+		plot.Parent = plotsFolder
+		plot:SetAttribute("PlotIndex", i)
+		plot:SetAttribute("Claimed", false)
+
+		part({
+			Name = "StationBase",
+			Parent = plot,
+			Size = Vector3.new(60, 2, 60),
+			CFrame = CFrame.new(center + Vector3.new(0, 1, 0)),
+			Color = GameConfig.Colors.Obsidian,
+			Material = Enum.Material.Metal,
+		})
+
+		local claim = part({
+			Name = "ClaimPad",
+			Parent = plot,
+			Size = Vector3.new(12, 1, 12),
+			CFrame = CFrame.new(center + Vector3.new(0, 2.2, 18)),
+			Color = GameConfig.Colors.Gold,
+			Material = Enum.Material.Neon,
+		})
+		claim:SetAttribute("PlotIndex", i)
+		billboard(claim, "CLAIM STATION " .. i)
+
+		local station = Instance.new("Folder")
+		station.Name = "Station"
+		station.Parent = plot
+
+		local refinery = part({
+			Name = "Refinery",
+			Parent = station,
+			Size = Vector3.new(14, 8, 14),
+			CFrame = CFrame.new(center + Vector3.new(-16, 5, -8)),
+			Color = GameConfig.Colors.Obsidian,
+			Material = Enum.Material.Metal,
+		})
+		billboard(refinery, "STATION REFINERY")
+
+		local grinder = part({
+			Name = "GrinderCore",
+			Parent = station,
+			Size = Vector3.new(12, 10, 12),
+			CFrame = CFrame.new(center + Vector3.new(16, 6, -8)),
+			Color = Color3.fromRGB(30, 30, 40),
+			Material = Enum.Material.DiamondPlate,
+		})
+		billboard(grinder, "GRINDER CORE")
+
+		local upgrades = Instance.new("Folder")
+		upgrades.Name = "UpgradePads"
+		upgrades.Parent = station
+		local upgradeDefs = {
+			{ "Drill", Vector3.new(-18, 0, 8) },
+			{ "Cargo", Vector3.new(-6, 0, 8) },
+			{ "DroneSlot", Vector3.new(6, 0, 8) },
+			{ "StationTier", Vector3.new(18, 0, 8) },
+		}
+		for _, def in upgradeDefs do
+			local up = part({
+				Name = def[1],
+				Parent = upgrades,
+				Size = Vector3.new(8, 1, 8),
+				CFrame = CFrame.new(center + def[2] + Vector3.new(0, 2.2, 0)),
+				Color = GameConfig.Colors.Gold,
+				Material = Enum.Material.Neon,
+			})
+			up:SetAttribute("UpgradeId", def[1])
+			billboard(up, def[1])
+		end
+
+		local tuner = part({
+			Name = "LaserTuner",
+			Parent = station,
+			Size = Vector3.new(6, 1, 6),
+			CFrame = CFrame.new(center + Vector3.new(0, 2.2, -18)),
+			Color = Color3.fromRGB(90, 220, 255),
+			Material = Enum.Material.Neon,
+		})
+		billboard(tuner, "LASER COLOR")
+
+		part({
+			Name = "WarpGatePlaceholder",
+			Parent = station,
+			Size = Vector3.new(10, 16, 2),
+			CFrame = CFrame.new(center + Vector3.new(22, 9, 16)),
+			Color = Color3.fromRGB(40, 40, 60),
+			Transparency = 0.4,
+		})
+
+		local relics = Instance.new("Folder")
+		relics.Name = "RelicPedestals"
+		relics.Parent = station
+
+		local spawn = part({
+			Name = "PlayerSpawn",
+			Parent = plot,
+			Size = Vector3.new(6, 1, 6),
+			CFrame = CFrame.new(center + Vector3.new(0, 2.5, 10)),
+			Color = GameConfig.Colors.GoldBright,
+			Material = Enum.Material.Neon,
+			CanCollide = false,
+		})
+		spawn.Transparency = 0.3
+
+		-- Personal asteroid belt
+		local belt = Instance.new("Folder")
+		belt.Name = "PersonalBelt"
+		belt.Parent = plot
+		for a = 1, 6 do
+			local aAng = (a / 6) * math.pi * 2
+			local aPos = center + Vector3.new(math.cos(aAng) * 36, 10, math.sin(aAng) * 36)
+			local asteroid = part({
+				Name = "Asteroid_" .. a,
+				Parent = belt,
+				Size = Vector3.new(7, 7, 7),
+				CFrame = CFrame.new(aPos),
+				Color = Color3.fromRGB(70, 70, 80),
+				Material = Enum.Material.Rock,
+				Shape = Enum.PartType.Ball,
+			})
+			asteroid:SetAttribute("Sector", "Starter")
+			asteroid:SetAttribute("MaxHealth", 40)
+			asteroid:SetAttribute("Health", 40)
+			asteroid:SetAttribute("Shared", false)
+			asteroid:SetAttribute("PlotIndex", i)
+		end
+
+		-- Energy bridge path (visual beam parts)
+		local bridge = Instance.new("Folder")
+		bridge.Name = "BridgeAttach"
+		bridge.Parent = plot
+		local outward = center.Unit
+		local bridgeStart = center - outward * 28
+		local bridgeEnd = outward * (GameConfig.HubRadius + 4)
+		local mid = (bridgeStart + bridgeEnd) / 2
+		local length = (bridgeEnd - bridgeStart).Magnitude
+		local beam = part({
+			Name = "EnergyBridge",
+			Parent = bridge,
+			Size = Vector3.new(4, 0.6, length),
+			CFrame = CFrame.lookAt(mid, bridgeEnd) * CFrame.new(0, 2, 0),
+			Color = GameConfig.Colors.Gold,
+			Material = Enum.Material.Neon,
+			Transparency = 0.65,
+			CanCollide = false,
+		})
+		beam:SetAttribute("Ignited", false)
+	end
+
+	-- Spawn location for unclaimed players near monument
+	local spawnLoc = Instance.new("SpawnLocation")
+	spawnLoc.Name = "VoidlineSpawn"
+	spawnLoc.Anchored = true
+	spawnLoc.Size = Vector3.new(12, 1, 12)
+	spawnLoc.CFrame = CFrame.new(-40, 1.5, 52)
+	spawnLoc.Color = GameConfig.Colors.Gold
+	spawnLoc.Material = Enum.Material.Neon
+	spawnLoc.Duration = 0
+	spawnLoc.Parent = hub
+
+	print("[Voidline] MapBuilder: VoidlineMap ready (12 plots)")
+	return root
+end
+
+return MapBuilder
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="46">
+          <Properties>
+            <string name="Name">MonetizationService</string>
+            <string name="Source"><![CDATA[local MarketplaceService = game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local MonetizationConfig = require(Voidline.Config.MonetizationConfig)
+local Remotes = require(Voidline.Remotes)
+local RateLimiter = require(Voidline.Modules.RateLimiter)
+local PlayerDataService = require(script.Parent.PlayerDataService)
+local WorldEventService = require(script.Parent.WorldEventService)
+
+local MonetizationService = {
+	_limiter = RateLimiter.new(0.5),
+}
+
+local function grantPass(player: Player, passId: string)
+	PlayerDataService.Mutate(player, function(d)
+		d.OwnedPerks[passId] = true
+	end)
+	PlayerDataService.Save(player)
+	Remotes.Get("JuiceEvent"):FireClient(player, { Kind = "PassOwned", Id = passId })
+end
+
+function MonetizationService.Init()
+	Remotes.Get("PurchaseWithTokens").OnServerEvent:Connect(function(player, passId)
+		if not MonetizationService._limiter:Allow(player.UserId) then
+			return
+		end
+		if typeof(passId) ~= "string" then
+			return
+		end
+		local pass = MonetizationConfig.GetPass(passId)
+		local data = PlayerDataService.Get(player)
+		if not pass or not data then
+			return
+		end
+		if data.OwnedPerks[passId] then
+			return
+		end
+		if data.VoidlineTokens < pass.Tokens then
+			return
+		end
+		PlayerDataService.Mutate(player, function(d)
+			d.VoidlineTokens -= pass.Tokens
+			d.OwnedPerks[passId] = true
+		end)
+		PlayerDataService.Save(player)
+		Remotes.Get("JuiceEvent"):FireClient(player, { Kind = "PassOwned", Id = passId })
+	end)
+
+	Remotes.Get("PromptRobuxPurchase").OnServerEvent:Connect(function(player, kind, id)
+		if not MonetizationService._limiter:Allow(player.UserId) then
+			return
+		end
+		if kind == "Pass" then
+			local pass = MonetizationConfig.GetPass(id)
+			if not pass or pass.GamePassId == 0 then
+				-- Studio/dev fallback: grant for testing when ID unset
+				grantPass(player, id)
+				Remotes.Get("JuiceEvent"):FireClient(player, {
+					Kind = "DevGrant",
+					Message = "Placeholder GamePassId — granted for Studio test",
+				})
+				return
+			end
+			MarketplaceService:PromptGamePassPurchase(player, pass.GamePassId)
+		elseif kind == "Product" then
+			local product = nil
+			for _, p in MonetizationConfig.DevProducts do
+				if p.Id == id then
+					product = p
+					break
+				end
+			end
+			if not product or product.ProductId == 0 then
+				if id == "SummonVoidStarfall" then
+					WorldEventService.QueueSummon(player, "VoidStarfall")
+				elseif id == "ServerLuckSurge" then
+					WorldEventService.QueueSummon(player, "LuckSurge")
+				end
+				return
+			end
+			MarketplaceService:PromptProductPurchase(player, product.ProductId)
+		end
+	end)
+
+	MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player, passId, wasPurchased)
+		if not wasPurchased then
+			return
+		end
+		for _, pass in MonetizationConfig.Passes do
+			if pass.GamePassId == passId then
+				grantPass(player, pass.Id)
+				break
+			end
+		end
+	end)
+
+	MarketplaceService.ProcessReceipt = function(receipt)
+		local player = Players:GetPlayerByUserId(receipt.PlayerId)
+		if not player then
+			return Enum.ProductPurchaseDecision.NotProcessedYet
+		end
+		for _, product in MonetizationConfig.DevProducts do
+			if product.ProductId == receipt.ProductId then
+				if product.Id == "SummonVoidStarfall" then
+					WorldEventService.QueueSummon(player, "VoidStarfall")
+				elseif product.Id == "ServerLuckSurge" then
+					WorldEventService.QueueSummon(player, "LuckSurge")
+				end
+				return Enum.ProductPurchaseDecision.PurchaseGranted
+			end
+		end
+		return Enum.ProductPurchaseDecision.NotProcessedYet
+	end
+end
+
+return MonetizationService
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="47">
+          <Properties>
+            <string name="Name">PlayerDataService</string>
+            <string name="Source"><![CDATA[local DataStoreService = game:GetService("DataStoreService")
+local Players = game:GetService("Players")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local GameConfig = require(Voidline.Config.GameConfig)
+local RebirthConfig = require(Voidline.Config.RebirthConfig)
+local PerformanceConfig = require(Voidline.Config.PerformanceConfig)
+local DroneConfig = require(Voidline.Config.DroneConfig)
+local Remotes = require(Voidline.Remotes)
+
+local STORE_NAME = "VoidlinePlayer_v1"
+local store = DataStoreService:GetDataStore(STORE_NAME)
+
+local PlayerDataService = {
+	_profiles = {} :: { [number]: any },
+	_saving = {} :: { [number]: boolean },
+}
+
+local function dayKey(): string
+	return os.date("!%Y-%m-%d")
+end
+
+local function defaultProfile()
+	return {
+		Credits = 0,
+		Ore = 0,
+		VoidShards = 0,
+		Artifacts = 0,
+		VoidlineTokens = 0,
+		Rebirths = 0,
+		CreditMult = 1,
+		StationTier = 1,
+		DrillLevel = 1,
+		CargoLevel = 1,
+		DroneSlots = DroneConfig.StarterSlots,
+		DroneTier = 1,
+		GalaxyFlags = {
+			Starter = true,
+			Nebula = false,
+			VoidRim = false,
+			Celestial = false,
+		},
+		OwnedPerks = {},
+		RedeemedCodes = {},
+		TutorialStep = 1,
+		TutorialComplete = false,
+		Settings = {
+			PerfMode = PerformanceConfig.DefaultPerfMode,
+			HideJetpack = false,
+			ClipMode = false,
+			LaserColor = DroneConfig.DefaultLaserColor,
+		},
+		Cosmetics = { Title = nil },
+		ForgeTokensEarnedToday = 0,
+		ForgeDayKey = dayKey(),
+		DailyStreak = 0,
+		LastLoginDay = "",
+		TrialVouchers = {},
+		Codex = {},
+		Relics = {},
+		Formation = 1,
+		Version = 1,
+	}
+end
+
+function PlayerDataService.Get(player: Player)
+	return PlayerDataService._profiles[player.UserId]
+end
+
+function PlayerDataService.Replicate(player: Player)
+	local data = PlayerDataService.Get(player)
+	if not data then
+		return
+	end
+	Remotes.Get("DataSnapshot"):FireClient(player, data)
+end
+
+function PlayerDataService.Load(player: Player)
+	local key = "p_" .. player.UserId
+	local ok, saved = pcall(function()
+		return store:GetAsync(key)
+	end)
+	local data = defaultProfile()
+	if ok and typeof(saved) == "table" then
+		for k, v in saved do
+			data[k] = v
+		end
+	end
+	-- Daily streak on load
+	local today = dayKey()
+	if data.LastLoginDay ~= today then
+		local yesterday = os.date("!%Y-%m-%d", os.time() - 86400)
+		if data.LastLoginDay == yesterday then
+			data.DailyStreak = math.min(7, (data.DailyStreak or 0) + 1)
+		else
+			data.DailyStreak = 1
+		end
+		data.LastLoginDay = today
+	end
+	if data.ForgeDayKey ~= today then
+		data.ForgeDayKey = today
+		data.ForgeTokensEarnedToday = 0
+	end
+	data.CreditMult = RebirthConfig.CreditMultiplier(data.Rebirths or 0)
+	PlayerDataService._profiles[player.UserId] = data
+	PlayerDataService.Replicate(player)
+	return data
+end
+
+function PlayerDataService.Save(player: Player)
+	local data = PlayerDataService.Get(player)
+	if not data or PlayerDataService._saving[player.UserId] then
+		return
+	end
+	PlayerDataService._saving[player.UserId] = true
+	local key = "p_" .. player.UserId
+	local payload = table.clone(data)
+	payload.Ore = data.Ore -- session ore persists too for fairness
+	local ok, err = pcall(function()
+		store:UpdateAsync(key, function()
+			return payload
+		end)
+	end)
+	PlayerDataService._saving[player.UserId] = false
+	if not ok then
+		warn("[Voidline] Save failed", player.Name, err)
+	end
+end
+
+function PlayerDataService.Mutate(player: Player, mutator: (any) -> ())
+	local data = PlayerDataService.Get(player)
+	if not data then
+		return
+	end
+	mutator(data)
+	PlayerDataService.Replicate(player)
+end
+
+function PlayerDataService.HasPerk(player: Player, perkId: string): boolean
+	local data = PlayerDataService.Get(player)
+	if not data then
+		return false
+	end
+	if data.OwnedPerks[perkId] then
+		return true
+	end
+	local voucherExp = data.TrialVouchers[perkId]
+	if voucherExp and voucherExp > os.time() then
+		return true
+	end
+	return false
+end
+
+function PlayerDataService.Init()
+	Remotes.Get("SettingsUpdate").OnServerEvent:Connect(function(player, patch)
+		if typeof(patch) ~= "table" then
+			return
+		end
+		PlayerDataService.Mutate(player, function(d)
+			if typeof(patch.PerfMode) == "boolean" then
+				d.Settings.PerfMode = patch.PerfMode
+			end
+			if typeof(patch.HideJetpack) == "boolean" then
+				d.Settings.HideJetpack = patch.HideJetpack
+			end
+			if typeof(patch.ClipMode) == "boolean" then
+				d.Settings.ClipMode = patch.ClipMode
+			end
+			if typeof(patch.LaserColor) == "string" then
+				d.Settings.LaserColor = patch.LaserColor
+			end
+		end)
+	end)
+
+	Players.PlayerAdded:Connect(function(player)
+		PlayerDataService.Load(player)
+	end)
+	Players.PlayerRemoving:Connect(function(player)
+		PlayerDataService.Save(player)
+		PlayerDataService._profiles[player.UserId] = nil
+	end)
+	for _, player in Players:GetPlayers() do
+		task.spawn(PlayerDataService.Load, player)
+	end
+	task.spawn(function()
+		while true do
+			task.wait(GameConfig.AutosaveSeconds)
+			for _, player in Players:GetPlayers() do
+				task.spawn(PlayerDataService.Save, player)
+			end
+		end
+	end)
+	game:BindToClose(function()
+		for _, player in Players:GetPlayers() do
+			PlayerDataService.Save(player)
+		end
+	end)
+end
+
+return PlayerDataService
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="48">
+          <Properties>
+            <string name="Name">PlotService</string>
+            <string name="Source"><![CDATA[local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local Remotes = require(Voidline.Remotes)
+local RateLimiter = require(Voidline.Modules.RateLimiter)
+local PlayerDataService = require(script.Parent.PlayerDataService)
+
+local PlotService = {
+	Owners = {} :: { [number]: Player },
+	ByPlayer = {} :: { [number]: number },
+	_limiter = RateLimiter.new(0.5),
+}
+
+local function getPlot(index: number): Folder?
+	local map = Workspace:FindFirstChild("VoidlineMap")
+	if not map then
+		return nil
+	end
+	local plots = map:FindFirstChild("Plots")
+	return plots and plots:FindFirstChild("Plot_" .. index)
+end
+
+function PlotService.GetPlayerPlot(player: Player): Folder?
+	local idx = PlotService.ByPlayer[player.UserId]
+	if not idx then
+		return nil
+	end
+	return getPlot(idx)
+end
+
+function PlotService.TeleportToPlot(player: Player, plotIndex: number)
+	local plot = getPlot(plotIndex)
+	if not plot then
+		return
+	end
+	local spawn = plot:FindFirstChild("PlayerSpawn")
+	local char = player.Character or player.CharacterAdded:Wait()
+	local hrp = char:WaitForChild("HumanoidRootPart")
+	if spawn and spawn:IsA("BasePart") then
+		hrp.CFrame = spawn.CFrame + Vector3.new(0, 3, 0)
+	end
+end
+
+function PlotService.Claim(player: Player, plotIndex: number): boolean
+	if PlotService.ByPlayer[player.UserId] then
+		return false
+	end
+	if PlotService.Owners[plotIndex] then
+		return false
+	end
+	local plot = getPlot(plotIndex)
+	if not plot then
+		return false
+	end
+	PlotService.Owners[plotIndex] = player
+	PlotService.ByPlayer[player.UserId] = plotIndex
+	plot:SetAttribute("Claimed", true)
+	plot:SetAttribute("OwnerUserId", player.UserId)
+	PlayerDataService.Mutate(player, function(data)
+		data.PlotIndex = plotIndex
+	end)
+	PlotService.TeleportToPlot(player, plotIndex)
+	Remotes.Get("JuiceEvent"):FireClient(player, { Kind = "ClaimPlot", PlotIndex = plotIndex })
+	return true
+end
+
+function PlotService.IgniteBridge(player: Player)
+	local plot = PlotService.GetPlayerPlot(player)
+	if not plot then
+		return
+	end
+	local bridge = plot:FindFirstChild("BridgeAttach")
+	local beam = bridge and bridge:FindFirstChild("EnergyBridge")
+	if beam and beam:IsA("BasePart") then
+		beam.Transparency = 0.15
+		beam:SetAttribute("Ignited", true)
+	end
+	Remotes.Get("JuiceEvent"):FireClient(player, { Kind = "BridgeIgnition" })
+end
+
+function PlotService.Init()
+	Remotes.Get("ClaimPlot").OnServerEvent:Connect(function(player, plotIndex)
+		if not PlotService._limiter:Allow(player.UserId) then
+			return
+		end
+		if typeof(plotIndex) ~= "number" then
+			return
+		end
+		plotIndex = math.floor(plotIndex)
+		if plotIndex < 1 or plotIndex > 12 then
+			return
+		end
+		PlotService.Claim(player, plotIndex)
+	end)
+
+	-- Auto-claim first free plot on join for instant action
+	Players.PlayerAdded:Connect(function(player)
+		player.CharacterAdded:Connect(function()
+			task.wait(0.5)
+			if PlotService.ByPlayer[player.UserId] then
+				PlotService.TeleportToPlot(player, PlotService.ByPlayer[player.UserId])
+				return
+			end
+			for i = 1, 12 do
+				if not PlotService.Owners[i] then
+					PlotService.Claim(player, i)
+					break
+				end
+			end
+		end)
+	end)
+
+	Players.PlayerRemoving:Connect(function(player)
+		local idx = PlotService.ByPlayer[player.UserId]
+		if idx then
+			PlotService.Owners[idx] = nil
+			local plot = getPlot(idx)
+			if plot then
+				plot:SetAttribute("Claimed", false)
+				plot:SetAttribute("OwnerUserId", nil)
+			end
+		end
+		PlotService.ByPlayer[player.UserId] = nil
+		PlotService._limiter:Clear(player.UserId)
+	end)
+end
+
+return PlotService
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="49">
+          <Properties>
+            <string name="Name">RebirthService</string>
+            <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local RebirthConfig = require(Voidline.Config.RebirthConfig)
+local Remotes = require(Voidline.Remotes)
+local RateLimiter = require(Voidline.Modules.RateLimiter)
+local PlayerDataService = require(script.Parent.PlayerDataService)
+
+local RebirthService = {
+	_limiter = RateLimiter.new(2),
+}
+
+function RebirthService.Init()
+	Remotes.Get("RequestRebirth").OnServerEvent:Connect(function(player)
+		if not RebirthService._limiter:Allow(player.UserId) then
+			return
+		end
+		local data = PlayerDataService.Get(player)
+		if not data or data.StationTier < RebirthConfig.RequiredStationTier then
+			return
+		end
+		local nextRebirth = data.Rebirths + 1
+		local shards = RebirthConfig.ShardPayout(nextRebirth)
+		PlayerDataService.Mutate(player, function(d)
+			d.Rebirths = nextRebirth
+			d.CreditMult = RebirthConfig.CreditMultiplier(nextRebirth)
+			d.Credits = 0
+			d.Ore = 0
+			d.StationTier = 1
+			d.DrillLevel = 1
+			d.CargoLevel = 1
+			-- Keep drone slots as quality-of-life; design said basic drill/cargo + pads reset
+			d.VoidShards += shards
+			d.Cosmetics.Title = "VOID " .. tostring(nextRebirth)
+			d.GalaxyFlags.Nebula = false
+			d.GalaxyFlags.VoidRim = false
+			d.GalaxyFlags.Celestial = false
+			d.GalaxyFlags.Starter = true
+		end)
+		PlayerDataService.Save(player)
+		Remotes.Get("JuiceEvent"):FireAllClients({
+			Kind = "RebirthShockwave",
+			PlayerName = player.DisplayName,
+			Rebirths = nextRebirth,
+		})
+	end)
+end
+
+return RebirthService
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="50">
+          <Properties>
+            <string name="Name">SoftContestService</string>
+            <string name="Source"><![CDATA[local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local ContributionSplit = require(Voidline.Modules.ContributionSplit)
+local Remotes = require(Voidline.Remotes)
+local PlayerDataService = require(script.Parent.PlayerDataService)
+local EconomyService = require(script.Parent.EconomyService)
+
+local SoftContestService = {
+	_damage = {} :: { [BasePart]: { [number]: number } },
+}
+
+function SoftContestService.AddDamage(target: BasePart, player: Player, amount: number)
+	local map = SoftContestService._damage[target]
+	if not map then
+		map = {}
+		SoftContestService._damage[target] = map
+	end
+	map[player.UserId] = (map[player.UserId] or 0) + amount
+	Remotes.Get("SoftContestUpdate"):FireAllClients({
+		Target = target,
+		Damage = map,
+	})
+end
+
+function SoftContestService.Resolve(target: BasePart)
+	local map = SoftContestService._damage[target] or {}
+	local shares = ContributionSplit.Compute(map)
+	local poolOre = 80
+	local topId = nil
+	local topShare = -1
+	for userId, share in shares do
+		if share > topShare then
+			topShare = share
+			topId = userId
+		end
+	end
+	for userId, share in shares do
+		local player = Players:GetPlayerByUserId(userId)
+		if player then
+			local ore = math.max(1, math.floor(poolOre * share))
+			local shards = if share >= 0.2 then 2 else 1
+			if PlayerDataService.HasPerk(player, "ShardRelicLuck2x") then
+				shards *= 2
+			end
+			EconomyService.AddOre(player, ore)
+			PlayerDataService.Mutate(player, function(d)
+				d.VoidShards += shards
+			end)
+			Remotes.Get("JuiceEvent"):FireClient(player, {
+				Kind = "CoreChunk",
+				Position = target.Position,
+				Ore = ore,
+				IsTop = userId == topId,
+			})
+		end
+	end
+	SoftContestService._damage[target] = nil
+	local maxHp = target:GetAttribute("MaxHealth") or 5000
+	-- Respawn timer
+	target.Transparency = 0.8
+	task.delay(20, function()
+		if target and target.Parent then
+			target:SetAttribute("Health", maxHp)
+			target.Transparency = 0
+		end
+	end)
+end
+
+function SoftContestService.Init()
+	-- no remotes; driven by DroneService
+end
+
+return SoftContestService
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="51">
+          <Properties>
+            <string name="Name">SquadService</string>
+            <string name="Source"><![CDATA[local Players = game:GetService("Players")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local SquadConfig = require(Voidline.Config.SquadConfig)
+local Remotes = require(Voidline.Remotes)
+local RateLimiter = require(Voidline.Modules.RateLimiter)
+
+local SquadService = {
+	_squads = {} :: { [string]: { number } }, -- squadId -> userIds
+	_byPlayer = {} :: { [number]: string },
+	_limiter = RateLimiter.new(0.5),
+}
+
+local function replicate(squadId: string)
+	local members = SquadService._squads[squadId] or {}
+	local names = {}
+	for _, userId in members do
+		local p = Players:GetPlayerByUserId(userId)
+		if p then
+			table.insert(names, p.DisplayName)
+		end
+	end
+	for _, userId in members do
+		local p = Players:GetPlayerByUserId(userId)
+		if p then
+			Remotes.Get("SquadUpdate"):FireClient(p, {
+				SquadId = squadId,
+				Members = names,
+				LuckBonus = SquadConfig.LinkedShardLuckBonus,
+			})
+		end
+	end
+end
+
+function SquadService.GetLuckBonus(player: Player): number
+	local sid = SquadService._byPlayer[player.UserId]
+	if not sid then
+		return 0
+	end
+	local members = SquadService._squads[sid]
+	if members and #members >= SquadConfig.MinSize then
+		return SquadConfig.LinkedShardLuckBonus
+	end
+	return 0
+end
+
+function SquadService.Init()
+	Remotes.Get("SquadInvite").OnServerEvent:Connect(function(player, targetName)
+		if not SquadService._limiter:Allow(player.UserId) then
+			return
+		end
+		if typeof(targetName) ~= "string" then
+			return
+		end
+		local target = nil
+		for _, p in Players:GetPlayers() do
+			if string.lower(p.Name) == string.lower(targetName)
+				or string.lower(p.DisplayName) == string.lower(targetName) then
+				target = p
+				break
+			end
+		end
+		if not target or target == player then
+			return
+		end
+		local sid = SquadService._byPlayer[player.UserId]
+		if not sid then
+			sid = "squad_" .. player.UserId .. "_" .. tostring(os.time())
+			SquadService._squads[sid] = { player.UserId }
+			SquadService._byPlayer[player.UserId] = sid
+		end
+		local members = SquadService._squads[sid]
+		if #members >= SquadConfig.MaxSize then
+			return
+		end
+		if SquadService._byPlayer[target.UserId] then
+			return
+		end
+		table.insert(members, target.UserId)
+		SquadService._byPlayer[target.UserId] = sid
+		replicate(sid)
+	end)
+
+	Remotes.Get("SquadLeave").OnServerEvent:Connect(function(player)
+		local sid = SquadService._byPlayer[player.UserId]
+		if not sid then
+			return
+		end
+		local members = SquadService._squads[sid]
+		if members then
+			for i = #members, 1, -1 do
+				if members[i] == player.UserId then
+					table.remove(members, i)
+				end
+			end
+			if #members == 0 then
+				SquadService._squads[sid] = nil
+			else
+				replicate(sid)
+			end
+		end
+		SquadService._byPlayer[player.UserId] = nil
+		Remotes.Get("SquadUpdate"):FireClient(player, { SquadId = nil, Members = {} })
+	end)
+
+	Remotes.Get("SquadKick").OnServerEvent:Connect(function(player, targetName)
+		local sid = SquadService._byPlayer[player.UserId]
+		if not sid then
+			return
+		end
+		-- Leader is creator (first member)
+		local members = SquadService._squads[sid]
+		if not members or members[1] ~= player.UserId then
+			return
+		end
+		for _, p in Players:GetPlayers() do
+			if p.Name == targetName or p.DisplayName == targetName then
+				for i = #members, 1, -1 do
+					if members[i] == p.UserId then
+						table.remove(members, i)
+					end
+				end
+				SquadService._byPlayer[p.UserId] = nil
+				Remotes.Get("SquadUpdate"):FireClient(p, { SquadId = nil, Members = {} })
+				replicate(sid)
+				break
+			end
+		end
+	end)
+
+	Players.PlayerRemoving:Connect(function(player)
+		local sid = SquadService._byPlayer[player.UserId]
+		if not sid then
+			return
+		end
+		local members = SquadService._squads[sid]
+		if members then
+			for i = #members, 1, -1 do
+				if members[i] == player.UserId then
+					table.remove(members, i)
+				end
+			end
+			if #members == 0 then
+				SquadService._squads[sid] = nil
+			else
+				replicate(sid)
+			end
+		end
+		SquadService._byPlayer[player.UserId] = nil
+	end)
+end
+
+return SquadService
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="52">
+          <Properties>
+            <string name="Name">TowService</string>
+            <string name="Source"><![CDATA[-- Tow spectacle is primarily client VFX; server authorizes grind completion via Mining/SoftContest.
+-- This service exposes helpers for future physical tow replication.
+local TowService = {}
+
+function TowService.Init()
+	-- Reserved for networked Core Chunk tow entities in a later polish pass.
+end
+
+return TowService
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="53">
+          <Properties>
+            <string name="Name">WarpService</string>
+            <string name="Source"><![CDATA[-- v2 stub: Deep-Space Warp Gate + Anomaly Sectors
+local WarpService = {}
+
+function WarpService.Init()
+	print("[Voidline] WarpService stub ready (v2)")
+end
+
+return WarpService
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="54">
+          <Properties>
+            <string name="Name">WorldEventService</string>
+            <string name="Source"><![CDATA[local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local GameConfig = require(Voidline.Config.GameConfig)
+local SoftContestConfig = require(Voidline.Config.SoftContestConfig)
+local Remotes = require(Voidline.Remotes)
+
+local WorldEventService = {
+	_active = false,
+	_queue = {} :: { { Player: Player, Kind: string } },
+	_luckSurgeUntil = 0,
+}
+
+local function getDeep(): Folder?
+	local map = Workspace:FindFirstChild("VoidlineMap")
+	return map and map:FindFirstChild("DeepSpace")
+end
+
+local function spawnEventMeteor(kind: string)
+	local deep = getDeep()
+	if not deep then
+		return
+	end
+	local folder = deep:FindFirstChild("EventMeteors")
+	if not folder then
+		folder = Instance.new("Folder")
+		folder.Name = "EventMeteors"
+		folder.Parent = deep
+	end
+	folder:ClearAllChildren()
+	local meteor = Instance.new("Part")
+	meteor.Name = kind == "LuckSurge" and "LuckSurgeCore" or "StarfallCore"
+	meteor.Shape = Enum.PartType.Ball
+	meteor.Size = Vector3.new(28, 28, 28)
+	meteor.Anchored = true
+	meteor.Material = Enum.Material.Neon
+	meteor.Color = kind == "LuckSurge" and Color3.fromRGB(120, 80, 255) or Color3.fromRGB(255, 200, 80)
+	meteor.CFrame = CFrame.new(0, 36, 0)
+	meteor:SetAttribute("Shared", true)
+	meteor:SetAttribute("Sector", "VoidRim")
+	meteor:SetAttribute("MaxHealth", SoftContestConfig.EventCoreHealth)
+	meteor:SetAttribute("Health", SoftContestConfig.EventCoreHealth)
+	meteor:SetAttribute("EventKind", kind)
+	meteor.Parent = folder
+
+	local monolith = Workspace:FindFirstChild("VoidlineMap")
+		and Workspace.VoidlineMap.Hub:FindFirstChild("VoidlineMonolith")
+	if monolith then
+		local core = monolith:FindFirstChild("MonolithCore")
+		if core and core:IsA("BasePart") then
+			core.Size = Vector3.new(22, 78, 8) -- "split" silhouette
+		end
+	end
+	return meteor
+end
+
+local function endEvent()
+	WorldEventService._active = false
+	local deep = getDeep()
+	local folder = deep and deep:FindFirstChild("EventMeteors")
+	if folder then
+		folder:ClearAllChildren()
+	end
+	local map = Workspace:FindFirstChild("VoidlineMap")
+	local monolith = map and map.Hub:FindFirstChild("VoidlineMonolith")
+	local core = monolith and monolith:FindFirstChild("MonolithCore")
+	if core and core:IsA("BasePart") then
+		core.Size = Vector3.new(18, 72, 18)
+	end
+	Remotes.Get("WorldEventState"):FireAllClients({ Active = false })
+	-- Drain queue
+	local nextJob = table.remove(WorldEventService._queue, 1)
+	if nextJob then
+		task.defer(function()
+			WorldEventService.Start(nextJob.Kind, nextJob.Player)
+		end)
+	end
+end
+
+function WorldEventService.Start(kind: string, summoner: Player?)
+	if WorldEventService._active then
+		if summoner then
+			table.insert(WorldEventService._queue, { Player = summoner, Kind = kind })
+		end
+		return
+	end
+	WorldEventService._active = true
+	spawnEventMeteor(kind)
+	if kind == "LuckSurge" then
+		WorldEventService._luckSurgeUntil = os.time() + GameConfig.WorldEventDurationSeconds
+	end
+	local name = summoner and summoner.DisplayName or "VOIDLINE"
+	Remotes.Get("WorldEventState"):FireAllClients({
+		Active = true,
+		Kind = kind,
+		Summoner = name,
+		Duration = GameConfig.WorldEventDurationSeconds,
+	})
+	Remotes.Get("JuiceEvent"):FireAllClients({
+		Kind = "EventBanner",
+		Text = string.upper(kind) .. " — " .. name,
+	})
+	task.delay(GameConfig.WorldEventDurationSeconds, endEvent)
+end
+
+function WorldEventService.IsLuckSurge(): boolean
+	return os.time() < WorldEventService._luckSurgeUntil
+end
+
+function WorldEventService.QueueSummon(player: Player, kind: string)
+	WorldEventService.Start(kind, player)
+end
+
+function WorldEventService.Init()
+	task.spawn(function()
+		while true do
+			task.wait(GameConfig.WorldEventIntervalSeconds)
+			if not WorldEventService._active then
+				local kind = if math.random() > 0.5 then "VoidStarfall" else "LuckSurge"
+				WorldEventService.Start(kind, nil)
+			end
+		end
+	end)
+end
+
+return WorldEventService
+]]></string>
+          </Properties>
+        </Item>
+      </Item>
+    </Item>
+  </Item>
+  <Item class="ServerStorage" referent="55">
+    <Properties>
+      <string name="Name">ServerStorage</string>
+    </Properties>
+    <Item class="Folder" referent="56">
+      <Properties>
+        <string name="Name">Voidline</string>
+      </Properties>
+      <Item class="Folder" referent="57">
+        <Properties>
+          <string name="Name">AsteroidTemplates</string>
+        </Properties>
+      </Item>
+      <Item class="Folder" referent="58">
+        <Properties>
+          <string name="Name">EventMeteorTemplates</string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="59">
+        <Properties>
+          <string name="Name">README</string>
+          <string name="Source"><![CDATA[-- ServerStorage.Voidline holds runtime templates if needed.
+-- MapBuilder currently constructs geometry in Workspace at boot.
+return {}
+]]></string>
+        </Properties>
+      </Item>
+    </Item>
+  </Item>
+  <Item class="StarterPlayer" referent="60">
+    <Properties>
+      <string name="Name">StarterPlayer</string>
+    </Properties>
+    <Item class="StarterPlayerScripts" referent="61">
+      <Properties>
+        <string name="Name">StarterPlayerScripts</string>
+      </Properties>
+      <Item class="Folder" referent="62">
+        <Properties>
+          <string name="Name">Voidline</string>
+        </Properties>
+        <Item class="LocalScript" referent="63">
+          <Properties>
+            <string name="Name">ClientBoot</string>
+            <string name="Source"><![CDATA[--[[
+	Voidline: Deep Space — client boot
+]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local Remotes = require(Voidline.Remotes)
+Remotes.Ensure()
+
+local Controllers = script.Parent.Controllers
+local HUDController = require(Controllers.HUDController)
+local HotbarController = require(Controllers.HotbarController)
+local StoreController = require(Controllers.StoreController)
+local SettingsController = require(Controllers.SettingsController)
+local OnboardingController = require(Controllers.OnboardingController)
+local CameraController = require(Controllers.CameraController)
+local VFXController = require(Controllers.VFXController)
+local StationInteractController = require(Controllers.StationInteractController)
+local ThrusterCosmeticController = require(Controllers.ThrusterCosmeticController)
+
+HUDController.Init()
+StoreController.Init()
+SettingsController.Init()
+OnboardingController.Init()
+CameraController.Init()
+VFXController.Init(HUDController)
+StationInteractController.Init()
+ThrusterCosmeticController.Init()
+
+HotbarController.Init({
+	OpenStore = function()
+		StoreController.Toggle()
+	end,
+	OpenSettings = function()
+		SettingsController.Toggle()
+	end,
+	OpenSquad = function()
+		-- Lightweight prompt: invite nearest player name via chat attribute
+		local me = Players.LocalPlayer
+		local closest, best = nil, math.huge
+		for _, p in Players:GetPlayers() do
+			if p ~= me and p.Character and me.Character then
+				local a = p.Character:FindFirstChild("HumanoidRootPart")
+				local b = me.Character:FindFirstChild("HumanoidRootPart")
+				if a and b then
+					local d = (a.Position - b.Position).Magnitude
+					if d < best then
+						best = d
+						closest = p
+					end
+				end
+			end
+		end
+		if closest then
+			Remotes.Get("SquadInvite"):FireServer(closest.Name)
+			HUDController.ShowBanner("SQUAD INVITE → " .. closest.DisplayName, 2)
+		else
+			HUDController.ShowBanner("NO NEARBY PLAYERS TO SQUAD", 2)
+		end
+	end,
+	SetClipMode = function(on)
+		HUDController.SetClipMode(on)
+		HotbarController.SetVisible(not on)
+	end,
+})
+
+Remotes.Get("DataSnapshot").OnClientEvent:Connect(function(data)
+	HUDController.SetData(data)
+	if data.TutorialStep then
+		OnboardingController.SetStep(data.TutorialStep)
+	end
+end)
+
+-- Daily redeem hint once
+task.delay(8, function()
+	HUDController.ShowBanner("TIP: VIP LOUNGE PAD → DAILY STREAK  |  CODES AT MONOLITH", 4)
+end)
+
+print("[Voidline] Client online")
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="Folder" referent="64">
+          <Properties>
+            <string name="Name">Controllers</string>
+          </Properties>
+          <Item class="ModuleScript" referent="65">
+            <Properties>
+              <string name="Name">CameraController</string>
+              <string name="Source"><![CDATA[local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local Remotes = require(Voidline.Remotes)
+
+local player = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+
+local CameraController = {
+	_action = false,
+	_baseFov = 70,
+}
+
+function CameraController.Init()
+	Remotes.Get("JuiceEvent").OnClientEvent:Connect(function(payload)
+		if typeof(payload) ~= "table" then
+			return
+		end
+		if payload.Kind == "Laser" and payload.Formation == 2 then
+			CameraController._action = true
+		elseif payload.Kind == "CoreChunk" or payload.Kind == "Shatter" then
+			CameraController._action = true
+			task.delay(1.2, function()
+				CameraController._action = false
+			end)
+		elseif payload.Kind == "BridgeIgnition" then
+			CameraController._action = true
+			task.delay(1.5, function()
+				CameraController._action = false
+			end)
+		end
+	end)
+
+	RunService.RenderStepped:Connect(function()
+		camera = workspace.CurrentCamera
+		if not camera then
+			return
+		end
+		local target = if CameraController._action then 80 else CameraController._baseFov
+		camera.FieldOfView = camera.FieldOfView + (target - camera.FieldOfView) * 0.08
+	end)
+end
+
+return CameraController
+]]></string>
+            </Properties>
+          </Item>
+          <Item class="ModuleScript" referent="66">
+            <Properties>
+              <string name="Name">HUDController</string>
+              <string name="Source"><![CDATA[local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local FormatNumber = require(Voidline.Modules.FormatNumber)
+local OreMath = require(Voidline.Modules.OreMath)
+local GameConfig = require(Voidline.Config.GameConfig)
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local HUDController = {
+	_gui = nil :: ScreenGui?,
+	_data = nil,
+	_clip = false,
+}
+
+local function ensureGui()
+	if HUDController._gui then
+		return HUDController._gui
+	end
+	local gui = Instance.new("ScreenGui")
+	gui.Name = "VoidlineHUD"
+	gui.ResetOnSpawn = false
+	gui.IgnoreGuiInset = true
+	gui.Parent = playerGui
+
+	local pill = Instance.new("Frame")
+	pill.Name = "TopPill"
+	pill.AnchorPoint = Vector2.new(0.5, 0)
+	pill.Position = UDim2.new(0.5, 0, 0, 16)
+	pill.Size = UDim2.fromOffset(520, 44)
+	pill.BackgroundColor3 = GameConfig.Colors.Obsidian
+	pill.BackgroundTransparency = 0.15
+	pill.Parent = gui
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = GameConfig.Colors.Gold
+	stroke.Thickness = 1
+	stroke.Parent = pill
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(1, 0)
+	corner.Parent = pill
+
+	local label = Instance.new("TextLabel")
+	label.Name = "Stats"
+	label.BackgroundTransparency = 1
+	label.Size = UDim2.fromScale(1, 1)
+	label.Font = Enum.Font.GothamBold
+	label.TextSize = 16
+	label.TextColor3 = GameConfig.Colors.GoldBright
+	label.Text = "CREDITS 0  |  CARGO 0/10  |  DRONES 1  |  SHARDS 0"
+	label.Parent = pill
+
+	local cargoBar = Instance.new("Frame")
+	cargoBar.Name = "CargoBarBg"
+	cargoBar.AnchorPoint = Vector2.new(0.5, 0)
+	cargoBar.Position = UDim2.new(0.5, 0, 0, 64)
+	cargoBar.Size = UDim2.fromOffset(280, 6)
+	cargoBar.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+	cargoBar.Parent = gui
+	local barCorner = Instance.new("UICorner")
+	barCorner.CornerRadius = UDim.new(1, 0)
+	barCorner.Parent = cargoBar
+	local fill = Instance.new("Frame")
+	fill.Name = "Fill"
+	fill.Size = UDim2.fromScale(0, 1)
+	fill.BackgroundColor3 = GameConfig.Colors.Gold
+	fill.BorderSizePixel = 0
+	fill.Parent = cargoBar
+	local fillCorner = Instance.new("UICorner")
+	fillCorner.CornerRadius = UDim.new(1, 0)
+	fillCorner.Parent = fill
+
+	local ticker = Instance.new("TextLabel")
+	ticker.Name = "TutorialTicker"
+	ticker.AnchorPoint = Vector2.new(0.5, 0)
+	ticker.Position = UDim2.new(0.5, 0, 0, 78)
+	ticker.Size = UDim2.fromOffset(420, 22)
+	ticker.BackgroundTransparency = 1
+	ticker.Font = Enum.Font.GothamMedium
+	ticker.TextSize = 14
+	ticker.TextColor3 = GameConfig.Colors.Gold
+	ticker.Text = "[1/4] HARVESTING ORE"
+	ticker.Parent = gui
+
+	local banner = Instance.new("TextLabel")
+	banner.Name = "EventBanner"
+	banner.AnchorPoint = Vector2.new(0.5, 0)
+	banner.Position = UDim2.new(0.5, 0, 0, -60)
+	banner.Size = UDim2.fromOffset(560, 36)
+	banner.BackgroundColor3 = GameConfig.Colors.Obsidian
+	banner.BackgroundTransparency = 0.1
+	banner.Font = Enum.Font.GothamBold
+	banner.TextSize = 18
+	banner.TextColor3 = GameConfig.Colors.GoldBright
+	banner.Text = ""
+	banner.Visible = false
+	banner.Parent = gui
+	local bStroke = Instance.new("UIStroke")
+	bStroke.Color = GameConfig.Colors.Gold
+	bStroke.Parent = banner
+
+	HUDController._gui = gui
+	return gui
+end
+
+local TICKER = {
+	[1] = "[1/4] HARVESTING ORE",
+	[2] = "[2/4] REFINE AT PAD",
+	[3] = "[3/4] DEPLOY 2ND DRONE",
+	[4] = "[4/4] ENERGY BRIDGE ONLINE",
+}
+
+function HUDController.SetData(data)
+	HUDController._data = data
+	local gui = ensureGui()
+	if HUDController._clip then
+		gui.Enabled = false
+		return
+	end
+	gui.Enabled = true
+	local cap = OreMath.CargoCap(data.CargoLevel)
+	gui.TopPill.Stats.Text = string.format(
+		"CREDITS %s  |  CARGO %d/%d  |  DRONES %d  |  SHARDS %s",
+		FormatNumber.Compact(data.Credits),
+		data.Ore,
+		cap,
+		data.DroneSlots,
+		FormatNumber.Compact(data.VoidShards)
+	)
+	gui.CargoBarBg.Fill.Size = UDim2.fromScale(math.clamp(data.Ore / math.max(1, cap), 0, 1), 1)
+	if data.TutorialComplete then
+		gui.TutorialTicker.Visible = false
+	else
+		gui.TutorialTicker.Visible = true
+		gui.TutorialTicker.Text = TICKER[data.TutorialStep] or TICKER[1]
+	end
+end
+
+function HUDController.SetClipMode(on: boolean)
+	HUDController._clip = on
+	local gui = ensureGui()
+	gui.Enabled = not on
+end
+
+function HUDController.ShowBanner(text: string, seconds: number?)
+	local gui = ensureGui()
+	local banner = gui.EventBanner
+	banner.Text = text
+	banner.Visible = true
+	banner.Position = UDim2.new(0.5, 0, 0, 12)
+	task.delay(seconds or 3, function()
+		banner.Visible = false
+		banner.Position = UDim2.new(0.5, 0, 0, -60)
+	end)
+end
+
+function HUDController.Init()
+	ensureGui()
+end
+
+return HUDController
+]]></string>
+            </Properties>
+          </Item>
+          <Item class="ModuleScript" referent="67">
+            <Properties>
+              <string name="Name">HotbarController</string>
+              <string name="Source"><![CDATA[local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local Remotes = require(Voidline.Remotes)
+local GameConfig = require(Voidline.Config.GameConfig)
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local HotbarController = {
+	_onOpenStore = nil :: (() -> ())?,
+	_onOpenSettings = nil :: (() -> ())?,
+	_onOpenSquad = nil :: (() -> ())?,
+}
+
+local function mkButton(parent, name, text, order)
+	local b = Instance.new("TextButton")
+	b.Name = name
+	b.Size = UDim2.fromOffset(72, 56)
+	b.BackgroundColor3 = GameConfig.Colors.Obsidian
+	b.BackgroundTransparency = 0.1
+	b.Text = text
+	b.TextColor3 = GameConfig.Colors.GoldBright
+	b.Font = Enum.Font.GothamBold
+	b.TextSize = 12
+	b.LayoutOrder = order
+	b.Parent = parent
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(0, 8)
+	c.Parent = b
+	local s = Instance.new("UIStroke")
+	s.Color = GameConfig.Colors.Gold
+	s.Thickness = 1
+	s.Parent = b
+	return b
+end
+
+function HotbarController.Init(hooks)
+	HotbarController._onOpenStore = hooks.OpenStore
+	HotbarController._onOpenSettings = hooks.OpenSettings
+	HotbarController._onOpenSquad = hooks.OpenSquad
+
+	local gui = Instance.new("ScreenGui")
+	gui.Name = "VoidlineHotbar"
+	gui.ResetOnSpawn = false
+	gui.IgnoreGuiInset = true
+	gui.Parent = playerGui
+
+	local bar = Instance.new("Frame")
+	bar.Name = "Bar"
+	bar.AnchorPoint = Vector2.new(0.5, 1)
+	bar.Position = UDim2.new(0.5, 0, 1, -24)
+	bar.Size = UDim2.fromOffset(520, 64)
+	bar.BackgroundTransparency = 1
+	bar.Parent = gui
+
+	local layout = Instance.new("UIListLayout")
+	layout.FillDirection = Enum.FillDirection.Horizontal
+	layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	layout.Padding = UDim.new(0, 8)
+	layout.Parent = bar
+
+	local f1 = mkButton(bar, "F1", "1\nSCATTER", 1)
+	local f2 = mkButton(bar, "F2", "2\nBEAM", 2)
+	local f3 = mkButton(bar, "F3", "3\nHALO", 3)
+	local squad = mkButton(bar, "Squad", "SQUAD", 4)
+	local shop = mkButton(bar, "Shop", "SHOP", 5)
+	local settings = mkButton(bar, "Settings", "SET", 6)
+	local upgrade = mkButton(bar, "Upgrade", "U\nUPGRADE", 7)
+	local sprint = mkButton(bar, "Sprint", "SPRINT", 8)
+	local clip = mkButton(bar, "Clip", "CLIP", 9)
+
+	local function setFormation(n)
+		Remotes.Get("SetFormation"):FireServer(n)
+	end
+	f1.MouseButton1Click:Connect(function()
+		setFormation(1)
+	end)
+	f2.MouseButton1Click:Connect(function()
+		setFormation(2)
+	end)
+	f3.MouseButton1Click:Connect(function()
+		setFormation(3)
+	end)
+	squad.MouseButton1Click:Connect(function()
+		if HotbarController._onOpenSquad then
+			HotbarController._onOpenSquad()
+		end
+	end)
+	shop.MouseButton1Click:Connect(function()
+		if HotbarController._onOpenStore then
+			HotbarController._onOpenStore()
+		end
+	end)
+	settings.MouseButton1Click:Connect(function()
+		if HotbarController._onOpenSettings then
+			HotbarController._onOpenSettings()
+		end
+	end)
+	upgrade.MouseButton1Click:Connect(function()
+		Remotes.Get("QuickUpgrade"):FireServer()
+	end)
+
+	local sprinting = false
+	local function toggleSprint()
+		sprinting = not sprinting
+		local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+		if hum then
+			hum.WalkSpeed = if sprinting then 28 else 16
+		end
+		Remotes.Get("PlayerInput"):FireServer()
+	end
+	sprint.MouseButton1Click:Connect(toggleSprint)
+
+	local clipOn = false
+	clip.MouseButton1Click:Connect(function()
+		clipOn = not clipOn
+		hooks.SetClipMode(clipOn)
+		gui.Enabled = not clipOn
+	end)
+
+	UserInputService.InputBegan:Connect(function(input, gp)
+		if gp then
+			return
+		end
+		Remotes.Get("PlayerInput"):FireServer()
+		if input.KeyCode == Enum.KeyCode.One then
+			setFormation(1)
+		elseif input.KeyCode == Enum.KeyCode.Two then
+			setFormation(2)
+		elseif input.KeyCode == Enum.KeyCode.Three then
+			setFormation(3)
+		elseif input.KeyCode == Enum.KeyCode.U then
+			Remotes.Get("QuickUpgrade"):FireServer()
+		elseif input.KeyCode == Enum.KeyCode.LeftShift then
+			toggleSprint()
+		end
+	end)
+
+	UserInputService.InputChanged:Connect(function()
+		Remotes.Get("PlayerInput"):FireServer()
+	end)
+
+	-- Touch-friendly: show sprint/upgrade always on mobile
+	if UserInputService.TouchEnabled then
+		sprint.Visible = true
+		upgrade.Visible = true
+	end
+
+	HotbarController._gui = gui
+end
+
+function HotbarController.SetVisible(on: boolean)
+	if HotbarController._gui then
+		HotbarController._gui.Enabled = on
+	end
+end
+
+return HotbarController
+]]></string>
+            </Properties>
+          </Item>
+          <Item class="ModuleScript" referent="68">
+            <Properties>
+              <string name="Name">OnboardingController</string>
+              <string name="Source"><![CDATA[local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local Remotes = require(Voidline.Remotes)
+local JuiceConfig = require(Voidline.Config.JuiceConfig)
+local GameConfig = require(Voidline.Config.GameConfig)
+
+local player = Players.LocalPlayer
+
+local OnboardingController = {
+	_step = 1,
+	_beam = nil :: Beam?,
+	_a0 = nil :: Attachment?,
+	_a1 = nil :: Attachment?,
+	_skipBtn = nil,
+}
+
+local function getPlot(): Folder?
+	local map = Workspace:FindFirstChild("VoidlineMap")
+	local plots = map and map:FindFirstChild("Plots")
+	if not plots then
+		return nil
+	end
+	for _, plot in plots:GetChildren() do
+		if plot:GetAttribute("OwnerUserId") == player.UserId then
+			return plot
+		end
+	end
+	return nil
+end
+
+local function ensureBeam()
+	if OnboardingController._beam then
+		return
+	end
+	local char = player.Character or player.CharacterAdded:Wait()
+	local hrp = char:WaitForChild("HumanoidRootPart")
+	local a0 = Instance.new("Attachment")
+	a0.Name = "VoidlineBeamA0"
+	a0.Parent = hrp
+	local a1 = Instance.new("Attachment")
+	a1.Name = "VoidlineBeamA1"
+	a1.Parent = hrp
+	local beam = Instance.new("Beam")
+	beam.Attachment0 = a0
+	beam.Attachment1 = a1
+	beam.Color = ColorSequence.new(JuiceConfig.TutorialBeamColor)
+	beam.Width0 = 1.2
+	beam.Width1 = 1.2
+	beam.FaceCamera = true
+	beam.Parent = hrp
+	OnboardingController._beam = beam
+	OnboardingController._a0 = a0
+	OnboardingController._a1 = a1
+end
+
+function OnboardingController.SetStep(step: number)
+	OnboardingController._step = step
+	if step >= 4 then
+		if OnboardingController._beam then
+			OnboardingController._beam.Enabled = false
+		end
+		if OnboardingController._skipBtn then
+			OnboardingController._skipBtn.Visible = false
+		end
+	end
+end
+
+function OnboardingController.Init()
+	local gui = player:WaitForChild("PlayerGui")
+	local skip = Instance.new("TextButton")
+	skip.Name = "TutorialSkip"
+	skip.Size = UDim2.fromOffset(72, 24)
+	skip.Position = UDim2.new(0.5, 210, 0, 80)
+	skip.BackgroundTransparency = 0.3
+	skip.BackgroundColor3 = GameConfig.Colors.Obsidian
+	skip.TextColor3 = GameConfig.Colors.Gold
+	skip.Font = Enum.Font.Gotham
+	skip.TextSize = 12
+	skip.Text = "Skip"
+	skip.Parent = gui:FindFirstChild("VoidlineHUD") or gui
+	skip.MouseButton1Click:Connect(function()
+		Remotes.Get("QuickUpgrade"):FireServer()
+		-- Soft skip: still need drone; fire sell if cargo full path incomplete
+		OnboardingController.SetStep(4)
+	end)
+	OnboardingController._skipBtn = skip
+
+	Remotes.Get("TutorialProgress").OnClientEvent:Connect(function(step)
+		OnboardingController.SetStep(step)
+	end)
+
+	RunService.RenderStepped:Connect(function()
+		if OnboardingController._step >= 4 then
+			return
+		end
+		ensureBeam()
+		local plot = getPlot()
+		local char = player.Character
+		local hrp = char and char:FindFirstChild("HumanoidRootPart")
+		if not plot or not hrp or not OnboardingController._a1 then
+			return
+		end
+		local target: BasePart? = nil
+		if OnboardingController._step <= 1 then
+			local belt = plot:FindFirstChild("PersonalBelt")
+			target = belt and belt:FindFirstChildWhichIsA("BasePart")
+		elseif OnboardingController._step == 2 then
+			local station = plot:FindFirstChild("Station")
+			target = station and station:FindFirstChild("Refinery")
+		else
+			local station = plot:FindFirstChild("Station")
+			local pads = station and station:FindFirstChild("UpgradePads")
+			target = pads and (pads:FindFirstChild("DroneSlot") or pads:FindFirstChild("Drill"))
+		end
+		if target and target:IsA("BasePart") then
+			OnboardingController._a1.WorldPosition = target.Position + Vector3.new(0, 2, 0)
+			if OnboardingController._beam then
+				OnboardingController._beam.Enabled = true
+			end
+		end
+	end)
+end
+
+return OnboardingController
+]]></string>
+            </Properties>
+          </Item>
+          <Item class="ModuleScript" referent="69">
+            <Properties>
+              <string name="Name">SettingsController</string>
+              <string name="Source"><![CDATA[local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local Remotes = require(Voidline.Remotes)
+local GameConfig = require(Voidline.Config.GameConfig)
+local DroneConfig = require(Voidline.Config.DroneConfig)
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local SettingsController = { _gui = nil, _perf = false, _hideJet = false }
+
+function SettingsController.Toggle()
+	if SettingsController._gui then
+		SettingsController._gui.Enabled = not SettingsController._gui.Enabled
+	end
+end
+
+function SettingsController.Init()
+	local gui = Instance.new("ScreenGui")
+	gui.Name = "VoidlineSettings"
+	gui.ResetOnSpawn = false
+	gui.Enabled = false
+	gui.Parent = playerGui
+
+	local panel = Instance.new("Frame")
+	panel.AnchorPoint = Vector2.new(0.5, 0.5)
+	panel.Position = UDim2.fromScale(0.5, 0.5)
+	panel.Size = UDim2.fromOffset(360, 280)
+	panel.BackgroundColor3 = GameConfig.Colors.Obsidian
+	panel.Parent = gui
+	Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 12)
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = GameConfig.Colors.Gold
+	stroke.Parent = panel
+
+	local title = Instance.new("TextLabel")
+	title.Size = UDim2.new(1, -16, 0, 32)
+	title.Position = UDim2.fromOffset(12, 8)
+	title.BackgroundTransparency = 1
+	title.Font = Enum.Font.GothamBold
+	title.TextSize = 20
+	title.TextColor3 = GameConfig.Colors.Gold
+	title.TextXAlignment = Enum.TextXAlignment.Left
+	title.Text = "SETTINGS"
+	title.Parent = panel
+
+	local function toggleBtn(y, label, callback)
+		local b = Instance.new("TextButton")
+		b.Size = UDim2.new(1, -24, 0, 40)
+		b.Position = UDim2.fromOffset(12, y)
+		b.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
+		b.TextColor3 = GameConfig.Colors.GoldBright
+		b.Font = Enum.Font.GothamMedium
+		b.TextSize = 14
+		b.Text = label
+		b.Parent = panel
+		Instance.new("UICorner", b).CornerRadius = UDim.new(0, 8)
+		b.MouseButton1Click:Connect(function()
+			callback(b)
+		end)
+		return b
+	end
+
+	toggleBtn(56, "Performance Mode: OFF", function(b)
+		SettingsController._perf = not SettingsController._perf
+		b.Text = "Performance Mode: " .. (SettingsController._perf and "ON" or "OFF")
+		Lighting.Bloom.Enabled = not SettingsController._perf
+		Remotes.Get("SettingsUpdate"):FireServer({ PerfMode = SettingsController._perf })
+	end)
+
+	toggleBtn(108, "Hide Jetpack: OFF", function(b)
+		SettingsController._hideJet = not SettingsController._hideJet
+		b.Text = "Hide Jetpack: " .. (SettingsController._hideJet and "ON" or "OFF")
+		Remotes.Get("SettingsUpdate"):FireServer({ HideJetpack = SettingsController._hideJet })
+		player:SetAttribute("HideJetpack", SettingsController._hideJet)
+	end)
+
+	local close = Instance.new("TextButton")
+	close.Size = UDim2.new(1, -24, 0, 40)
+	close.Position = UDim2.fromOffset(12, 220)
+	close.BackgroundColor3 = GameConfig.Colors.Gold
+	close.TextColor3 = GameConfig.Colors.Obsidian
+	close.Font = Enum.Font.GothamBold
+	close.Text = "CLOSE"
+	close.Parent = panel
+	Instance.new("UICorner", close).CornerRadius = UDim.new(0, 8)
+	close.MouseButton1Click:Connect(function()
+		gui.Enabled = false
+	end)
+
+	-- Ensure bloom exists for perf toggle
+	if not Lighting:FindFirstChildOfClass("BloomEffect") then
+		local bloom = Instance.new("BloomEffect")
+		bloom.Intensity = 0.6
+		bloom.Size = 24
+		bloom.Threshold = 1.2
+		bloom.Parent = Lighting
+	end
+
+	SettingsController._gui = gui
+end
+
+return SettingsController
+]]></string>
+            </Properties>
+          </Item>
+          <Item class="ModuleScript" referent="70">
+            <Properties>
+              <string name="Name">StationInteractController</string>
+              <string name="Source"><![CDATA[local Players = game:GetService("Players")
+local ProximityPromptService = game:GetService("ProximityPromptService")
+local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local Remotes = require(Voidline.Remotes)
+local DroneConfig = require(Voidline.Config.DroneConfig)
+
+local player = Players.LocalPlayer
+
+local StationInteractController = {}
+
+local function addPrompt(part: BasePart, action: string, objectText: string)
+	if part:FindFirstChildOfClass("ProximityPrompt") then
+		return
+	end
+	local prompt = Instance.new("ProximityPrompt")
+	prompt.ActionText = action
+	prompt.ObjectText = objectText
+	prompt.HoldDuration = 0
+	prompt.MaxActivationDistance = 14
+	prompt.RequiresLineOfSight = false
+	prompt.Parent = part
+end
+
+function StationInteractController.Init()
+	task.spawn(function()
+		local map = Workspace:WaitForChild("VoidlineMap", 30)
+		if not map then
+			return
+		end
+		for _, plot in map.Plots:GetChildren() do
+			local station = plot:FindFirstChild("Station")
+			if station then
+				local refinery = station:FindFirstChild("Refinery")
+				if refinery then
+					addPrompt(refinery, "Sell Ore", "Station Refinery")
+				end
+				local pads = station:FindFirstChild("UpgradePads")
+				if pads then
+					for _, pad in pads:GetChildren() do
+						if pad:IsA("BasePart") then
+							addPrompt(pad, "Upgrade", pad.Name)
+						end
+					end
+				end
+				local tuner = station:FindFirstChild("LaserTuner")
+				if tuner and tuner:IsA("BasePart") then
+					addPrompt(tuner, "Cycle Laser Color", "Laser Tuner")
+				end
+			end
+		end
+		local monolith = map.Hub:FindFirstChild("VoidlineMonolith")
+		if monolith then
+			if monolith:FindFirstChild("RebirthPad") then
+				addPrompt(monolith.RebirthPad, "Void Rebirth", "Monolith")
+			end
+			if monolith:FindFirstChild("ForgeAnchor") then
+				addPrompt(monolith.ForgeAnchor, "Forge Artifact", "Artifact Forge")
+				local turnIn = Instance.new("ProximityPrompt")
+				turnIn.Name = "TurnIn"
+				turnIn.ActionText = "Turn In Artifact"
+				turnIn.ObjectText = "Token Redemption"
+				turnIn.HoldDuration = 0
+				turnIn.MaxActivationDistance = 14
+				turnIn.RequiresLineOfSight = false
+				turnIn.Parent = monolith.ForgeAnchor
+			end
+			if monolith:FindFirstChild("CodeTerminal") then
+				addPrompt(monolith.CodeTerminal, "Enter Code", "Voidline Codes")
+			end
+			if monolith:FindFirstChild("SummonPads") then
+				addPrompt(monolith.SummonPads, "Summon Starfall", "Server Summons")
+			end
+		end
+	end)
+
+	ProximityPromptService.PromptTriggered:Connect(function(prompt, triggerPlayer)
+		if triggerPlayer ~= player then
+			return
+		end
+		local part = prompt.Parent
+		if not part or not part:IsA("BasePart") then
+			return
+		end
+		local name = part.Name
+		if name == "Refinery" then
+			Remotes.Get("SellOre"):FireServer()
+		elseif part:GetAttribute("UpgradeId") then
+			Remotes.Get("RequestUpgrade"):FireServer(part:GetAttribute("UpgradeId"))
+		elseif name == "RebirthPad" then
+			Remotes.Get("RequestRebirth"):FireServer()
+		elseif name == "ForgeAnchor" and prompt.Name == "TurnIn" then
+			Remotes.Get("TurnInArtifact"):FireServer()
+		elseif name == "ForgeAnchor" then
+			Remotes.Get("RequestForge"):FireServer()
+		elseif name == "CodeTerminal" then
+			-- Simple Studio-friendly cycle of launch codes via attribute index
+			local codes = { "VOIDLINE", "KILLSHOT", "LAUNCH" }
+			local idx = (part:GetAttribute("CodeIdx") or 0) + 1
+			if idx > #codes then
+				idx = 1
+			end
+			part:SetAttribute("CodeIdx", idx)
+			Remotes.Get("RedeemCode"):FireServer(codes[idx])
+		elseif name == "SummonPads" then
+			Remotes.Get("PromptRobuxPurchase"):FireServer("Product", "SummonVoidStarfall")
+		elseif name == "LaserTuner" then
+			local colors = {}
+			for k in DroneConfig.LaserColors do
+				table.insert(colors, k)
+			end
+			table.sort(colors)
+			local idx = (part:GetAttribute("ColorIdx") or 0) + 1
+			if idx > #colors then
+				idx = 1
+			end
+			part:SetAttribute("ColorIdx", idx)
+			Remotes.Get("SetLaserColor"):FireServer(colors[idx])
+		elseif name == "VIPLoungePad" then
+			Remotes.Get("RedeemDaily"):FireServer()
+		end
+	end)
+end
+
+return StationInteractController
+]]></string>
+            </Properties>
+          </Item>
+          <Item class="ModuleScript" referent="71">
+            <Properties>
+              <string name="Name">StoreController</string>
+              <string name="Source"><![CDATA[local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local MonetizationConfig = require(Voidline.Config.MonetizationConfig)
+local Remotes = require(Voidline.Remotes)
+local GameConfig = require(Voidline.Config.GameConfig)
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local StoreController = { _gui = nil }
+
+function StoreController.Toggle()
+	local gui = StoreController._gui
+	if not gui then
+		return
+	end
+	gui.Enabled = not gui.Enabled
+end
+
+function StoreController.Init()
+	local gui = Instance.new("ScreenGui")
+	gui.Name = "VoidlineStore"
+	gui.ResetOnSpawn = false
+	gui.Enabled = false
+	gui.Parent = playerGui
+
+	local panel = Instance.new("Frame")
+	panel.AnchorPoint = Vector2.new(0.5, 0.5)
+	panel.Position = UDim2.fromScale(0.5, 0.5)
+	panel.Size = UDim2.fromOffset(560, 420)
+	panel.BackgroundColor3 = GameConfig.Colors.Obsidian
+	panel.Parent = gui
+	Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 12)
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = GameConfig.Colors.Gold
+	stroke.Parent = panel
+
+	local title = Instance.new("TextLabel")
+	title.Size = UDim2.new(1, -20, 0, 36)
+	title.Position = UDim2.fromOffset(10, 8)
+	title.BackgroundTransparency = 1
+	title.Font = Enum.Font.GothamBold
+	title.TextSize = 22
+	title.TextColor3 = GameConfig.Colors.Gold
+	title.Text = "VOIDLINE STORE"
+	title.TextXAlignment = Enum.TextXAlignment.Left
+	title.Parent = panel
+
+	local close = Instance.new("TextButton")
+	close.Size = UDim2.fromOffset(36, 36)
+	close.Position = UDim2.new(1, -44, 0, 8)
+	close.Text = "X"
+	close.Font = Enum.Font.GothamBold
+	close.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+	close.TextColor3 = GameConfig.Colors.GoldBright
+	close.Parent = panel
+	close.MouseButton1Click:Connect(function()
+		gui.Enabled = false
+	end)
+
+	local scroll = Instance.new("ScrollingFrame")
+	scroll.Position = UDim2.fromOffset(12, 52)
+	scroll.Size = UDim2.new(1, -24, 1, -64)
+	scroll.BackgroundTransparency = 1
+	scroll.ScrollBarThickness = 4
+	scroll.CanvasSize = UDim2.fromOffset(0, 0)
+	scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+	scroll.Parent = panel
+	local list = Instance.new("UIListLayout")
+	list.Padding = UDim.new(0, 8)
+	list.Parent = scroll
+
+	for _, pass in MonetizationConfig.Passes do
+		local row = Instance.new("Frame")
+		row.Size = UDim2.new(1, -8, 0, 64)
+		row.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
+		row.Parent = scroll
+		Instance.new("UICorner", row).CornerRadius = UDim.new(0, 8)
+		local name = Instance.new("TextLabel")
+		name.BackgroundTransparency = 1
+		name.Position = UDim2.fromOffset(10, 8)
+		name.Size = UDim2.new(0.5, 0, 0, 22)
+		name.Font = Enum.Font.GothamBold
+		name.TextSize = 14
+		name.TextXAlignment = Enum.TextXAlignment.Left
+		name.TextColor3 = GameConfig.Colors.GoldBright
+		name.Text = pass.Name
+		name.Parent = row
+
+		local robux = Instance.new("TextButton")
+		robux.Size = UDim2.fromOffset(120, 28)
+		robux.Position = UDim2.new(1, -260, 0, 18)
+		robux.Text = pass.Robux .. " R$"
+		robux.Font = Enum.Font.GothamBold
+		robux.TextSize = 12
+		robux.BackgroundColor3 = GameConfig.Colors.Gold
+		robux.TextColor3 = GameConfig.Colors.Obsidian
+		robux.Parent = row
+		Instance.new("UICorner", robux).CornerRadius = UDim.new(0, 6)
+		robux.MouseButton1Click:Connect(function()
+			Remotes.Get("PromptRobuxPurchase"):FireServer("Pass", pass.Id)
+		end)
+
+		local tokens = Instance.new("TextButton")
+		tokens.Size = UDim2.fromOffset(120, 28)
+		tokens.Position = UDim2.new(1, -130, 0, 18)
+		tokens.Text = pass.Tokens .. " Tokens"
+		tokens.Font = Enum.Font.GothamBold
+		tokens.TextSize = 12
+		tokens.BackgroundColor3 = GameConfig.Colors.VoidAccent
+		tokens.TextColor3 = Color3.new(1, 1, 1)
+		tokens.Parent = row
+		Instance.new("UICorner", tokens).CornerRadius = UDim.new(0, 6)
+		tokens.MouseButton1Click:Connect(function()
+			Remotes.Get("PurchaseWithTokens"):FireServer(pass.Id)
+		end)
+	end
+
+	for _, product in MonetizationConfig.DevProducts do
+		local row = Instance.new("Frame")
+		row.Size = UDim2.new(1, -8, 0, 56)
+		row.BackgroundColor3 = Color3.fromRGB(28, 18, 40)
+		row.Parent = scroll
+		Instance.new("UICorner", row).CornerRadius = UDim.new(0, 8)
+		local name = Instance.new("TextLabel")
+		name.BackgroundTransparency = 1
+		name.Position = UDim2.fromOffset(10, 14)
+		name.Size = UDim2.new(0.55, 0, 0, 22)
+		name.Font = Enum.Font.GothamBold
+		name.TextSize = 14
+		name.TextXAlignment = Enum.TextXAlignment.Left
+		name.TextColor3 = GameConfig.Colors.Gold
+		name.Text = product.Name .. " (Robux only)"
+		name.Parent = row
+		local buy = Instance.new("TextButton")
+		buy.Size = UDim2.fromOffset(120, 28)
+		buy.Position = UDim2.new(1, -130, 0, 14)
+		buy.Text = product.Robux .. " R$"
+		buy.Font = Enum.Font.GothamBold
+		buy.BackgroundColor3 = GameConfig.Colors.Gold
+		buy.TextColor3 = GameConfig.Colors.Obsidian
+		buy.Parent = row
+		Instance.new("UICorner", buy).CornerRadius = UDim.new(0, 6)
+		buy.MouseButton1Click:Connect(function()
+			Remotes.Get("PromptRobuxPurchase"):FireServer("Product", product.Id)
+		end)
+	end
+
+	StoreController._gui = gui
+end
+
+return StoreController
+]]></string>
+            </Properties>
+          </Item>
+          <Item class="ModuleScript" referent="72">
+            <Properties>
+              <string name="Name">ThrusterCosmeticController</string>
+              <string name="Source"><![CDATA[local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+
+local ThrusterCosmeticController = {}
+
+local function attachPack(character: Model)
+	if character:FindFirstChild("VoidlineThrusterPack") then
+		return
+	end
+	local torso = character:FindFirstChild("UpperTorso") or character:FindFirstChild("Torso")
+	if not torso then
+		return
+	end
+	local pack = Instance.new("Part")
+	pack.Name = "VoidlineThrusterPack"
+	pack.Size = Vector3.new(1.4, 1.8, 0.6)
+	pack.Color = Color3.fromRGB(12, 12, 18)
+	pack.Material = Enum.Material.Metal
+	pack.CanCollide = false
+	pack.Massless = true
+	pack.Parent = character
+	local weld = Instance.new("Weld")
+	weld.Part0 = torso
+	weld.Part1 = pack
+	weld.C0 = CFrame.new(0, 0.2, 0.75)
+	weld.Parent = pack
+	local glow = Instance.new("Part")
+	glow.Name = "GoldTrim"
+	glow.Size = Vector3.new(1.5, 0.2, 0.65)
+	glow.Color = Color3.fromRGB(232, 186, 74)
+	glow.Material = Enum.Material.Neon
+	glow.CanCollide = false
+	glow.Massless = true
+	glow.Parent = character
+	local weld2 = Instance.new("Weld")
+	weld2.Part0 = pack
+	weld2.Part1 = glow
+	weld2.Parent = glow
+end
+
+function ThrusterCosmeticController.Init()
+	local function onChar(char)
+		task.wait(0.2)
+		attachPack(char)
+	end
+	if player.Character then
+		onChar(player.Character)
+	end
+	player.CharacterAdded:Connect(onChar)
+
+	RunService.RenderStepped:Connect(function()
+		local char = player.Character
+		if not char then
+			return
+		end
+		local pack = char:FindFirstChild("VoidlineThrusterPack")
+		local trim = char:FindFirstChild("GoldTrim")
+		local hide = player:GetAttribute("HideJetpack") == true
+		if pack and pack:IsA("BasePart") then
+			pack.Transparency = if hide then 1 else 0
+		end
+		if trim and trim:IsA("BasePart") then
+			trim.Transparency = if hide then 1 else 0
+		end
+	end)
+end
+
+return ThrusterCosmeticController
+]]></string>
+            </Properties>
+          </Item>
+          <Item class="ModuleScript" referent="73">
+            <Properties>
+              <string name="Name">VFXController</string>
+              <string name="Source"><![CDATA[local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local Remotes = require(Voidline.Remotes)
+local GameConfig = require(Voidline.Config.GameConfig)
+
+local player = Players.LocalPlayer
+
+local VFXController = {}
+
+local function floatingText(pos: Vector3, text: string, color: Color3)
+	local p = Instance.new("Part")
+	p.Anchored = true
+	p.CanCollide = false
+	p.Transparency = 1
+	p.Size = Vector3.new(1, 1, 1)
+	p.Position = pos
+	p.Parent = workspace
+	local bb = Instance.new("BillboardGui")
+	bb.Size = UDim2.fromOffset(120, 40)
+	bb.AlwaysOnTop = true
+	bb.Parent = p
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.fromScale(1, 1)
+	label.BackgroundTransparency = 1
+	label.Font = Enum.Font.GothamBold
+	label.TextScaled = true
+	label.TextColor3 = color
+	label.Text = text
+	label.Parent = bb
+	TweenService:Create(p, TweenInfo.new(0.8), { Position = pos + Vector3.new(0, 6, 0) }):Play()
+	task.delay(0.85, function()
+		p:Destroy()
+	end)
+end
+
+function VFXController.Init(hud)
+	Remotes.Get("JuiceEvent").OnClientEvent:Connect(function(payload)
+		if typeof(payload) ~= "table" then
+			return
+		end
+		if payload.Kind == "Shatter" or payload.Kind == "CoreChunk" then
+			if payload.Position then
+				floatingText(payload.Position, "+" .. tostring(payload.Ore) .. " ORE", GameConfig.Colors.GoldBright)
+			end
+			if payload.IsTop then
+				floatingText(payload.Position or Vector3.zero, "#1 TOP MINER", GameConfig.Colors.Gold)
+			end
+		elseif payload.Kind == "Sold" then
+			floatingText(
+				player.Character and player.Character:GetPivot().Position or Vector3.zero,
+				"+" .. tostring(payload.Amount) .. " C",
+				GameConfig.Colors.Gold
+			)
+		elseif payload.Kind == "EventBanner" then
+			hud.ShowBanner(payload.Text or "WORLD EVENT", 3)
+		elseif payload.Kind == "TutorialComplete" then
+			hud.ShowBanner("TUTORIAL COMPLETE — +100 CREDITS", 3)
+		elseif payload.Kind == "RebirthShockwave" then
+			hud.ShowBanner((payload.PlayerName or "?") .. " REBIRTH VOID " .. tostring(payload.Rebirths), 3)
+		elseif payload.Kind == "AfkIdle" then
+			hud.ShowBanner("DRONES IN IDLE ORBIT — MOVE TO RESUME", 3)
+		elseif payload.Kind == "CodeSuccess" then
+			hud.ShowBanner(payload.Message or "CODE REDEEMED", 3)
+		elseif payload.Kind == "DailySuccess" then
+			hud.ShowBanner("DAILY STREAK DAY " .. tostring(payload.Day), 3)
+		elseif payload.Kind == "ForgeCooling" then
+			hud.ShowBanner("FORGE COOLING (REDUCED SPEED)", 3)
+		end
+	end)
+
+	Remotes.Get("WorldEventState").OnClientEvent:Connect(function(state)
+		if state.Active then
+			hud.ShowBanner(string.upper(state.Kind or "EVENT") .. " — " .. (state.Summoner or "VOIDLINE"), 3)
+		end
+	end)
+end
+
+return VFXController
+]]></string>
+            </Properties>
+          </Item>
+        </Item>
+      </Item>
+    </Item>
+  </Item>
+  <Item class="Workspace" referent="74">
+    <Properties>
+      <string name="Name">Workspace</string>
+      <float name="Gravity">60</float>
+      <bool name="NeedsPivotMigration">false</bool>
+    </Properties>
+  </Item>
+</roblox>

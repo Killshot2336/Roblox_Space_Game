@@ -1,0 +1,5 @@
+rojo.exe
+_rojo_extract/
+rojo-windows.zip
+*.log
+.DS_Store
