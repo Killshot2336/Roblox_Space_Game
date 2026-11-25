@@ -334,7 +334,17 @@ for _, ladder in LADDERS do
 	end
 end
 
-local function special(id: string, name: string, description: string, category: string, stat: string, title: string?)
+-- One-off rewards scale with how far into the game the moment happens, so
+-- early "firsts" do not flood a new pilot with Credits.
+local function special(
+	id: string,
+	name: string,
+	description: string,
+	category: string,
+	stat: string,
+	title: string?,
+	credits: number
+)
 	table.insert(list, {
 		Id = id,
 		Name = name,
@@ -342,32 +352,44 @@ local function special(id: string, name: string, description: string, category: 
 		Category = category,
 		Stat = stat,
 		Threshold = 1,
-		RewardCredits = 250,
+		RewardCredits = credits,
 		RewardShards = 3,
 		RewardTitle = title or "",
 		RewardUnlock = "",
 	})
 end
 
-for _, sector in { { "Nebula", "Nebula Ring" }, { "VoidRim", "Void Rim" }, { "Celestial", "Celestial Orbit" } } do
+local SECTORS: { { any } } = {
+	{ "Nebula", "Nebula Ring", 500 },
+	{ "VoidRim", "Void Rim", 2000 },
+	{ "Celestial", "Celestial Orbit", 8000 },
+}
+for _, sector in SECTORS do
 	special(
 		"ach.sector." .. string.lower(sector[1]),
 		"Charted: " .. sector[2],
 		"Discover the " .. sector[2],
 		"Progression",
 		"Flag:GalaxyFlags." .. sector[1],
-		"title.sector." .. string.lower(sector[1])
+		"title.sector." .. string.lower(sector[1]),
+		sector[3]
 	)
 end
 
-for index, formation in { { "scatter", "Scatter" }, { "beam_link", "Orbital Beam-Link" }, { "halo", "Sovereign Halo" } } do
+local FORMATIONS: { { any } } = {
+	{ "scatter", "Scatter", 25 },
+	{ "beam_link", "Orbital Beam-Link", 60 },
+	{ "halo", "Sovereign Halo", 60 },
+}
+for index, formation in FORMATIONS do
 	special(
 		"ach.formation." .. formation[1],
 		"Formation: " .. formation[2],
 		"Fly the " .. formation[2] .. " formation",
 		"Drones",
 		"Formation:" .. index,
-		"title.formation." .. formation[1]
+		"title.formation." .. formation[1],
+		formation[3]
 	)
 end
 
@@ -378,7 +400,8 @@ for _, tier in OreRegistry.Tiers do
 		"Mine any " .. tier.Label .. " ore",
 		"Codex",
 		"OreTier:" .. tier.Index,
-		nil
+		nil,
+		math.floor(25 * 2.5 ^ (tier.Index - 1))
 	)
 end
 
@@ -389,7 +412,8 @@ for _, archetype in BiomeRegistry.Archetypes do
 		"Be in the deep-space zone during a " .. archetype.Name,
 		"Events",
 		"Archetype:" .. archetype.Id,
-		"title.witness." .. archetype.Id
+		"title.witness." .. archetype.Id,
+		150
 	)
 end
 
@@ -400,7 +424,8 @@ for _, set in RelicRegistry.Sets do
 		"Collect every " .. set.Name .. " relic",
 		"Codex",
 		"RelicSet:" .. set.Id,
-		"title.curator." .. set.Id
+		"title.curator." .. set.Id,
+		400
 	)
 end
 
@@ -411,7 +436,8 @@ for _, branch in { "Miner", "Hauler", "Swarm" } do
 		"Choose the " .. branch .. " drone evolution line",
 		"Drones",
 		"Branch:" .. branch,
-		"title.branch." .. string.lower(branch)
+		"title.branch." .. string.lower(branch),
+		500
 	)
 end
 
