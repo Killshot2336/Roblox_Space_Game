@@ -10,8 +10,17 @@ local GameConfig = {
 	WorldEventDurationSeconds = 90,
 	BridgeIgnitionTutorialStep = 4,
 	TutorialCompleteBonusCredits = 100,
+	-- Owner brief: bridge ignition and +100 Credits land at ~45 s.
+	TutorialTargetSeconds = 45,
 	BrandCreator = "Killshot2336",
 	GameDisplayName = "Voidline: Deep Space",
+	-- Belt asteroids kept alive around each claimed plot.
+	BeltAsteroidsPerPlot = 6,
+	BeltRespawnSeconds = 1.5,
+	-- Deep-space shared rocks kept alive around the Monolith.
+	SharedAsteroidCount = 4,
+	SharedRespawnSeconds = 20,
+	LeaderboardRefreshSeconds = 90,
 	Colors = {
 		Obsidian = Color3.fromRGB(12, 12, 18),
 		Gold = Color3.fromRGB(232, 186, 74),
