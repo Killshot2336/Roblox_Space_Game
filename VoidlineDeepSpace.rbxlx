@@ -37,6 +37,30 @@
         </Properties>
         <Item class="ModuleScript" referent="4">
           <Properties>
+            <string name="Name">AudioConfig</string>
+            <string name="Source"><![CDATA[-- Central sound placeholders for the audio pass. Leave AssetId as "" until
+-- the owner drops real rbxassetid values in from the Creator Dashboard / library.
+-- AudioController skips any entry with an empty AssetId (no errors in Studio).
+local AudioConfig = {
+	MasterVolume = 1,
+	Sounds = {
+		Mine = { AssetId = "", Volume = 0.35 },
+		Sell = { AssetId = "", Volume = 0.55 },
+		Upgrade = { AssetId = "", Volume = 0.5 },
+		TowArrive = { AssetId = "", Volume = 0.45 },
+		BridgeIgnite = { AssetId = "", Volume = 0.7 },
+		Starfall = { AssetId = "", Volume = 0.65 },
+		Rebirth = { AssetId = "", Volume = 0.6 },
+		StoreSuccess = { AssetId = "", Volume = 0.5 },
+	},
+}
+
+return AudioConfig
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="5">
+          <Properties>
             <string name="Name">CodesConfig</string>
             <string name="Source"><![CDATA[--!strict
 -- Code Terminal rewards (spec §11). Codes are case/space-insensitive and each
@@ -80,7 +104,7 @@ return CodesConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="5">
+        <Item class="ModuleScript" referent="6">
           <Properties>
             <string name="Name">DailyConfig</string>
             <string name="Source"><![CDATA[--!strict
@@ -111,7 +135,7 @@ return DailyConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="6">
+        <Item class="ModuleScript" referent="7">
           <Properties>
             <string name="Name">DroneConfig</string>
             <string name="Source"><![CDATA[--!strict
@@ -174,7 +198,7 @@ return DroneConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="7">
+        <Item class="ModuleScript" referent="8">
           <Properties>
             <string name="Name">EconomyConfig</string>
             <string name="Source"><![CDATA[--!strict
@@ -283,7 +307,7 @@ return EconomyConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="8">
+        <Item class="ModuleScript" referent="9">
           <Properties>
             <string name="Name">ForgeConfig</string>
             <string name="Source"><![CDATA[local ForgeConfig = {
@@ -298,7 +322,7 @@ return ForgeConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="9">
+        <Item class="ModuleScript" referent="10">
           <Properties>
             <string name="Name">GalaxyConfig</string>
             <string name="Source"><![CDATA[--!strict
@@ -372,7 +396,7 @@ return GalaxyConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="10">
+        <Item class="ModuleScript" referent="11">
           <Properties>
             <string name="Name">GameConfig</string>
             <string name="Source"><![CDATA[-- Voidline: Deep Space — global game constants
@@ -411,7 +435,7 @@ return GameConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="11">
+        <Item class="ModuleScript" referent="12">
           <Properties>
             <string name="Name">JuiceConfig</string>
             <string name="Source"><![CDATA[local JuiceConfig = {
@@ -426,7 +450,7 @@ return JuiceConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="12">
+        <Item class="ModuleScript" referent="13">
           <Properties>
             <string name="Name">MonetizationConfig</string>
             <string name="Source"><![CDATA[--!strict
@@ -633,7 +657,7 @@ return MonetizationConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="13">
+        <Item class="ModuleScript" referent="14">
           <Properties>
             <string name="Name">PerformanceConfig</string>
             <string name="Source"><![CDATA[local PerformanceConfig = {
@@ -649,7 +673,7 @@ return PerformanceConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="14">
+        <Item class="ModuleScript" referent="15">
           <Properties>
             <string name="Name">RebirthConfig</string>
             <string name="Source"><![CDATA[local RebirthConfig = {
@@ -671,7 +695,7 @@ return RebirthConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="15">
+        <Item class="ModuleScript" referent="16">
           <Properties>
             <string name="Name">SoftContestConfig</string>
             <string name="Source"><![CDATA[local SoftContestConfig = {
@@ -686,7 +710,7 @@ return SoftContestConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="16">
+        <Item class="ModuleScript" referent="17">
           <Properties>
             <string name="Name">SquadConfig</string>
             <string name="Source"><![CDATA[local SquadConfig = {
@@ -700,11 +724,11 @@ return SquadConfig
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="17">
+      <Item class="Folder" referent="18">
         <Properties>
           <string name="Name">Content</string>
         </Properties>
-        <Item class="ModuleScript" referent="18">
+        <Item class="ModuleScript" referent="19">
           <Properties>
             <string name="Name">AchievementRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -1170,7 +1194,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="19">
+        <Item class="ModuleScript" referent="20">
           <Properties>
             <string name="Name">BiomeRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -1596,7 +1620,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="20">
+        <Item class="ModuleScript" referent="21">
           <Properties>
             <string name="Name">CitadelRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -1709,7 +1733,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="21">
+        <Item class="ModuleScript" referent="22">
           <Properties>
             <string name="Name">ContentIndex</string>
             <string name="Source"><![CDATA[--!strict
@@ -1806,7 +1830,7 @@ return ContentIndex
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="22">
+        <Item class="ModuleScript" referent="23">
           <Properties>
             <string name="Name">ContentUtil</string>
             <string name="Source"><![CDATA[--!strict
@@ -1920,7 +1944,7 @@ return ContentUtil
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="23">
+        <Item class="ModuleScript" referent="24">
           <Properties>
             <string name="Name">DroneRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -2194,7 +2218,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="24">
+        <Item class="ModuleScript" referent="25">
           <Properties>
             <string name="Name">OreRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -2526,7 +2550,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="25">
+        <Item class="ModuleScript" referent="26">
           <Properties>
             <string name="Name">Prng</string>
             <string name="Source"><![CDATA[--!strict
@@ -2617,7 +2641,7 @@ return Prng
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="26">
+        <Item class="ModuleScript" referent="27">
           <Properties>
             <string name="Name">QuestRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -2751,7 +2775,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="27">
+        <Item class="ModuleScript" referent="28">
           <Properties>
             <string name="Name">RelicRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -3062,7 +3086,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="28">
+        <Item class="ModuleScript" referent="29">
           <Properties>
             <string name="Name">TitleRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -3192,7 +3216,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="29">
+        <Item class="ModuleScript" referent="30">
           <Properties>
             <string name="Name">WorldEventRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -3357,11 +3381,11 @@ return registry
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="30">
+      <Item class="Folder" referent="31">
         <Properties>
           <string name="Name">Modules</string>
         </Properties>
-        <Item class="ModuleScript" referent="31">
+        <Item class="ModuleScript" referent="32">
           <Properties>
             <string name="Name">ContributionSplit</string>
             <string name="Source"><![CDATA[--!strict
@@ -3479,7 +3503,7 @@ return ContributionSplit
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="32">
+        <Item class="ModuleScript" referent="33">
           <Properties>
             <string name="Name">FormatNumber</string>
             <string name="Source"><![CDATA[local FormatNumber = {}
@@ -3500,7 +3524,7 @@ return FormatNumber
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="33">
+        <Item class="ModuleScript" referent="34">
           <Properties>
             <string name="Name">HubLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -3576,7 +3600,7 @@ return HubLayout
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="34">
+        <Item class="ModuleScript" referent="35">
           <Properties>
             <string name="Name">OreMath</string>
             <string name="Source"><![CDATA[local EconomyConfig = require(script.Parent.Parent.Config.EconomyConfig)
@@ -3600,7 +3624,7 @@ return OreMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="35">
+        <Item class="ModuleScript" referent="36">
           <Properties>
             <string name="Name">PlotLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -3690,7 +3714,7 @@ return PlotLayout
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="36">
+        <Item class="ModuleScript" referent="37">
           <Properties>
             <string name="Name">ProfileSchema</string>
             <string name="Source"><![CDATA[--!strict
@@ -3902,7 +3926,7 @@ return ProfileSchema
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="37">
+        <Item class="ModuleScript" referent="38">
           <Properties>
             <string name="Name">RateLimiter</string>
             <string name="Source"><![CDATA[--!strict
@@ -3959,7 +3983,7 @@ return RateLimiter
           </Properties>
         </Item>
       </Item>
-      <Item class="ModuleScript" referent="38">
+      <Item class="ModuleScript" referent="39">
         <Properties>
           <string name="Name">Remotes</string>
           <string name="Source"><![CDATA[--!strict
@@ -4077,11 +4101,11 @@ return Remotes
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Folder" referent="39">
+      <Item class="Folder" referent="40">
         <Properties>
           <string name="Name">Rules</string>
         </Properties>
-        <Item class="ModuleScript" referent="40">
+        <Item class="ModuleScript" referent="41">
           <Properties>
             <string name="Name">AchievementRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -4212,7 +4236,7 @@ return AchievementRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="41">
+        <Item class="ModuleScript" referent="42">
           <Properties>
             <string name="Name">EconomyRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -4413,7 +4437,7 @@ return EconomyRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="42">
+        <Item class="ModuleScript" referent="43">
           <Properties>
             <string name="Name">MiningRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -4516,7 +4540,7 @@ return MiningRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="43">
+        <Item class="ModuleScript" referent="44">
           <Properties>
             <string name="Name">ProgressionRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -4709,7 +4733,7 @@ return ProgressionRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="44">
+        <Item class="ModuleScript" referent="45">
           <Properties>
             <string name="Name">QuestRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -4821,7 +4845,7 @@ return QuestRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="45">
+        <Item class="ModuleScript" referent="46">
           <Properties>
             <string name="Name">StoreRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -4903,7 +4927,7 @@ return StoreRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="46">
+        <Item class="ModuleScript" referent="47">
           <Properties>
             <string name="Name">TutorialRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -5018,15 +5042,15 @@ return TutorialRules
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="47">
+  <Item class="ServerScriptService" referent="48">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="48">
+    <Item class="Folder" referent="49">
       <Properties>
         <string name="Name">Voidline</string>
       </Properties>
-      <Item class="Script" referent="49">
+      <Item class="Script" referent="50">
         <Properties>
           <string name="Name">Boot</string>
           <token name="RunContext">0</token>
@@ -5099,11 +5123,11 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Folder" referent="50">
+      <Item class="Folder" referent="51">
         <Properties>
           <string name="Name">Security</string>
         </Properties>
-        <Item class="ModuleScript" referent="51">
+        <Item class="ModuleScript" referent="52">
           <Properties>
             <string name="Name">ValidateRemote</string>
             <string name="Source"><![CDATA[--!strict
@@ -5259,11 +5283,11 @@ return ValidateRemote
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="52">
+      <Item class="Folder" referent="53">
         <Properties>
           <string name="Name">Services</string>
         </Properties>
-        <Item class="ModuleScript" referent="53">
+        <Item class="ModuleScript" referent="54">
           <Properties>
             <string name="Name">AfkService</string>
             <string name="Source"><![CDATA[--!strict
@@ -5344,7 +5368,7 @@ return AfkService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="54">
+        <Item class="ModuleScript" referent="55">
           <Properties>
             <string name="Name">BeltService</string>
             <string name="Source"><![CDATA[--!strict
@@ -5561,7 +5585,7 @@ return BeltService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="55">
+        <Item class="ModuleScript" referent="56">
           <Properties>
             <string name="Name">CitadelService</string>
             <string name="Source"><![CDATA[--!strict
@@ -5815,7 +5839,7 @@ return CitadelService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="56">
+        <Item class="ModuleScript" referent="57">
           <Properties>
             <string name="Name">CodeService</string>
             <string name="Source"><![CDATA[--!strict
@@ -5871,7 +5895,7 @@ return CodeService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="57">
+        <Item class="ModuleScript" referent="58">
           <Properties>
             <string name="Name">CodexService</string>
             <string name="Source"><![CDATA[--!strict
@@ -5963,7 +5987,7 @@ return CodexService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="58">
+        <Item class="ModuleScript" referent="59">
           <Properties>
             <string name="Name">CosmeticService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6118,7 +6142,7 @@ return CosmeticService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="59">
+        <Item class="ModuleScript" referent="60">
           <Properties>
             <string name="Name">DailyStreakService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6175,7 +6199,7 @@ return DailyStreakService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="60">
+        <Item class="ModuleScript" referent="61">
           <Properties>
             <string name="Name">DroneService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6431,7 +6455,7 @@ return DroneService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="61">
+        <Item class="ModuleScript" referent="62">
           <Properties>
             <string name="Name">EconomyService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6823,7 +6847,7 @@ return EconomyService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="62">
+        <Item class="ModuleScript" referent="63">
           <Properties>
             <string name="Name">ForgeService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6950,7 +6974,7 @@ return ForgeService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="63">
+        <Item class="ModuleScript" referent="64">
           <Properties>
             <string name="Name">InspectService</string>
             <string name="Source"><![CDATA[--!strict
@@ -7029,7 +7053,7 @@ return InspectService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="64">
+        <Item class="ModuleScript" referent="65">
           <Properties>
             <string name="Name">JuiceService</string>
             <string name="Source"><![CDATA[--!strict
@@ -7069,7 +7093,7 @@ return JuiceService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="65">
+        <Item class="ModuleScript" referent="66">
           <Properties>
             <string name="Name">LeaderboardService</string>
             <string name="Source"><![CDATA[--!strict
@@ -7309,7 +7333,7 @@ return LeaderboardService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="66">
+        <Item class="ModuleScript" referent="67">
           <Properties>
             <string name="Name">MapBuilder</string>
             <string name="Source"><![CDATA[--!strict
@@ -7831,7 +7855,7 @@ return MapBuilder
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="67">
+        <Item class="ModuleScript" referent="68">
           <Properties>
             <string name="Name">MonetizationService</string>
             <string name="Source"><![CDATA[--!strict
@@ -8045,7 +8069,7 @@ return MonetizationService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="68">
+        <Item class="ModuleScript" referent="69">
           <Properties>
             <string name="Name">PlayerDataService</string>
             <string name="Source"><![CDATA[--!strict
@@ -8677,7 +8701,7 @@ return PlayerDataService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="69">
+        <Item class="ModuleScript" referent="70">
           <Properties>
             <string name="Name">PlotService</string>
             <string name="Source"><![CDATA[--!strict
@@ -8872,7 +8896,7 @@ return PlotService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="70">
+        <Item class="ModuleScript" referent="71">
           <Properties>
             <string name="Name">RebirthService</string>
             <string name="Source"><![CDATA[--!strict
@@ -8951,7 +8975,7 @@ return RebirthService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="71">
+        <Item class="ModuleScript" referent="72">
           <Properties>
             <string name="Name">RelicService</string>
             <string name="Source"><![CDATA[--!strict
@@ -9135,7 +9159,7 @@ return RelicService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="72">
+        <Item class="ModuleScript" referent="73">
           <Properties>
             <string name="Name">RiftService</string>
             <string name="Source"><![CDATA[--!strict
@@ -9240,7 +9264,7 @@ return RiftService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="73">
+        <Item class="ModuleScript" referent="74">
           <Properties>
             <string name="Name">RockService</string>
             <string name="Source"><![CDATA[--!strict
@@ -9533,7 +9557,7 @@ return RockService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="74">
+        <Item class="ModuleScript" referent="75">
           <Properties>
             <string name="Name">SoftContestService</string>
             <string name="Source"><![CDATA[--!strict
@@ -9765,7 +9789,7 @@ return SoftContestService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="75">
+        <Item class="ModuleScript" referent="76">
           <Properties>
             <string name="Name">SquadService</string>
             <string name="Source"><![CDATA[--!strict
@@ -10108,7 +10132,7 @@ return SquadService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="76">
+        <Item class="ModuleScript" referent="77">
           <Properties>
             <string name="Name">StatService</string>
             <string name="Source"><![CDATA[--!strict
@@ -10236,7 +10260,7 @@ return StatService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="77">
+        <Item class="ModuleScript" referent="78">
           <Properties>
             <string name="Name">SummonService</string>
             <string name="Source"><![CDATA[--!strict
@@ -10382,7 +10406,7 @@ return SummonService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="78">
+        <Item class="ModuleScript" referent="79">
           <Properties>
             <string name="Name">TowService</string>
             <string name="Source"><![CDATA[--!strict
@@ -10487,7 +10511,7 @@ return TowService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="79">
+        <Item class="ModuleScript" referent="80">
           <Properties>
             <string name="Name">TutorialService</string>
             <string name="Source"><![CDATA[--!strict
@@ -10589,7 +10613,7 @@ return TutorialService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="80">
+        <Item class="ModuleScript" referent="81">
           <Properties>
             <string name="Name">WarpService</string>
             <string name="Source"><![CDATA[--!strict
@@ -10766,7 +10790,7 @@ return WarpService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="81">
+        <Item class="ModuleScript" referent="82">
           <Properties>
             <string name="Name">WorldEventService</string>
             <string name="Source"><![CDATA[--!strict
@@ -11091,7 +11115,7 @@ return WorldEventService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="82">
+        <Item class="ModuleScript" referent="83">
           <Properties>
             <string name="Name">WorldState</string>
             <string name="Source"><![CDATA[--!strict
@@ -11182,15 +11206,15 @@ return WorldState
       </Item>
     </Item>
   </Item>
-  <Item class="ServerStorage" referent="83">
+  <Item class="ServerStorage" referent="84">
     <Properties>
       <string name="Name">ServerStorage</string>
     </Properties>
-    <Item class="Folder" referent="84">
+    <Item class="Folder" referent="85">
       <Properties>
         <string name="Name">Voidline</string>
       </Properties>
-      <Item class="ModuleScript" referent="85">
+      <Item class="ModuleScript" referent="86">
         <Properties>
           <string name="Name">README</string>
           <string name="Source"><![CDATA[-- ServerStorage.Voidline holds runtime templates if needed.
@@ -11201,23 +11225,23 @@ return {}
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="86">
+  <Item class="StarterPlayer" referent="87">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="87">
+    <Item class="StarterPlayerScripts" referent="88">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="88">
+      <Item class="Folder" referent="89">
         <Properties>
           <string name="Name">Voidline</string>
         </Properties>
-        <Item class="Folder" referent="89">
+        <Item class="Folder" referent="90">
           <Properties>
             <string name="Name">Client</string>
           </Properties>
-          <Item class="ModuleScript" referent="90">
+          <Item class="ModuleScript" referent="91">
             <Properties>
               <string name="Name">ClientState</string>
               <string name="Source"><![CDATA[--!strict
@@ -11380,7 +11404,7 @@ return ClientState
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="91">
+          <Item class="ModuleScript" referent="92">
             <Properties>
               <string name="Name">Ui</string>
               <string name="Source"><![CDATA[--!strict
@@ -11672,7 +11696,7 @@ return Ui
             </Properties>
           </Item>
         </Item>
-        <Item class="LocalScript" referent="92">
+        <Item class="LocalScript" referent="93">
           <Properties>
             <string name="Name">ClientBoot</string>
             <string name="Source"><![CDATA[--!strict
@@ -11700,6 +11724,7 @@ local StoreController = require(Controllers.StoreController)
 local MenuController = require(Controllers.MenuController)
 local InteractController = require(Controllers.InteractController)
 local JuiceController = require(Controllers.JuiceController)
+local AudioController = require(Controllers.AudioController)
 
 -- Input pings keep the server's idle detector honest without any anti-idle
 -- tricks: they only fire on real player input.
@@ -11758,6 +11783,7 @@ HotbarController.Init({
 	ToggleClip = toggleClip,
 })
 JuiceController.Init()
+AudioController.Init()
 task.spawn(InteractController.Init, {
 	OpenStore = openStore,
 	OpenMenu = function(tab: string?)
@@ -11787,11 +11813,101 @@ print(("[Voidline] Client online for %s"):format(Players.LocalPlayer.Name))
 ]]></string>
           </Properties>
         </Item>
-        <Item class="Folder" referent="93">
+        <Item class="Folder" referent="94">
           <Properties>
             <string name="Name">Controllers</string>
           </Properties>
-          <Item class="ModuleScript" referent="94">
+          <Item class="ModuleScript" referent="95">
+            <Properties>
+              <string name="Name">AudioController</string>
+              <string name="Source"><![CDATA[--!strict
+-- Optional one-shot SFX on JuiceEvent kinds. Uses AudioConfig placeholders only;
+-- gameplay does not depend on audio loading or playing.
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local AudioConfig = require(Voidline.Config.AudioConfig)
+local Remotes = require(Voidline.Remotes)
+
+local AudioController = {}
+
+local player = Players.LocalPlayer
+
+local KIND_TO_KEY: { [string]: string } = {
+	Ore = "Mine",
+	Sell = "Sell",
+	Upgrade = "Upgrade",
+	BridgeIgnite = "BridgeIgnite",
+	ContestShare = "TowArrive",
+	WorldEvent = "Starfall",
+	Rebirth = "Rebirth",
+	PassGranted = "StoreSuccess",
+	Store = "StoreSuccess",
+}
+
+local folder: Folder
+local cache: { [string]: Sound } = {}
+
+local function getOrCreate(key: string): Sound?
+	local spec = AudioConfig.Sounds[key]
+	if not spec or type(spec.AssetId) ~= "string" or spec.AssetId == "" then
+		return nil
+	end
+	local sound = cache[key]
+	if sound and sound.Parent then
+		return sound
+	end
+	local newSound = Instance.new("Sound")
+	newSound.Name = "Voidline_" .. key
+	newSound.SoundId = spec.AssetId
+	newSound.Volume = (spec.Volume or 0.5) * (AudioConfig.MasterVolume or 1)
+	newSound.RollOffMaxDistance = 0
+	newSound.Parent = folder
+	cache[key] = newSound
+	return newSound
+end
+
+local function playKey(key: string)
+	local sound = getOrCreate(key)
+	if not sound then
+		return
+	end
+	sound.TimePosition = 0
+	sound:Play()
+end
+
+local function onJuice(message: any)
+	if type(message) ~= "table" or type(message.Kind) ~= "string" then
+		return
+	end
+	if message.Kind == "Store" and message.Ok ~= true then
+		return
+	end
+	if message.Kind == "Rebirth" and message.Ok ~= true then
+		return
+	end
+	if message.Kind == "WorldEvent" and message.Phase ~= "start" then
+		return
+	end
+	local key = KIND_TO_KEY[message.Kind]
+	if key then
+		playKey(key)
+	end
+end
+
+function AudioController.Init()
+	folder = Instance.new("Folder")
+	folder.Name = "VoidlineAudio"
+	folder.Parent = player:WaitForChild("PlayerGui")
+	Remotes.Get("JuiceEvent").OnClientEvent:Connect(onJuice)
+end
+
+return AudioController
+]]></string>
+            </Properties>
+          </Item>
+          <Item class="ModuleScript" referent="96">
             <Properties>
               <string name="Name">CameraController</string>
               <string name="Source"><![CDATA[--!strict
@@ -11875,7 +11991,7 @@ return CameraController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="95">
+          <Item class="ModuleScript" referent="97">
             <Properties>
               <string name="Name">DroneController</string>
               <string name="Source"><![CDATA[--!strict
@@ -12489,7 +12605,7 @@ return DroneController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="96">
+          <Item class="ModuleScript" referent="98">
             <Properties>
               <string name="Name">HUDController</string>
               <string name="Source"><![CDATA[--!strict
@@ -12992,7 +13108,7 @@ return HUDController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="97">
+          <Item class="ModuleScript" referent="99">
             <Properties>
               <string name="Name">HotbarController</string>
               <string name="Source"><![CDATA[--!strict
@@ -13294,7 +13410,7 @@ return HotbarController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="98">
+          <Item class="ModuleScript" referent="100">
             <Properties>
               <string name="Name">InteractController</string>
               <string name="Source"><![CDATA[--!strict
@@ -13414,7 +13530,7 @@ return InteractController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="99">
+          <Item class="ModuleScript" referent="101">
             <Properties>
               <string name="Name">JuiceController</string>
               <string name="Source"><![CDATA[--!strict
@@ -13858,7 +13974,7 @@ return JuiceController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="100">
+          <Item class="ModuleScript" referent="102">
             <Properties>
               <string name="Name">MenuController</string>
               <string name="Source"><![CDATA[--!strict
@@ -14743,7 +14859,7 @@ return MenuController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="101">
+          <Item class="ModuleScript" referent="103">
             <Properties>
               <string name="Name">OnboardingController</string>
               <string name="Source"><![CDATA[--!strict
@@ -15077,7 +15193,7 @@ return OnboardingController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="102">
+          <Item class="ModuleScript" referent="104">
             <Properties>
               <string name="Name">SettingsController</string>
               <string name="Source"><![CDATA[local Players = game:GetService("Players")
@@ -15189,7 +15305,7 @@ return SettingsController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="103">
+          <Item class="ModuleScript" referent="105">
             <Properties>
               <string name="Name">StationInteractController</string>
               <string name="Source"><![CDATA[local Players = game:GetService("Players")
@@ -15322,7 +15438,7 @@ return StationInteractController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="104">
+          <Item class="ModuleScript" referent="106">
             <Properties>
               <string name="Name">StoreController</string>
               <string name="Source"><![CDATA[--!strict
@@ -15718,7 +15834,7 @@ return StoreController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="105">
+          <Item class="ModuleScript" referent="107">
             <Properties>
               <string name="Name">ThrusterCosmeticController</string>
               <string name="Source"><![CDATA[local Players = game:GetService("Players")
@@ -15794,7 +15910,7 @@ return ThrusterCosmeticController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="106">
+          <Item class="ModuleScript" referent="108">
             <Properties>
               <string name="Name">TowController</string>
               <string name="Source"><![CDATA[--!strict
@@ -15936,7 +16052,7 @@ return TowController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="107">
+          <Item class="ModuleScript" referent="109">
             <Properties>
               <string name="Name">VFXController</string>
               <string name="Source"><![CDATA[--!strict
@@ -16153,7 +16269,7 @@ return VFXController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="108">
+          <Item class="ModuleScript" referent="110">
             <Properties>
               <string name="Name">WorldController</string>
               <string name="Source"><![CDATA[--!strict
@@ -16403,7 +16519,7 @@ return WorldController
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="109">
+  <Item class="Workspace" referent="111">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">60</float>
