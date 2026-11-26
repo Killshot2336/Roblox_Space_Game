@@ -46,7 +46,7 @@ MonetizationConfig.Passes = {
 		Name = "Starter Bundle",
 		Robux = 79,
 		Tokens = 65,
-		GamePassId = 0,
+		GamePassId = 2102231833,
 		Blurb = "+500 Credits once, Gold Comet thruster and the PIONEER title.",
 	},
 	{
@@ -54,7 +54,7 @@ MonetizationConfig.Passes = {
 		Name = "Auto-Sell Warp Link",
 		Robux = 249,
 		Tokens = 200,
-		GamePassId = 0,
+		GamePassId = 2102231834,
 		Blurb = "Full cargo warps to your refinery and sells itself.",
 	},
 	{
@@ -62,7 +62,7 @@ MonetizationConfig.Passes = {
 		Name = "2x Credits",
 		Robux = 449,
 		Tokens = 370,
-		GamePassId = 0,
+		GamePassId = 2099034650,
 		Blurb = "Every sale pays double.",
 	},
 	{
@@ -70,7 +70,7 @@ MonetizationConfig.Passes = {
 		Name = "2x Shard & Relic Luck",
 		Robux = 499,
 		Tokens = 410,
-		GamePassId = 0,
+		GamePassId = 2099004700,
 		Blurb = "Double the chance to find Void Shards and relics.",
 	},
 	{
@@ -78,7 +78,7 @@ MonetizationConfig.Passes = {
 		Name = "+3 Drone Slots",
 		Robux = 599,
 		Tokens = 490,
-		GamePassId = 0,
+		GamePassId = 2099880676,
 		Blurb = "Three extra drones join your swarm.",
 	},
 	{
@@ -86,7 +86,7 @@ MonetizationConfig.Passes = {
 		Name = "+5 Mega Swarm Slots",
 		Robux = 999,
 		Tokens = 820,
-		GamePassId = 0,
+		GamePassId = 2099454780,
 		Blurb = "Five extra drones join your swarm.",
 	},
 	{
@@ -94,7 +94,7 @@ MonetizationConfig.Passes = {
 		Name = "Laser Overclock",
 		Robux = 349,
 		Tokens = 285,
-		GamePassId = 0,
+		GamePassId = 2099112722,
 		Blurb = "+35% laser damage and the Overclock laser shader.",
 	},
 	{
@@ -102,7 +102,7 @@ MonetizationConfig.Passes = {
 		Name = "Deep-Space Warp Pass",
 		Robux = 399,
 		Tokens = 325,
-		GamePassId = 0,
+		GamePassId = 2100246702,
 		Blurb = "Warp to the Monolith, Overlook and Rift from anywhere; faster tows.",
 	},
 	{
@@ -110,7 +110,7 @@ MonetizationConfig.Passes = {
 		Name = "Void Sovereign VIP",
 		Robux = 899,
 		Tokens = 740,
-		GamePassId = 0,
+		GamePassId = 2102105843,
 		Blurb = "VIP Lounge access, +10% Credits and the VOID SOVEREIGN title.",
 	},
 	{
@@ -118,7 +118,7 @@ MonetizationConfig.Passes = {
 		Name = "Eternal Architect",
 		Robux = 1499,
 		Tokens = 1230,
-		GamePassId = 0,
+		GamePassId = 2099928725,
 		Blurb = "Station Tier upgrades 10% cheaper and the ETERNAL ARCHITECT title.",
 	},
 } :: { Pass }
