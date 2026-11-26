@@ -7,6 +7,8 @@ local ProfileSchema = {}
 
 ProfileSchema.VERSION = 2
 ProfileSchema.MAX_RECEIPTS = 64
+-- Diff replication marks a removed sub-key with this value (never a real value).
+ProfileSchema.REMOVED = "\0nil"
 
 local function defaults()
 	return {

@@ -36,7 +36,7 @@ local LOAD_ATTEMPTS = 5
 local SAVE_ATTEMPTS = 3
 local FLUSH_INTERVAL = 0.15
 local RELEASE_WAIT_SECONDS = 30
-local REMOVED = "\0nil"
+local REMOVED = ProfileSchema.REMOVED
 
 -- Never replicated to the client.
 local SERVER_ONLY = { ProcessedReceipts = true, PassGrants = true, RedeemedCodes = true }
