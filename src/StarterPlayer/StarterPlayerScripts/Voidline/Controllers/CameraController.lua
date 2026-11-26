@@ -1,46 +1,78 @@
+--!strict
+-- Camera feel layered on top of the default camera: a smooth FOV pullback
+-- while the Orbital Beam-Link is engaged, short FOV punches and small,
+-- quickly decaying shakes. Reduced Motion turns shakes off and halves FOV moves.
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
 
-local Voidline = ReplicatedStorage:WaitForChild("Voidline")
-local Remotes = require(Voidline.Remotes)
+local Client = script.Parent.Parent.Client
+local Ui = require(Client.Ui)
+
+local CameraController = {}
+
+local BASE_FOV = 70
+local BEAM_LINK_FOV = 8
+local FOV_RATE = 4
+local MAX_SHAKE = 1.2
 
 local player = Players.LocalPlayer
-local camera = workspace.CurrentCamera
+local currentFov = BASE_FOV
+local punch = 0
+local punchUntil = 0
+local shakeAmount = 0
+local shakeUntil = 0
+local shakeDuration = 1
 
-local CameraController = {
-	_action = false,
-	_baseFov = 70,
-}
+local function beamLinkEngaged(): boolean
+	local targets = player:GetAttribute("DroneTargets")
+	return player:GetAttribute("Formation") == 2 and type(targets) == "string" and targets ~= ""
+end
+
+function CameraController.Punch(fovDelta: number, seconds: number)
+	punch = fovDelta * (if Ui.ReducedMotion then 0.5 else 1)
+	punchUntil = os.clock() + seconds
+end
+
+function CameraController.Shake(intensity: number, seconds: number)
+	if Ui.ReducedMotion then
+		return
+	end
+	shakeAmount = math.min(MAX_SHAKE, math.max(shakeAmount, intensity))
+	shakeDuration = math.max(0.05, seconds)
+	shakeUntil = os.clock() + shakeDuration
+end
+
+local function step(dt: number)
+	local camera = Workspace.CurrentCamera
+	if not camera then
+		return
+	end
+	local now = os.clock()
+	local target = BASE_FOV
+	if beamLinkEngaged() then
+		target += BEAM_LINK_FOV * (if Ui.ReducedMotion then 0.5 else 1)
+	end
+	if now < punchUntil then
+		target += punch
+	end
+	currentFov += (target - currentFov) * (1 - math.exp(-dt * FOV_RATE))
+	camera.FieldOfView = currentFov
+	if now < shakeUntil then
+		local fade = (shakeUntil - now) / shakeDuration
+		local amount = math.rad(shakeAmount * fade)
+		camera.CFrame *= CFrame.Angles(
+			(math.random() - 0.5) * amount,
+			(math.random() - 0.5) * amount,
+			(math.random() - 0.5) * amount * 0.5
+		)
+	else
+		shakeAmount = 0
+	end
+end
 
 function CameraController.Init()
-	Remotes.Get("JuiceEvent").OnClientEvent:Connect(function(payload)
-		if typeof(payload) ~= "table" then
-			return
-		end
-		if payload.Kind == "Laser" and payload.Formation == 2 then
-			CameraController._action = true
-		elseif payload.Kind == "CoreChunk" or payload.Kind == "Shatter" then
-			CameraController._action = true
-			task.delay(1.2, function()
-				CameraController._action = false
-			end)
-		elseif payload.Kind == "BridgeIgnition" then
-			CameraController._action = true
-			task.delay(1.5, function()
-				CameraController._action = false
-			end)
-		end
-	end)
-
-	RunService.RenderStepped:Connect(function()
-		camera = workspace.CurrentCamera
-		if not camera then
-			return
-		end
-		local target = if CameraController._action then 80 else CameraController._baseFov
-		camera.FieldOfView = camera.FieldOfView + (target - camera.FieldOfView) * 0.08
-	end)
+	RunService:BindToRenderStep("VoidlineCamera", Enum.RenderPriority.Camera.Value + 1, step)
 end
 
 return CameraController

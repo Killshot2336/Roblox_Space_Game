@@ -1,161 +1,296 @@
-local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
+--!strict
+-- Bottom hotbar: Quick Upgrade, the three formations, Store, Menu, Home warp
+-- and (with Auto-Sell Warp Link) remote Sell. Every key has an on-screen
+-- button of at least 48 px, so touch players get the same actions.
+local ContextActionService = game:GetService("ContextActionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
-local Remotes = require(Voidline.Remotes)
-local GameConfig = require(Voidline.Config.GameConfig)
+local EconomyConfig = require(Voidline.Config.EconomyConfig)
+local DroneConfig = require(Voidline.Config.DroneConfig)
+local EconomyRules = require(Voidline.Rules.EconomyRules)
 
-local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+local Client = script.Parent.Parent.Client
+local Ui = require(Client.Ui)
+local ClientState = require(Client.ClientState)
 
-local HotbarController = {
-	_onOpenStore = nil :: (() -> ())?,
-	_onOpenSettings = nil :: (() -> ())?,
-	_onOpenSquad = nil :: (() -> ())?,
+local HotbarController = {}
+
+export type Actions = {
+	OpenStore: () -> (),
+	OpenMenu: (tab: string?) -> (),
+	ToggleClip: () -> (),
 }
 
-local function mkButton(parent, name, text, order)
-	local b = Instance.new("TextButton")
-	b.Name = name
-	b.Size = UDim2.fromOffset(72, 56)
-	b.BackgroundColor3 = GameConfig.Colors.Obsidian
-	b.BackgroundTransparency = 0.1
-	b.Text = text
-	b.TextColor3 = GameConfig.Colors.GoldBright
-	b.Font = Enum.Font.GothamBold
-	b.TextSize = 12
-	b.LayoutOrder = order
-	b.Parent = parent
-	local c = Instance.new("UICorner")
-	c.CornerRadius = UDim.new(0, 8)
-	c.Parent = b
-	local s = Instance.new("UIStroke")
-	s.Color = GameConfig.Colors.Gold
-	s.Thickness = 1
-	s.Parent = b
-	return b
+local SLOT = 56
+local FORMATION_GLYPHS = { "✶", "⟐", "♛" }
+
+local gui: ScreenGui
+local bar: Frame
+local upgradeButton: TextButton
+local upgradeDetail: TextLabel
+local formationButtons: { TextButton } = {}
+local sellButton: TextButton
+local actions: Actions
+
+-- Next upgrade worth showing (affordable or not): tutorial order first, then
+-- the cheapest available upgrade.
+function HotbarController.NextUpgrade(profile: any, ctx: any): (string?, number?)
+	if not profile.TutorialComplete then
+		for _, entry in { { "Drill", "Drill" }, { "Cargo", "Cargo" }, { "Drone", "DroneSlot" } } do
+			if not profile.TutorialFlags[entry[1]] then
+				return entry[2], EconomyRules.UpgradeCost(profile, entry[2], ctx)
+			end
+		end
+	end
+	local best, bestCost = nil, math.huge
+	for _, id in EconomyConfig.UpgradeOrder do
+		local ok, reason = EconomyRules.CanUpgrade(profile, id, ctx)
+		if ok or reason == "funds" then
+			local cost = EconomyRules.UpgradeCost(profile, id, ctx) :: number
+			if cost < bestCost then
+				best, bestCost = id, cost
+			end
+		end
+	end
+	if best then
+		return best, bestCost
+	end
+	return nil, nil
 end
 
-function HotbarController.Init(hooks)
-	HotbarController._onOpenStore = hooks.OpenStore
-	HotbarController._onOpenSettings = hooks.OpenSettings
-	HotbarController._onOpenSquad = hooks.OpenSquad
-
-	local gui = Instance.new("ScreenGui")
-	gui.Name = "VoidlineHotbar"
-	gui.ResetOnSpawn = false
-	gui.IgnoreGuiInset = true
-	gui.Parent = playerGui
-
-	local bar = Instance.new("Frame")
-	bar.Name = "Bar"
-	bar.AnchorPoint = Vector2.new(0.5, 1)
-	bar.Position = UDim2.new(0.5, 0, 1, -24)
-	bar.Size = UDim2.fromOffset(520, 64)
-	bar.BackgroundTransparency = 1
-	bar.Parent = gui
-
-	local layout = Instance.new("UIListLayout")
-	layout.FillDirection = Enum.FillDirection.Horizontal
-	layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-	layout.Padding = UDim.new(0, 8)
-	layout.Parent = bar
-
-	local f1 = mkButton(bar, "F1", "1\nSCATTER", 1)
-	local f2 = mkButton(bar, "F2", "2\nBEAM", 2)
-	local f3 = mkButton(bar, "F3", "3\nHALO", 3)
-	local squad = mkButton(bar, "Squad", "SQUAD", 4)
-	local shop = mkButton(bar, "Shop", "SHOP", 5)
-	local settings = mkButton(bar, "Settings", "SET", 6)
-	local upgrade = mkButton(bar, "Upgrade", "U\nUPGRADE", 7)
-	local sprint = mkButton(bar, "Sprint", "SPRINT", 8)
-	local clip = mkButton(bar, "Clip", "CLIP", 9)
-
-	local function setFormation(n)
-		Remotes.Get("SetFormation"):FireServer(n)
+local function keyHint(parent: Instance, key: string)
+	if Ui.IsTouch() then
+		return
 	end
-	f1.MouseButton1Click:Connect(function()
-		setFormation(1)
-	end)
-	f2.MouseButton1Click:Connect(function()
-		setFormation(2)
-	end)
-	f3.MouseButton1Click:Connect(function()
-		setFormation(3)
-	end)
-	squad.MouseButton1Click:Connect(function()
-		if HotbarController._onOpenSquad then
-			HotbarController._onOpenSquad()
-		end
-	end)
-	shop.MouseButton1Click:Connect(function()
-		if HotbarController._onOpenStore then
-			HotbarController._onOpenStore()
-		end
-	end)
-	settings.MouseButton1Click:Connect(function()
-		if HotbarController._onOpenSettings then
-			HotbarController._onOpenSettings()
-		end
-	end)
-	upgrade.MouseButton1Click:Connect(function()
-		Remotes.Get("QuickUpgrade"):FireServer()
-	end)
+	local hint = Ui.Label({
+		Name = "Key",
+		AnchorPoint = Vector2.new(1, 0),
+		Position = UDim2.new(1, -4, 0, 2),
+		Size = UDim2.fromOffset(16, 14),
+		Text = key,
+		TextSize = 11,
+		Font = Ui.Font.Bold,
+		TextColor3 = Ui.Colors.Muted,
+		ZIndex = 3,
+		Parent = parent,
+	})
+	hint.TextXAlignment = Enum.TextXAlignment.Right
+end
 
-	local sprinting = false
-	local function toggleSprint()
-		sprinting = not sprinting
-		local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-		if hum then
-			hum.WalkSpeed = if sprinting then 28 else 16
-		end
-		Remotes.Get("PlayerInput"):FireServer()
+local function slotButton(
+	name: string,
+	glyph: string,
+	caption: string,
+	key: string,
+	order: number,
+	onActivate: () -> ()
+): TextButton
+	local button = Ui.Button({
+		Name = name,
+		Size = UDim2.fromOffset(SLOT, SLOT),
+		Text = "",
+		LayoutOrder = order,
+		Parent = bar,
+	}, onActivate)
+	Ui.Label({
+		Name = "Glyph",
+		Size = UDim2.new(1, 0, 0, 34),
+		Position = UDim2.fromOffset(0, 4),
+		Text = glyph,
+		Font = Ui.Font.Title,
+		TextSize = 24,
+		TextColor3 = Ui.Colors.GoldBright,
+		Parent = button,
+	})
+	Ui.Label({
+		Name = "Caption",
+		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.new(0, 0, 1, -3),
+		Size = UDim2.new(1, 0, 0, 14),
+		Text = caption,
+		Font = Ui.Font.Bold,
+		TextSize = 10,
+		TextColor3 = Ui.Colors.Muted,
+		Parent = button,
+	})
+	keyHint(button, key)
+	return button
+end
+
+local function quickUpgrade()
+	ClientState.Fire("QuickUpgrade")
+end
+
+local function setFormation(n: number)
+	if ClientState.Profile.Formation == n then
+		return
 	end
-	sprint.MouseButton1Click:Connect(toggleSprint)
+	ClientState.Fire("SetFormation", n)
+end
 
-	local clipOn = false
-	clip.MouseButton1Click:Connect(function()
-		clipOn = not clipOn
-		hooks.SetClipMode(clipOn)
-		gui.Enabled = not clipOn
-	end)
-
-	UserInputService.InputBegan:Connect(function(input, gp)
-		if gp then
-			return
+local function refresh()
+	local profile = ClientState.Profile
+	local ctx = ClientState.Ctx()
+	local id, cost = HotbarController.NextUpgrade(profile, ctx)
+	if id and cost then
+		local def = EconomyConfig.Upgrades[id]
+		local affordable = profile.Credits >= cost
+		upgradeDetail.Text = ("%s · ◆%s"):format(def.Label, Ui.Compact(cost))
+		upgradeDetail.TextColor3 = if affordable then Ui.Colors.GoldBright else Ui.Colors.Muted
+		local stroke = upgradeButton:FindFirstChildOfClass("UIStroke")
+		if stroke then
+			stroke.Transparency = if affordable then 0.1 else 0.6
 		end
-		Remotes.Get("PlayerInput"):FireServer()
-		if input.KeyCode == Enum.KeyCode.One then
-			setFormation(1)
-		elseif input.KeyCode == Enum.KeyCode.Two then
-			setFormation(2)
-		elseif input.KeyCode == Enum.KeyCode.Three then
-			setFormation(3)
-		elseif input.KeyCode == Enum.KeyCode.U then
-			Remotes.Get("QuickUpgrade"):FireServer()
-		elseif input.KeyCode == Enum.KeyCode.LeftShift then
-			toggleSprint()
-		end
-	end)
-
-	UserInputService.InputChanged:Connect(function()
-		Remotes.Get("PlayerInput"):FireServer()
-	end)
-
-	-- Touch-friendly: show sprint/upgrade always on mobile
-	if UserInputService.TouchEnabled then
-		sprint.Visible = true
-		upgrade.Visible = true
+	else
+		upgradeDetail.Text = "ALL MAXED"
+		upgradeDetail.TextColor3 = Ui.Colors.Muted
 	end
+	for n, button in formationButtons do
+		local selected = profile.Formation == n
+		button.BackgroundColor3 = if selected then Ui.Colors.Gold else Ui.Colors.GlassLight
+		local glyph = button:FindFirstChild("Glyph") :: TextLabel?
+		if glyph then
+			glyph.TextColor3 = if selected then Ui.Colors.Shadow else Ui.Colors.GoldBright
+		end
+	end
+	sellButton.Visible = ClientState.HasPerk("AutoSellWarpLink")
+end
 
-	HotbarController._gui = gui
+local function bindKey(name: string, fn: () -> (), ...: Enum.KeyCode)
+	ContextActionService:BindAction(name, function(_, state)
+		if state == Enum.UserInputState.Begin then
+			fn()
+			return Enum.ContextActionResult.Sink
+		end
+		return Enum.ContextActionResult.Pass
+	end, false, ...)
 end
 
 function HotbarController.SetVisible(on: boolean)
-	if HotbarController._gui then
-		HotbarController._gui.Enabled = on
+	gui.Enabled = on
+end
+
+function HotbarController.Init(hotbarActions: Actions)
+	actions = hotbarActions
+	gui = Ui.Screen("VoidlineHotbar", 6)
+	bar = Ui.Glass({
+		Name = "Hotbar",
+		AnchorPoint = Vector2.new(0.5, 1),
+		Position = UDim2.new(0.5, 0, 1, -10),
+		Size = UDim2.fromOffset(0, SLOT + 16),
+		AutomaticSize = Enum.AutomaticSize.X,
+		CornerRadius = 18,
+		Parent = gui,
+	})
+	Ui.Padding(bar, 8)
+	Ui.List(bar, Enum.FillDirection.Horizontal, 8)
+
+	upgradeButton = Ui.Button({
+		Name = "Upgrade",
+		Size = UDim2.fromOffset(176, SLOT),
+		Text = "",
+		LayoutOrder = 1,
+		Parent = bar,
+	}, quickUpgrade)
+	Ui.Label({
+		Name = "Title",
+		Position = UDim2.fromOffset(0, 6),
+		Size = UDim2.new(1, 0, 0, 22),
+		Text = "UPGRADE",
+		Font = Ui.Font.Title,
+		TextSize = 18,
+		TextColor3 = Ui.Colors.Text,
+		Parent = upgradeButton,
+	})
+	upgradeDetail = Ui.Label({
+		Name = "Detail",
+		Position = UDim2.fromOffset(4, 30),
+		Size = UDim2.new(1, -8, 0, 18),
+		Text = "",
+		Font = Ui.Font.Bold,
+		TextSize = 13,
+		TextTruncate = Enum.TextTruncate.AtEnd,
+		Parent = upgradeButton,
+	})
+	keyHint(upgradeButton, "U")
+
+	for n = 1, 3 do
+		local caption = string.split(DroneConfig.FormationLabels[n], " ")
+		formationButtons[n] = slotButton(
+			"Formation" .. n,
+			FORMATION_GLYPHS[n],
+			caption[#caption],
+			tostring(n),
+			1 + n,
+			function()
+				setFormation(n)
+			end
+		)
 	end
+	slotButton("Store", "⬡", "STORE", "B", 10, function()
+		actions.OpenStore()
+	end)
+	slotButton("Menu", "☰", "CODEX", "C", 11, function()
+		actions.OpenMenu(nil)
+	end)
+	slotButton("Home", "⌂", "HOME", "H", 12, function()
+		ClientState.Fire("WarpRequest", "Home")
+	end)
+	sellButton = slotButton("Sell", "⇪", "SELL", "R", 13, function()
+		ClientState.Fire("SellOre")
+	end)
+
+	bindKey("VoidlineUpgrade", quickUpgrade, Enum.KeyCode.U)
+	bindKey("VoidlineFormation1", function()
+		setFormation(1)
+	end, Enum.KeyCode.One)
+	bindKey("VoidlineFormation2", function()
+		setFormation(2)
+	end, Enum.KeyCode.Two)
+	bindKey("VoidlineFormation3", function()
+		setFormation(3)
+	end, Enum.KeyCode.Three)
+	bindKey("VoidlineStore", function()
+		actions.OpenStore()
+	end, Enum.KeyCode.B)
+	bindKey("VoidlineMenu", function()
+		actions.OpenMenu(nil)
+	end, Enum.KeyCode.C)
+	bindKey("VoidlineHome", function()
+		ClientState.Fire("WarpRequest", "Home")
+	end, Enum.KeyCode.H)
+	bindKey("VoidlineSell", function()
+		if ClientState.HasPerk("AutoSellWarpLink") then
+			ClientState.Fire("SellOre")
+		end
+	end, Enum.KeyCode.R)
+	bindKey("VoidlineClipMode", function()
+		actions.ToggleClip()
+	end, Enum.KeyCode.K)
+
+	refresh()
+	ClientState.OnChanged(function(changed)
+		if
+			changed.Credits
+			or changed.Formation
+			or changed.TutorialFlags
+			or changed.Store
+			or changed.OwnedPerks
+			or changed.TrialVouchers
+			or changed.Loaded
+			or changed.DrillLevel
+			or changed.CargoLevel
+			or changed.DroneSlots
+			or changed.StationTier
+			or changed.DroneTier
+		then
+			refresh()
+		end
+		if changed.Settings or changed.Loaded then
+			HotbarController.SetVisible(ClientState.Profile.Settings.ClipMode ~= true)
+		end
+	end)
 end
 
 return HotbarController
