@@ -59,6 +59,19 @@ tests["dev products are the two Robux-only summons and no shard packs"] = functi
 	expect(n).toBe(2)
 end
 
+tests["placeholder ids stay zero until owner pastes Dashboard numbers"] = function()
+	local world = Harness.new()
+	local MonetizationConfig = world:require("ReplicatedStorage/Voidline/Config/MonetizationConfig")
+	for _, pass in MonetizationConfig.Passes do
+		expect(pass.GamePassId).toBe(0)
+	end
+	for _, product in MonetizationConfig.DevProducts do
+		expect(product.ProductId).toBe(0)
+	end
+	expect(MonetizationConfig.PassByGamePassId(0)).toBeNil()
+	expect(MonetizationConfig.ProductByProductId(0)).toBeNil()
+end
+
 tests["launch codes VOIDLINE, KILLSHOT, LAUNCH are one-time"] = function()
 	local world = Harness.new()
 	local CodesConfig = world:require("ReplicatedStorage/Voidline/Config/CodesConfig")

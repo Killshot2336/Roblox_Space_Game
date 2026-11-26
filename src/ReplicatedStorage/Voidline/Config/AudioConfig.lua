@@ -13,6 +13,7 @@ local AudioConfig = {
 		TowArrive = { AssetId = "rbxasset://sounds/Kerplunk.mp3", Volume = 0.42 },
 		BridgeIgnite = { AssetId = "rbxasset://sounds/flashbulb.mp3", Volume = 0.65 },
 		Starfall = { AssetId = "rbxasset://sounds/collide.mp3", Volume = 0.55 },
+		MonolithSplit = { AssetId = "rbxasset://sounds/impact_water.mp3", Volume = 0.58 },
 		Rebirth = { AssetId = "rbxasset://sounds/victory.mp3", Volume = 0.55 },
 		StoreSuccess = { AssetId = "rbxasset://sounds/electronicpingshort.mp3", Volume = 0.45 },
 		-- Extra juice

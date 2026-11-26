@@ -9,6 +9,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
 local GameConfig = require(Voidline.Config.GameConfig)
+local ClipFramingConfig = require(Voidline.Config.ClipFramingConfig)
 local PlotLayout = require(Voidline.Modules.PlotLayout)
 local HubLayout = require(Voidline.Modules.HubLayout)
 
@@ -150,7 +151,7 @@ local function buildHub(root: Instance)
 			local band = part({
 				Name = "GoldBand" .. i,
 				Parent = half,
-				Size = Vector3.new(halfSize.X + 0.6, 1.2, halfSize.Z + 0.6),
+				Size = Vector3.new(halfSize.X + 0.8, 1.35, halfSize.Z + 0.8),
 				CFrame = half.CFrame * CFrame.new(0, -size.Y / 2 + 10 + i * 13, 0),
 				Color = COLORS.Gold,
 				Material = Enum.Material.Neon,
@@ -159,7 +160,30 @@ local function buildHub(root: Instance)
 			})
 			band:SetAttribute("Offset", half.CFrame:ToObjectSpace(band.CFrame))
 		end
+		local edge = part({
+			Name = "SplitEdge" .. side,
+			Parent = half,
+			Size = Vector3.new(0.5, size.Y * 0.92, halfSize.Z * 0.85),
+			CFrame = half.CFrame * CFrame.new(-sign * (halfSize.X / 2 - 0.2), 0, 0),
+			Color = COLORS.GoldBright,
+			Material = Enum.Material.Neon,
+			Transparency = 0.15,
+			CanCollide = false,
+			CanQuery = false,
+		})
+		edge:SetAttribute("Offset", half.CFrame:ToObjectSpace(edge.CFrame))
 	end
+	part({
+		Name = "MonolithSplitSeam",
+		Parent = monolith,
+		Size = Vector3.new(0.4, size.Y, size.Z * 0.9),
+		CFrame = CFrame.new(HubLayout.MonolithCenter),
+		Color = COLORS.GoldBright,
+		Material = Enum.Material.Neon,
+		Transparency = 0.2,
+		CanCollide = false,
+		CanQuery = false,
+	})
 	local core = part({
 		Name = "VoidCore",
 		Parent = monolith,
@@ -292,6 +316,39 @@ local function buildHub(root: Instance)
 	plaqueText.Text = "Created by " .. GameConfig.BrandCreator
 	plaqueText.Parent = surface
 	label(plinth, "Created by " .. GameConfig.BrandCreator, 26, 120)
+	part({
+		Name = "MonumentHalo",
+		Parent = monument,
+		Size = Vector3.new(14, 0.5, 14),
+		CFrame = plinth.CFrame * CFrame.new(0, 2.5, 0) * CFrame.Angles(0, 0, math.rad(90)),
+		Shape = Enum.PartType.Cylinder,
+		Color = COLORS.GoldBright,
+		Material = Enum.Material.Neon,
+		Transparency = 0.35,
+		CanCollide = false,
+		CanQuery = false,
+	})
+
+	local clipShots = folder("ClipShots", hub)
+	for _, shot in ClipFramingConfig.Shots do
+		local pad = part({
+			Name = "ClipShot_" .. shot.Id,
+			Parent = clipShots,
+			Size = Vector3.new(5, 0.15, 5),
+			CFrame = CFrame.new(shot.Stand),
+			Color = COLORS.Gold,
+			Material = Enum.Material.Neon,
+			Transparency = 0.88,
+			CanCollide = false,
+			CanQuery = false,
+		})
+		pad:SetAttribute("ClipShotId", shot.Id)
+		pad:SetAttribute("LookAt", shot.LookAt)
+		if shot.Fov then
+			pad:SetAttribute("ClipFov", shot.Fov)
+		end
+		label(pad, shot.Hint, 3, 55, COLORS.GoldBright)
+	end
 
 	-- Leaderboard frames; LeaderboardService draws the holographic lists.
 	local boards = folder("Leaderboards", hub)
@@ -386,6 +443,18 @@ local function buildDeepSpace(root: Instance)
 		CFrame = CFrame.new(0, -8, 0),
 		Color = Color3.fromRGB(8, 6, 14),
 		Material = Enum.Material.Slate,
+		CanCollide = false,
+		CanQuery = false,
+	})
+	part({
+		Name = "PlotOrbitRing",
+		Parent = deep,
+		Size = Vector3.new(1.2, GameConfig.PlotRingRadius * 2.02, GameConfig.PlotRingRadius * 2.02),
+		CFrame = CFrame.new(0, 3, 0) * CFrame.Angles(0, 0, math.rad(90)),
+		Shape = Enum.PartType.Cylinder,
+		Color = COLORS.Gold,
+		Material = Enum.Material.Neon,
+		Transparency = 0.78,
 		CanCollide = false,
 		CanQuery = false,
 	})
@@ -573,10 +642,21 @@ local function buildPlot(plots: Instance, index: number)
 			CFrame = CFrame.lookAt(center, center + span),
 			Color = COLORS.Gold,
 			Material = Enum.Material.Neon,
-			Transparency = 0.85,
+			Transparency = 0.72,
 			CanCollide = false,
 		})
 		segment:SetAttribute("SegmentIndex", i)
+		part({
+			Name = "Spine" .. i,
+			Parent = bridge,
+			Size = Vector3.new(0.75, 0.45, segmentLength * 0.96),
+			CFrame = segment.CFrame * CFrame.new(0, 0.55, 0),
+			Color = COLORS.GoldBright,
+			Material = Enum.Material.Neon,
+			Transparency = 0.35,
+			CanCollide = false,
+			CanQuery = false,
+		})
 		part({
 			Name = "Rail" .. i,
 			Parent = bridge,

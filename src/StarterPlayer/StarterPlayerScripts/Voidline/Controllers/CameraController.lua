@@ -6,6 +6,11 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local ClipFramingConfig = require(Voidline.Config.ClipFramingConfig)
+
 local Client = script.Parent.Parent.Client
 local Ui = require(Client.Ui)
 
@@ -27,6 +32,8 @@ local punchUntil = 0
 local shakeAmount = 0
 local shakeUntil = 0
 local shakeDuration = 1
+local clipMode = false
+local perfMode = false
 
 local function beamLinkEngaged(): boolean
 	local targets = player:GetAttribute("DroneTargets")
@@ -47,12 +54,23 @@ local function localTowActive(): boolean
 end
 
 function CameraController.Punch(fovDelta: number, seconds: number)
+	if clipMode or perfMode then
+		return
+	end
 	punch = fovDelta * (if Ui.ReducedMotion then 0.5 else 1)
 	punchUntil = os.clock() + seconds
 end
 
+function CameraController.SetClipMode(on: boolean)
+	clipMode = on == true
+end
+
+function CameraController.SetPerfMode(on: boolean)
+	perfMode = on == true
+end
+
 function CameraController.Shake(intensity: number, seconds: number)
-	if Ui.ReducedMotion then
+	if Ui.ReducedMotion or clipMode or perfMode then
 		return
 	end
 	shakeAmount = math.min(MAX_SHAKE, math.max(shakeAmount, intensity))
@@ -66,15 +84,17 @@ local function step(dt: number)
 		return
 	end
 	local now = os.clock()
-	local target = BASE_FOV
+	local target = if clipMode then ClipFramingConfig.ClipFov else BASE_FOV
 	local motion = if Ui.ReducedMotion then 0.5 else 1
-	if beamLinkEngaged() then
-		target += BEAM_LINK_FOV * motion
-	elseif sovereignHalo() then
-		target += HALO_FOV * motion
-	end
-	if localTowActive() then
-		target += TOW_FOV * motion
+	if not clipMode then
+		if beamLinkEngaged() then
+			target += BEAM_LINK_FOV * motion
+		elseif sovereignHalo() then
+			target += HALO_FOV * motion
+		end
+		if localTowActive() then
+			target += TOW_FOV * motion
+		end
 	end
 	if now < punchUntil then
 		target += punch

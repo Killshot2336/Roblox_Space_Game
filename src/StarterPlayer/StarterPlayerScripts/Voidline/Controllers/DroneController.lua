@@ -69,6 +69,8 @@ local rockById: { [number]: BasePart } = {}
 local aimAttachments: { [BasePart]: Attachment } = {}
 local hitEmitters: { [BasePart]: ParticleEmitter } = {}
 local perfMode = false
+local haloRing: Part
+local haloSpin = 0
 
 -- Rocks -----------------------------------------------------------------------
 
@@ -191,8 +193,8 @@ local function newDrone(): Drone
 		Segments = 10,
 		CurveSize0 = 1.5,
 		CurveSize1 = -1.5,
-		Width0 = 0.35,
-		Width1 = 0.35,
+		Width0 = 0.42,
+		Width1 = 0.5,
 		Color = ColorSequence.new(Color3.fromRGB(150, 230, 255), Color3.fromRGB(255, 230, 150)),
 		Transparency = NumberSequence.new(0.2, 0.5),
 		Parent = body,
@@ -247,8 +249,8 @@ local function acquireLink(): Beam
 		LightEmission = 1,
 		LightInfluence = 0,
 		Segments = 1,
-		Width0 = 0.18,
-		Width1 = 0.18,
+		Width0 = 0.24,
+		Width1 = 0.24,
 		Transparency = NumberSequence.new(0.35),
 		Parent = folder,
 	})
@@ -510,6 +512,13 @@ local function stepFleet(
 		if tow and not far then
 			drone.Tether.Attachment1 = aimAttachment(tow.Part)
 			drone.Tether.Enabled = true
+			if isLocal and not perfMode then
+				drone.Tether.Width0 = 0.62
+				drone.Tether.Width1 = 0.48
+			else
+				drone.Tether.Width0 = 0.42
+				drone.Tether.Width1 = 0.5
+			end
 		else
 			drone.Tether.Enabled = false
 		end
@@ -535,6 +544,13 @@ local function stepFleet(
 		beam.Attachment1 = b.Attach
 		beam.Color = ColorSequence.new(fleet.LaserColor)
 		beam.Enabled = true
+		if isLocal and not perfMode then
+			beam.Width0 = 0.34
+			beam.Width1 = 0.34
+		else
+			beam.Width0 = 0.24
+			beam.Width1 = 0.24
+		end
 	end
 end
 
@@ -545,6 +561,10 @@ local function step(dt: number)
 	local parts: { BasePart } = {}
 	local cframes: { CFrame } = {}
 	local hitParts: { [BasePart]: Color3 } = {}
+	local localHalo = false
+	local localHaloCenter: Vector3? = nil
+	local localHaloScale = 6
+
 	for _, player in Players:GetPlayers() do
 		local fleet = fleetFor(player)
 		local n = desiredCount(player)
@@ -558,6 +578,24 @@ local function step(dt: number)
 			applyLook(fleet)
 		end
 		stepFleet(fleet, dt, t, cameraPos, parts, cframes, hitParts)
+		if player == Players.LocalPlayer and player:GetAttribute("Formation") == 3 and not perfMode then
+			local character = player.Character
+			local root = character and character:FindFirstChild("HumanoidRootPart") :: BasePart?
+			if root and (root.Position - cameraPos).Magnitude <= FAR_DISTANCE then
+				localHalo = true
+				localHaloCenter = root.Position
+				localHaloScale = 5.5 + #fleet.Drones * 0.22
+			end
+		end
+	end
+	if localHalo and localHaloCenter then
+		haloSpin += dt * 1.2
+		haloRing.CFrame = CFrame.new(localHaloCenter + Vector3.new(0, 3.1, 0))
+			* CFrame.Angles(0, haloSpin, math.rad(90))
+		haloRing.Size = Vector3.new(0.32, localHaloScale, localHaloScale)
+		haloRing.Transparency = 0.42
+	else
+		haloRing.CFrame = HIDDEN
 	end
 	if #parts > 0 then
 		Workspace:BulkMoveTo(parts, cframes, Enum.BulkMoveMode.FireCFrameChanged)
@@ -597,6 +635,21 @@ end
 
 function DroneController.Init()
 	folder = Ui.Make("Folder", { Name = "VoidlineDrones", Parent = Workspace })
+	haloRing = Ui.Make("Part", {
+		Name = "SovereignHaloRing",
+		Anchored = true,
+		CanCollide = false,
+		CanQuery = false,
+		CanTouch = false,
+		CastShadow = false,
+		Shape = Enum.PartType.Cylinder,
+		Material = Enum.Material.Neon,
+		Color = Ui.Colors.GoldBright,
+		Transparency = 1,
+		Size = Vector3.new(0.32, 6, 6),
+		CFrame = HIDDEN,
+		Parent = folder,
+	}) :: Part
 	CollectionService:GetInstanceAddedSignal(ROCK_TAG):Connect(indexRock)
 	for _, part in CollectionService:GetTagged(ROCK_TAG) do
 		indexRock(part)

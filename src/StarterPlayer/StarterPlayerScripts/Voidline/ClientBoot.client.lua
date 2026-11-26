@@ -49,6 +49,7 @@ local function applySettings()
 	DroneController.SetPerfMode(perf)
 	WorldController.SetPerfMode(perf)
 	VFXController.SetPerfMode(perf)
+	CameraController.SetPerfMode(perf)
 	-- Perf Mode keeps juice one-shots; only the ambient bed is dropped.
 	AudioController.SetAmbientEnabled(not perf and settings.ClipMode ~= true)
 end
@@ -64,6 +65,7 @@ local function applyClipMode()
 	HotbarController.SetVisible(not clip)
 	MovementController.SetVisible(not clip)
 	AudioController.SetMuted(clip)
+	CameraController.SetClipMode(clip)
 	if not clip then
 		AudioController.SetAmbientEnabled(ClientState.Profile.Settings.PerfMode ~= true)
 	end

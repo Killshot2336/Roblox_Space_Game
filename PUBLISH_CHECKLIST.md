@@ -44,4 +44,4 @@ To use your own stings: upload audio, then paste `rbxassetid://…` over any `As
 2. Commit ID changes only when real numbers are in `MonetizationConfig.lua`.
 3. Run the **11-item Studio playtest** in `BUILD_LOG.md` (first session ~10 min).
 
-**Agent cap:** Code hides Robux buttons while IDs are `0`; Token purchases work without Dashboard wiring.
+**Agent cap:** While IDs are `0`, passes show Token buy only; summons show “Coming soon”; server never calls Marketplace prompts or grants Robux items. Token purchases work without Dashboard wiring. See the name→field table in `MonetizationConfig.lua`.

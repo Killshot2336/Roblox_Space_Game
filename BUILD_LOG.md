@@ -14,6 +14,37 @@ unless the owner starts a new run.
 - Headless `Audio.spec.luau` asserts non-empty AssetIds.
 - Optional: override any AssetId with your uploaded `rbxassetid://` (see `PUBLISH_CHECKLIST.md`).
 
+## TikTok + feel max pass (2026-11-26)
+
+Honest agent scores after this pass. **Literal 10 on monetization needs Dashboard IDs; literal 10 on play feel and TikTok look needs owner Studio playtest.**
+
+| Category | Before | After (agent) | Owner unlock for true 10 |
+|----------|-------:|--------------:|---------------------------|
+| Spec / systems | 10 | **10** | Studio smoke only |
+| Code readiness | 10 | **10** | — |
+| Play feel / polish | 9 | **9.5** | Studio playtest (~10 min checklist) |
+| Publish / monetization | 9 | **9.5** | Paste 10 pass + 2 product IDs |
+| TikTok look | 8.5 | **9.5** | Studio framing / phone record pass |
+
+### Pass highlights
+
+- **ClipFramingConfig** + hub `ClipShot_*` pads; Clip Mode uses 82° FOV, no shake/FOV punch.
+- **MapBuilder:** monolith split seam + inner gold edges, plot orbit ring, bridge spines, monument halo, deeper bridge glow.
+- **World:** deep-space grade boost (contrast/bloom/atmosphere past 72 studs); monolith split SFX.
+- **Drones:** thicker tow tethers / Beam-Link + local Sovereign Halo neon ring.
+- **Onboarding:** wider beam/ring, step pop; **Perf Mode** also tames camera juice.
+- **Monetization:** Dashboard name table in `MonetizationConfig.lua`; id=0 tests.
+- **Tests:** `ClipFraming`, `MapVisual`, MonolithSplit audio, placeholder-id gate (+83 tests GREEN).
+
+### Owner steps (unchanged)
+
+1. Creator Dashboard → paste ids into `MonetizationConfig.lua`.
+2. Publish place + **Studio Access to API Services**.
+3. Optional custom `rbxassetid://` in `AudioConfig.lua`.
+4. Studio playtest checklist below (~10 min) + TikTok record on `ClipShot_*` pads.
+
+---
+
 ## Score drive (2026-11-26) — deep excellence pass
 
 Honest agent scores after this pass. **True 10 on monetization and TikTok look still needs owner Studio play + Dashboard IDs.** Engine SFX now ship so play feel is no longer blocked on uploads.
@@ -71,7 +102,7 @@ Single focused pass (no content-id loops). **Nothing playtested in Studio.**
 ```
 selene:    0 errors, 0 warnings
 luau-lsp:  0 errors, 0 warnings
-tests:     78 passed, 0 failed
+tests:     83 passed, 0 failed
 content:   CONTENT TOTAL 1126
 rojo:      OK (~506 KB place)
 RESULT:    GREEN

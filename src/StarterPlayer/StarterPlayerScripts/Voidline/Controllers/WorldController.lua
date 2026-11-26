@@ -5,6 +5,7 @@
 -- at the star overlook. Gravity changes come from the server.
 local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
+local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -33,6 +34,9 @@ local bloom: BloomEffect
 local hazardParts: { Part } = {}
 local hazardNext = 1
 local perfMode = false
+local deepSpaceBoost = false
+local deepSpaceSampleAt = 0
+local DEEP_SPACE_RADIUS = 72
 
 local BASE = {
 	Ambient = Lighting.Ambient,
@@ -80,19 +84,35 @@ local function applyGrade()
 		tint = tint:Lerp(CALM_TINT, 0.6)
 	end
 	Ui.Tween(Lighting, GRADE_SECONDS, { Ambient = if sky then sky.Ambient else BASE.Ambient })
+	local saturation = if calm then -0.05 elseif sky then sky.Saturation else BASE.Saturation
+	local contrast = if sky then sky.Contrast else BASE.Contrast
+	if deepSpaceBoost and not calm then
+		saturation += 0.12
+		contrast += 0.1
+		tint = tint:Lerp(Color3.fromRGB(120, 90, 200), 0.08)
+	end
 	Ui.Tween(grade, GRADE_SECONDS, {
 		TintColor = tint,
-		Saturation = if calm then -0.05 elseif sky then sky.Saturation else BASE.Saturation,
-		Contrast = if sky then sky.Contrast else BASE.Contrast,
+		Saturation = saturation,
+		Contrast = contrast,
 	})
+	local density = if sky then sky.Density else BASE.Density
+	local haze = if sky then sky.Haze else BASE.Haze
+	if deepSpaceBoost and not calm then
+		density += 0.06
+		haze += 0.25
+	end
 	Ui.Tween(atmosphere, GRADE_SECONDS, {
 		Color = if sky then sky.AtmosphereColor else BASE.AtmosphereColor,
 		Decay = if sky then sky.AtmosphereDecay else BASE.AtmosphereDecay,
-		Density = if sky then sky.Density else BASE.Density,
-		Haze = if sky then sky.Haze else BASE.Haze,
+		Density = density,
+		Haze = haze,
 		Glare = if sky then sky.Glare else BASE.Glare,
 	})
 	local bloomIntensity = if sky then sky.Bloom else BASE.Bloom
+	if deepSpaceBoost and not calm then
+		bloomIntensity += 0.14
+	end
 	Ui.Tween(bloom, GRADE_SECONDS, { Intensity = if perfMode then bloomIntensity * 0.4 else bloomIntensity })
 end
 
@@ -148,6 +168,31 @@ local function applySplit(split: boolean)
 	if split then
 		CameraController.Shake(0.6, 1.2)
 		CameraController.Punch(6, 1.6)
+		local ok, audio = pcall(function()
+			return require(script.Parent.AudioController)
+		end)
+		if ok and audio and audio.Play then
+			audio.Play("MonolithSplit")
+		end
+	end
+end
+
+local function sampleDeepSpace()
+	local now = os.clock()
+	if now - deepSpaceSampleAt < 0.4 then
+		return
+	end
+	deepSpaceSampleAt = now
+	local character = player.Character
+	local root = character and character:FindFirstChild("HumanoidRootPart") :: BasePart?
+	if not root then
+		return
+	end
+	local flat = Vector3.new(root.Position.X, 0, root.Position.Z)
+	local want = flat.Magnitude >= DEEP_SPACE_RADIUS
+	if want ~= deepSpaceBoost then
+		deepSpaceBoost = want
+		applyGrade()
 	end
 end
 
@@ -235,6 +280,7 @@ function WorldController.Init()
 		applySplit(Workspace:GetAttribute("MonolithSplit") == true)
 	end)
 	player:GetAttributeChangedSignal("CalmAura"):Connect(applyGrade)
+	RunService.Heartbeat:Connect(sampleDeepSpace)
 end
 
 return WorldController

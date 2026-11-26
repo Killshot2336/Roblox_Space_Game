@@ -2,6 +2,21 @@
 -- OWNER TODO: create the 10 game passes and 2 developer products on the
 -- Creator Dashboard and paste their IDs below. An ID of 0 means "not wired":
 -- the Robux button is hidden for that item and nothing is ever granted for it.
+--
+-- Dashboard name (must match exactly)     | Config `Id` / field              | R$
+-- ----------------------------------------|----------------------------------|----
+-- Starter Bundle                          | Passes.StarterBundle.GamePassId  |  79
+-- Auto-Sell Warp Link                     | Passes.AutoSellWarpLink          | 249
+-- 2x Credits                              | Passes.Credits2x                 | 449
+-- 2x Shard & Relic Luck                   | Passes.ShardRelicLuck2x          | 499
+-- +3 Drone Slots                          | Passes.DroneSlots3               | 599
+-- +5 Mega Swarm Slots                     | Passes.MegaSwarm5                | 999
+-- Laser Overclock                         | Passes.LaserOverclock            | 349
+-- Deep-Space Warp Pass                    | Passes.DeepSpaceWarpPass         | 399
+-- Void Sovereign VIP                      | Passes.VoidSovereignVIP          | 899
+-- Eternal Architect                       | Passes.EternalArchitect          | 1499
+-- Summon Void Starfall (Dev Product)      | DevProducts.SummonVoidStarfall   | 199
+-- Server Luck Surge (Dev Product)         | DevProducts.ServerLuckSurge      | 149
 -- Token prices stay 15-20% below Robux. There are deliberately no Robux shard
 -- packs: Void Shards are find-only and Voidline Tokens are earn-only.
 local MonetizationConfig = {}

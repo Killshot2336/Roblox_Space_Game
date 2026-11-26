@@ -38,6 +38,7 @@ local beam: Beam? = nil
 local rootAttachment: Attachment? = nil
 local finaleUntil = 0
 local finished = false
+local lastRenderedStep = 0
 
 local function ensureWorld(): (Part, Part, Beam)
 	if folder and anchor and ring and beam then
@@ -64,7 +65,7 @@ local function ensureWorld(): (Part, Part, Beam)
 		Shape = Enum.PartType.Cylinder,
 		Material = Enum.Material.Neon,
 		Color = JuiceConfig.TutorialBeamColor,
-		Size = Vector3.new(0.15, 9, 9),
+		Size = Vector3.new(0.18, 11, 11),
 		Transparency = 0.35,
 		Parent = f,
 	}) :: Part
@@ -74,8 +75,8 @@ local function ensureWorld(): (Part, Part, Beam)
 		Attachment1 = target,
 		Color = ColorSequence.new(JuiceConfig.TutorialBeamColor, GameConfig.Colors.GoldBright),
 		Transparency = NumberSequence.new(0.15, 0.4),
-		Width0 = 1.4,
-		Width1 = 0.8,
+		Width0 = 1.85,
+		Width1 = 1.0,
 		LightEmission = 1,
 		LightInfluence = 0,
 		FaceCamera = true,
@@ -181,6 +182,10 @@ local function render()
 		return
 	end
 	local step = if inFinale then TutorialRules.DoneStep else profile.TutorialStep
+	if step ~= lastRenderedStep and not inFinale then
+		lastRenderedStep = step
+		Ui.Pop(card, 0.72)
+	end
 	local info = TutorialRules.Steps[step]
 	tickerText.Text = if info then info.Ticker else ""
 	if inFinale then
