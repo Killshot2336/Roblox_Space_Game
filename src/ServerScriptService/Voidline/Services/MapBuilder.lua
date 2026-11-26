@@ -173,6 +173,47 @@ local function buildHub(root: Instance)
 	})
 	core:SetAttribute("Exposed", false)
 	label(monolith:FindFirstChild("MonolithLeft") :: Instance, "THE VOIDLINE MONOLITH", 42, 160)
+	local monolithHalfSize = Vector3.new(size.X / 2, size.Y, size.Z)
+	for side, sign in sides do
+		local half = monolith:FindFirstChild("Monolith" .. side)
+		if half and half:IsA("BasePart") then
+			part({
+				Name = "SpireCrown",
+				Parent = half,
+				Size = Vector3.new(monolithHalfSize.X * 0.35, 5, monolithHalfSize.Z * 0.35),
+				CFrame = half.CFrame * CFrame.new(0, size.Y / 2 + 2.5, 0),
+				Color = COLORS.GoldBright,
+				Material = Enum.Material.Neon,
+				CanCollide = false,
+				CanQuery = false,
+			})
+			part({
+				Name = "SpireFin",
+				Parent = half,
+				Size = Vector3.new(1.2, 14, 1.2),
+				CFrame = half.CFrame
+					* CFrame.new(sign * (monolithHalfSize.X * 0.28), size.Y / 2 + 9, 0)
+					* CFrame.Angles(0, 0, sign * math.rad(8)),
+				Color = COLORS.VoidAccent,
+				Material = Enum.Material.Glass,
+				Transparency = 0.15,
+				CanCollide = false,
+				CanQuery = false,
+			})
+		end
+	end
+	part({
+		Name = "HubSilhouetteRing",
+		Parent = hub,
+		Size = Vector3.new(2, HubLayout.HubSize.X * 1.45, HubLayout.HubSize.Z * 1.45),
+		CFrame = hubCFrame * CFrame.Angles(0, 0, math.rad(90)),
+		Shape = Enum.PartType.Cylinder,
+		Color = COLORS.Gold,
+		Material = Enum.Material.Neon,
+		Transparency = 0.82,
+		CanCollide = false,
+		CanQuery = false,
+	})
 
 	local function pad(name: string, position: Vector3, padSize: Vector3, color: Color3, text: string)
 		local p = part({
@@ -390,6 +431,25 @@ local function buildPlot(plots: Instance, index: number)
 		Color = COLORS.Obsidian,
 	})
 	goldTrim(plot, baseCFrame, PlotLayout.BaseSize)
+	local half = PlotLayout.BaseSize / 2
+	local pylonOffsets = {
+		Vector3.new(-half.X + 2, 2, -half.Z + 2),
+		Vector3.new(half.X - 2, 2, -half.Z + 2),
+		Vector3.new(-half.X + 2, 2, half.Z - 2),
+		Vector3.new(half.X - 2, 2, half.Z - 2),
+	}
+	for i, offset in pylonOffsets do
+		part({
+			Name = "PlotPylon" .. i,
+			Parent = plot,
+			Size = Vector3.new(1.4, 7, 1.4),
+			CFrame = plotCFrame * CFrame.new(offset),
+			Color = COLORS.GoldBright,
+			Material = Enum.Material.Neon,
+			CanCollide = false,
+			CanQuery = false,
+		})
+	end
 
 	local spawnMarker = part({
 		Name = "PlayerSpawn",
@@ -490,6 +550,28 @@ local function buildPlot(plots: Instance, index: number)
 			CanCollide = false,
 		})
 		segment:SetAttribute("SegmentIndex", i)
+		part({
+			Name = "Rail" .. i,
+			Parent = bridge,
+			Size = Vector3.new(0.35, 2.2, segmentLength * 0.92),
+			CFrame = segment.CFrame * CFrame.new(3.4, 1.2, 0),
+			Color = Color3.fromRGB(120, 200, 255),
+			Material = Enum.Material.Glass,
+			Transparency = 0.35,
+			CanCollide = false,
+			CanQuery = false,
+		})
+		part({
+			Name = "RailL" .. i,
+			Parent = bridge,
+			Size = Vector3.new(0.35, 2.2, segmentLength * 0.92),
+			CFrame = segment.CFrame * CFrame.new(-3.4, 1.2, 0),
+			Color = Color3.fromRGB(120, 200, 255),
+			Material = Enum.Material.Glass,
+			Transparency = 0.35,
+			CanCollide = false,
+			CanQuery = false,
+		})
 	end
 	return plot
 end
