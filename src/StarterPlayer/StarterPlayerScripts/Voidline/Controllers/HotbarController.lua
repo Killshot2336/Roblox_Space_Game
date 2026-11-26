@@ -127,6 +127,12 @@ local function setFormation(n: number)
 		return
 	end
 	ClientState.Fire("SetFormation", n)
+	local ok, Audio = pcall(function()
+		return require(script.Parent.AudioController)
+	end)
+	if ok and Audio and Audio.Play then
+		Audio.Play("Formation")
+	end
 end
 
 local function refresh()

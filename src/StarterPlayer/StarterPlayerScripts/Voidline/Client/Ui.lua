@@ -41,6 +41,8 @@ Ui.Font = {
 
 Ui.TOUCH = 48
 Ui.ReducedMotion = false
+-- Set by AudioController.Init to play UI click SFX without a hard require cycle.
+Ui.ClickSound = nil :: (() -> ())?
 
 function Ui.Motion(seconds: number): number
 	return if Ui.ReducedMotion then 0 else seconds
@@ -233,6 +235,9 @@ function Ui.Button(props: { [string]: any }, onActivate: (() -> ())?): TextButto
 	button.Activated:Connect(function()
 		scale.Scale = if Ui.ReducedMotion then 1 else 0.92
 		Ui.Tween(scale, 0.22, { Scale = 1 }, Enum.EasingStyle.Back)
+		if Ui.ClickSound then
+			Ui.ClickSound()
+		end
 		if onActivate then
 			onActivate()
 		end

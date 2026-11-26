@@ -38,20 +38,34 @@
         <Item class="ModuleScript" referent="4">
           <Properties>
             <string name="Name">AudioConfig</string>
-            <string name="Source"><![CDATA[-- Central sound placeholders for the audio pass. Leave AssetId as "" until
--- the owner drops real rbxassetid values in from the Creator Dashboard / library.
--- AudioController skips any entry with an empty AssetId (no errors in Studio).
+            <string name="Source"><![CDATA[--!strict
+-- Engine-bundled Roblox sounds (rbxasset://). These play in Studio/live without
+-- Creator Dashboard uploads. Optional: replace any AssetId with your own
+-- rbxassetid://… from the Toolbox / uploaded audio.
 local AudioConfig = {
 	MasterVolume = 1,
+	AmbientVolume = 0.08,
 	Sounds = {
-		Mine = { AssetId = "", Volume = 0.35 },
-		Sell = { AssetId = "", Volume = 0.55 },
-		Upgrade = { AssetId = "", Volume = 0.5 },
-		TowArrive = { AssetId = "", Volume = 0.45 },
-		BridgeIgnite = { AssetId = "", Volume = 0.7 },
-		Starfall = { AssetId = "", Volume = 0.65 },
-		Rebirth = { AssetId = "", Volume = 0.6 },
-		StoreSuccess = { AssetId = "", Volume = 0.5 },
+		-- Core loop
+		Mine = { AssetId = "rbxasset://sounds/hit.mp3", Volume = 0.32 },
+		Sell = { AssetId = "rbxasset://sounds/electronicpingshort.mp3", Volume = 0.5 },
+		Upgrade = { AssetId = "rbxasset://sounds/button.mp3", Volume = 0.48 },
+		TowArrive = { AssetId = "rbxasset://sounds/Kerplunk.mp3", Volume = 0.42 },
+		BridgeIgnite = { AssetId = "rbxasset://sounds/flashbulb.mp3", Volume = 0.65 },
+		Starfall = { AssetId = "rbxasset://sounds/collide.mp3", Volume = 0.55 },
+		Rebirth = { AssetId = "rbxasset://sounds/victory.mp3", Volume = 0.55 },
+		StoreSuccess = { AssetId = "rbxasset://sounds/electronicpingshort.mp3", Volume = 0.45 },
+		-- Extra juice
+		Click = { AssetId = "rbxasset://sounds/switch.mp3", Volume = 0.28 },
+		Formation = { AssetId = "rbxasset://sounds/snap.mp3", Volume = 0.35 },
+		Warp = { AssetId = "rbxasset://sounds/swordlunge.mp3", Volume = 0.4 },
+		Forge = { AssetId = "rbxasset://sounds/bass.mp3", Volume = 0.5 },
+		Achievement = { AssetId = "rbxasset://sounds/victory.mp3", Volume = 0.4 },
+		Warn = { AssetId = "rbxasset://sounds/button.mp3", Volume = 0.3 },
+		Relic = { AssetId = "rbxasset://sounds/flashbulb.mp3", Volume = 0.45 },
+		Codex = { AssetId = "rbxasset://sounds/electronicpingshort.mp3", Volume = 0.3 },
+		-- Soft Deep Space bed (looped quietly)
+		Ambient = { AssetId = "rbxasset://sounds/bass.mp3", Volume = 0.12, Loop = true },
 	},
 }
 
@@ -11559,6 +11573,8 @@ Ui.Font = {
 
 Ui.TOUCH = 48
 Ui.ReducedMotion = false
+-- Set by AudioController.Init to play UI click SFX without a hard require cycle.
+Ui.ClickSound = nil :: (() -> ())?
 
 function Ui.Motion(seconds: number): number
 	return if Ui.ReducedMotion then 0 else seconds
@@ -11751,6 +11767,9 @@ function Ui.Button(props: { [string]: any }, onActivate: (() -> ())?): TextButto
 	button.Activated:Connect(function()
 		scale.Scale = if Ui.ReducedMotion then 1 else 0.92
 		Ui.Tween(scale, 0.22, { Scale = 1 }, Enum.EasingStyle.Back)
+		if Ui.ClickSound then
+			Ui.ClickSound()
+		end
 		if onActivate then
 			onActivate()
 		end
@@ -11859,6 +11878,8 @@ local function applySettings()
 	DroneController.SetPerfMode(perf)
 	WorldController.SetPerfMode(perf)
 	VFXController.SetPerfMode(perf)
+	-- Perf Mode keeps juice one-shots; only the ambient bed is dropped.
+	AudioController.SetAmbientEnabled(not perf and settings.ClipMode ~= true)
 end
 
 local function applyClipMode()
@@ -11871,6 +11892,10 @@ local function applyClipMode()
 	HUDController.SetVisible(not clip)
 	HotbarController.SetVisible(not clip)
 	MovementController.SetVisible(not clip)
+	AudioController.SetMuted(clip)
+	if not clip then
+		AudioController.SetAmbientEnabled(ClientState.Profile.Settings.PerfMode ~= true)
+	end
 	pcall(function()
 		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, not clip)
 		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, not clip)
@@ -11963,14 +11988,18 @@ print(("[Voidline] Client online for %s"):format(Players.LocalPlayer.Name))
             <Properties>
               <string name="Name">AudioController</string>
               <string name="Source"><![CDATA[--!strict
--- Optional one-shot SFX on JuiceEvent kinds. Uses AudioConfig placeholders only;
--- gameplay does not depend on audio loading or playing.
+-- One-shot SFX + soft ambient bed. Uses AudioConfig (engine rbxasset:// by
+-- default). Gameplay never depends on audio loading or playing.
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SoundService = game:GetService("SoundService")
 
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
 local AudioConfig = require(Voidline.Config.AudioConfig)
 local Remotes = require(Voidline.Remotes)
+
+local Controllers = script.Parent
+local TowController = require(Controllers.TowController)
 
 local AudioController = {}
 
@@ -11986,10 +12015,49 @@ local KIND_TO_KEY: { [string]: string } = {
 	Rebirth = "Rebirth",
 	PassGranted = "StoreSuccess",
 	Store = "StoreSuccess",
+	Warp = "Warp",
+	VoidCatch = "Warp",
+	Forge = "Forge",
+	Achievement = "Achievement",
+	Quest = "Achievement",
+	Relic = "Relic",
+	Codex = "Codex",
+	CodexMilestone = "Achievement",
+	Evolution = "Achievement",
+	Mutation = "Relic",
+	Tokens = "StoreSuccess",
+	Daily = "StoreSuccess",
+	RiftCleared = "Starfall",
+	SquadChallenge = "Achievement",
+	UpgradeFail = "Warn",
+	StoreFail = "Warn",
+	WarpLocked = "Warn",
+	Code = "Click",
 }
 
 local folder: Folder
 local cache: { [string]: Sound } = {}
+local ambient: Sound? = nil
+local muted = false
+
+local PITCH_BAND: { [string]: { number } } = {
+	Mine = { 0.92, 1.08 },
+	Sell = { 0.98, 1.08 },
+	Upgrade = { 0.94, 1.06 },
+	TowArrive = { 0.94, 1.04 },
+	Starfall = { 0.88, 1.0 },
+	Rebirth = { 0.9, 1.02 },
+	StoreSuccess = { 1.0, 1.1 },
+	BridgeIgnite = { 0.96, 1.06 },
+	Click = { 0.97, 1.05 },
+	Formation = { 0.95, 1.08 },
+	Warp = { 0.9, 1.05 },
+	Forge = { 0.85, 1.0 },
+	Achievement = { 0.95, 1.05 },
+	Warn = { 0.85, 0.95 },
+	Relic = { 0.92, 1.06 },
+	Codex = { 1.05, 1.15 },
+}
 
 local function getOrCreate(key: string): Sound?
 	local spec = AudioConfig.Sounds[key]
@@ -12003,53 +12071,100 @@ local function getOrCreate(key: string): Sound?
 	local newSound = Instance.new("Sound")
 	newSound.Name = "Voidline_" .. key
 	newSound.SoundId = spec.AssetId
-	newSound.Volume = (spec.Volume or 0.5) * (AudioConfig.MasterVolume or 1)
+	local volume = (spec.Volume or 0.5) * (AudioConfig.MasterVolume or 1)
+	if key == "Ambient" then
+		volume = (AudioConfig.AmbientVolume or volume) * (AudioConfig.MasterVolume or 1)
+	end
+	newSound.Volume = volume
+	newSound.Looped = spec.Loop == true
 	newSound.RollOffMaxDistance = 0
 	newSound.Parent = folder
 	cache[key] = newSound
 	return newSound
 end
 
-local PITCH_BAND: { [string]: { number } } = {
-	Mine = { 0.95, 1.05 },
-	Sell = { 0.98, 1.08 },
-	Upgrade = { 0.92, 1.02 },
-	TowArrive = { 0.94, 1.04 },
-	Starfall = { 0.9, 1.0 },
-	Rebirth = { 0.88, 0.98 },
-	StoreSuccess = { 1.0, 1.1 },
-	BridgeIgnite = { 0.96, 1.06 },
-}
-
-local function playKey(key: string)
+function AudioController.Play(key: string)
+	if muted then
+		return
+	end
 	local sound = getOrCreate(key)
 	if not sound then
 		return
 	end
 	local band = PITCH_BAND[key]
-	if band then
+	if band and not sound.Looped then
 		sound.PlaybackSpeed = band[1] + math.random() * (band[2] - band[1])
+	else
+		sound.PlaybackSpeed = 1
 	end
-	sound.TimePosition = 0
+	if not sound.Looped then
+		sound.TimePosition = 0
+	end
 	sound:Play()
+end
+
+function AudioController.PlayClick()
+	AudioController.Play("Click")
+end
+
+function AudioController.SetMuted(value: boolean)
+	muted = value == true
+	if ambient then
+		if muted then
+			ambient:Stop()
+		elseif not ambient.IsPlaying then
+			ambient:Play()
+		end
+	end
+end
+
+function AudioController.SetAmbientEnabled(enabled: boolean)
+	if not ambient then
+		return
+	end
+	if enabled and not muted then
+		if not ambient.IsPlaying then
+			ambient:Play()
+		end
+	else
+		ambient:Stop()
+	end
 end
 
 local function onJuice(message: any)
 	if type(message) ~= "table" or type(message.Kind) ~= "string" then
 		return
 	end
-	if message.Kind == "Store" and message.Ok ~= true then
+	local kind = message.Kind
+	if kind == "Store" and message.Ok ~= true then
+		AudioController.Play("Warn")
 		return
 	end
-	if message.Kind == "Rebirth" and message.Ok ~= true then
+	if kind == "Rebirth" and message.Ok ~= true then
+		AudioController.Play("Warn")
 		return
 	end
-	if message.Kind == "WorldEvent" and message.Phase ~= "start" then
+	if kind == "Code" and message.Ok ~= true then
+		AudioController.Play("Warn")
 		return
 	end
-	local key = KIND_TO_KEY[message.Kind]
+	if kind == "Daily" and message.Ok ~= true then
+		return
+	end
+	if kind == "Forge" then
+		if message.Phase == "done" or message.Phase == "start" then
+			AudioController.Play("Forge")
+		elseif message.Phase == "fail" then
+			AudioController.Play("Warn")
+		end
+		return
+	end
+	if kind == "WorldEvent" and message.Phase ~= "start" then
+		return
+	end
+	local key = KIND_TO_KEY[kind]
 	if key then
-		playKey(key)
+		AudioController.Play(key)
 	end
 end
 
@@ -12057,7 +12172,38 @@ function AudioController.Init()
 	folder = Instance.new("Folder")
 	folder.Name = "VoidlineAudio"
 	folder.Parent = player:WaitForChild("PlayerGui")
+
+	-- Soft group under SoundService for future mixing.
+	pcall(function()
+		local group = SoundService:FindFirstChild("VoidlineSFX")
+		if not group then
+			group = Instance.new("SoundGroup")
+			group.Name = "VoidlineSFX"
+			group.Volume = 1
+			group.Parent = SoundService
+		end
+	end)
+
 	Remotes.Get("JuiceEvent").OnClientEvent:Connect(onJuice)
+
+	TowController.OnArrive(function(tow)
+		if tow.Owner == player.UserId then
+			AudioController.Play("TowArrive")
+		end
+	end)
+
+	-- UI click hook (avoids circular require at module load).
+	local ok, UiMod = pcall(function()
+		return require(script.Parent.Parent.Client.Ui)
+	end)
+	if ok and UiMod then
+		UiMod.ClickSound = AudioController.PlayClick
+	end
+
+	ambient = getOrCreate("Ambient")
+	if ambient and not muted then
+		ambient:Play()
+	end
 end
 
 return AudioController
@@ -13420,6 +13566,12 @@ local function setFormation(n: number)
 		return
 	end
 	ClientState.Fire("SetFormation", n)
+	local ok, Audio = pcall(function()
+		return require(script.Parent.AudioController)
+	end)
+	if ok and Audio and Audio.Play then
+		Audio.Play("Formation")
+	end
 end
 
 local function refresh()

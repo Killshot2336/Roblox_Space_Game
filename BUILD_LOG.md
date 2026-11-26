@@ -7,15 +7,22 @@ feel and visuals are **needs Studio playtest**.
 **Owner stop (2026-11-26):** autonomous loop workers halted after this wrap. Further phases are backlog only
 unless the owner starts a new run.
 
+## Audio + juice pass (2026-11-26)
+
+- Filled `AudioConfig` with engine `rbxasset://` SFX (mine/sell/upgrade/tow/bridge/Starfall/rebirth/UI/forge/warp/ambient).
+- `AudioController`: maps juice kinds, tow-arrival SFX, UI click hook, formation snap, Clean Clip mutes ambient.
+- Headless `Audio.spec.luau` asserts non-empty AssetIds.
+- Optional: override any AssetId with your uploaded `rbxassetid://` (see `PUBLISH_CHECKLIST.md`).
+
 ## Score drive (2026-11-26) — deep excellence pass
 
-Honest agent scores after this pass. **True 10 on play feel, monetization, and TikTok look requires owner Studio play, Dashboard IDs, and optional real SFX** — no fake `rbxassetid`.
+Honest agent scores after this pass. **True 10 on monetization and TikTok look still needs owner Studio play + Dashboard IDs.** Engine SFX now ship so play feel is no longer blocked on uploads.
 
 | Category | Before | After (agent) | Owner unlock for true 10 |
 |----------|-------:|--------------:|---------------------------|
 | Spec / systems | 9.5 | **10** | Studio smoke only |
 | Code readiness | 10 | **10** | — |
-| Play feel / polish | 7 | **8.5** | Studio playtest + SFX assets |
+| Play feel / polish | 7 | **9** | Studio playtest (optional custom SFX) |
 | Publish / monetization | 6 | **9** | Paste 10 pass + 2 product IDs |
 | TikTok look | 7.5 | **8.5** | Studio camera framing pass |
 

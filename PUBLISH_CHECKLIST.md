@@ -32,10 +32,11 @@ Use this after `./scripts/verify.sh` is **GREEN** locally. Do not invent IDs —
 2. **File → Publish to Roblox** (or update existing place).
 3. **Game Settings → Security → Enable Studio Access to API Services** (DataStores + OrderedDataStore boards).
 
-## 3. Optional audio (~2 min)
+## 3. Optional audio override (~2 min)
 
-1. Upload sting sounds to Roblox (Mine, Sell, Upgrade, Tow, Starfall, Rebirth, Store).
-2. Paste `rbxassetid://…` into `src/ReplicatedStorage/Voidline/Config/AudioConfig.lua` (`AssetId = ""` = silent).
+Engine `rbxasset://` SFX already ship (mine/sell/upgrade/tow/Starfall/rebirth/UI/ambient).
+To use your own stings: upload audio, then paste `rbxassetid://…` over any `AssetId` in
+`src/ReplicatedStorage/Voidline/Config/AudioConfig.lua`.
 
 ## 4. Ship
 
