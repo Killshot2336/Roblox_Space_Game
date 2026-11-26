@@ -308,6 +308,65 @@ tests["ProcessReceipt is idempotent and PurchaseGranted only after save"] = func
 	world:assertNoErrors()
 end
 
+tests["SetFormation updates profile and player attribute"] = function()
+	local world = boot()
+	local player = joinAndLoad(world, 4101, "FormationPilot")
+	world:fireServer("TutorialSkip", player)
+	world:advance(0.2, 0.1)
+	world:fireServer("SetFormation", player, 2)
+	world:advance(0.2, 0.1)
+	world:assertNoErrors()
+	local profile = service(world, "PlayerDataService").Get(player)
+	expect(profile.Formation).toBe(2)
+	expect(player:GetAttribute("Formation")).toBe(2)
+end
+
+tests["forge: 25 shards -> artifact -> tokens payout"] = function()
+	local world = boot()
+	local player = joinAndLoad(world, 4102, "Smith")
+	world:fireServer("TutorialSkip", player)
+	local PDS = service(world, "PlayerDataService")
+	local ForgeConfig = world:require("ReplicatedStorage/Voidline/Config/ForgeConfig")
+	PDS.Mutate(player, function(p)
+		p.VoidShards = ForgeConfig.ShardsPerArtifact
+	end)
+	world:clearRemoteLog()
+	world:fireServer("RequestForge", player)
+	world:advance(0.3, 0.1)
+	world:assertNoErrors()
+	expect(PDS.Get(player).ForgeJobEndsAt > 0).toBe(true)
+	world:advance(20, 0.25)
+	world:assertNoErrors()
+	expect(juiceKinds(world, player).Forge >= 1).toBe(true)
+	expect(PDS.Get(player).Artifacts > 0).toBe(true)
+	local tokensBefore = PDS.Get(player).VoidlineTokens
+	world:fireServer("TurnInArtifact", player)
+	world:advance(0.5, 0.1)
+	world:assertNoErrors()
+	expect(PDS.Get(player).VoidlineTokens > tokensBefore).toBe(true)
+	expect(juiceKinds(world, player).Tokens >= 1).toBe(true)
+end
+
+tests["rebirth at station tier 10 resets tiers and bumps multiplier"] = function()
+	local world = boot()
+	local player = joinAndLoad(world, 4103, "VoidI")
+	world:fireServer("TutorialSkip", player)
+	local PDS = service(world, "PlayerDataService")
+	local RebirthConfig = world:require("ReplicatedStorage/Voidline/Config/RebirthConfig")
+	PDS.Mutate(player, function(p)
+		p.StationTier = RebirthConfig.RequiredStationTier
+		p.Credits = 99999
+	end)
+	world:clearRemoteLog()
+	world:fireServer("RequestRebirth", player)
+	world:advance(0.5, 0.1)
+	world:assertNoErrors()
+	local profile = PDS.Get(player)
+	expect(profile.Rebirths).toBe(1)
+	expect(profile.StationTier).toBe(1)
+	expect(juiceKinds(world, player).Rebirth).toBe(1)
+end
+
 tests["a full server simulates a minute of mining without errors"] = function()
 	local world = boot()
 	local players = {}
