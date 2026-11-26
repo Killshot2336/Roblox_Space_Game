@@ -277,6 +277,37 @@ tests["twelve pilots get twelve distinct plots; the thirteenth waits safely"] = 
 	world:assertNoErrors()
 end
 
+-- Harness-only product id (not a published Roblox asset). Exercises receipt idempotency.
+local HARNESS_PRODUCT_ID = 910000001
+
+tests["ProcessReceipt is idempotent and PurchaseGranted only after save"] = function()
+	local world = boot()
+	local player = joinAndLoad(world, 5101, "Buyer")
+	local MonetizationConfig = world:require("ReplicatedStorage/Voidline/Config/MonetizationConfig")
+	for _, product in MonetizationConfig.DevProducts do
+		if product.Id == "SummonVoidStarfall" then
+			product.ProductId = HARNESS_PRODUCT_ID
+			break
+		end
+	end
+	local MS = service(world, "MonetizationService")
+	local PDS = service(world, "PlayerDataService")
+	local receipt = {
+		PlayerId = player.UserId,
+		PurchaseId = "harness-rcpt-1",
+		ProductId = HARNESS_PRODUCT_ID,
+	}
+	local first = MS.ProcessReceipt(receipt)
+	expect(first.Name).toBe("PurchaseGranted")
+	local profile = PDS.Get(player)
+	expect(type(profile.ProcessedReceipts["harness-rcpt-1"])).toBe("number")
+	local summons = profile.Summons
+	local second = MS.ProcessReceipt(receipt)
+	expect(second.Name).toBe("PurchaseGranted")
+	expect(PDS.Get(player).Summons).toBe(summons)
+	world:assertNoErrors()
+end
+
 tests["a full server simulates a minute of mining without errors"] = function()
 	local world = boot()
 	local players = {}
