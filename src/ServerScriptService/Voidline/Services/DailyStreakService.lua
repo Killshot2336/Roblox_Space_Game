@@ -1,54 +1,50 @@
+--!strict
+-- 7-day login streak. Day 7 adds a 24 h pass trial voucher; the cycle then
+-- restarts so the voucher stays a weekly treat.
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
-local Remotes = require(Voidline.Remotes)
-local RateLimiter = require(Voidline.Modules.RateLimiter)
+local ProgressionRules = require(Voidline.Rules.ProgressionRules)
+
+local ValidateRemote = require(script.Parent.Parent.Security.ValidateRemote)
 local PlayerDataService = require(script.Parent.PlayerDataService)
+local JuiceService = require(script.Parent.JuiceService)
+local StatService = require(script.Parent.StatService)
 
--- 7-day streak rewards; day 7 grants 24h trial voucher for Credits2x
-local DAY_REWARDS = {
-	[1] = { Credits = 50 },
-	[2] = { Credits = 75, VoidShards = 2 },
-	[3] = { Credits = 100, VoidShards = 3 },
-	[4] = { Credits = 150, VoidShards = 4 },
-	[5] = { Credits = 200, VoidShards = 5 },
-	[6] = { Credits = 300, VoidShards = 8 },
-	[7] = { Credits = 500, VoidShards = 10, TrialPerk = "Credits2x", TrialHours = 24 },
-}
+local DailyStreakService = {}
 
-local DailyStreakService = {
-	_limiter = RateLimiter.new(2),
-	_claimedToday = {} :: { [number]: boolean },
-}
+function DailyStreakService.Claim(player: Player): boolean
+	local ok, reward, day = false, nil, 0
+	PlayerDataService.Mutate(player, function(p)
+		ok, reward, day = ProgressionRules.ClaimDaily(p, os.time())
+	end)
+	if not ok or not reward then
+		JuiceService.Send(player, "Daily", { Ok = false })
+		return false
+	end
+	JuiceService.Send(player, "Daily", {
+		Ok = true,
+		Day = day,
+		Credits = reward.Credits,
+		Shards = reward.VoidShards,
+		Trial = reward.TrialPerk,
+	})
+	StatService.Bump(player, "DailyClaims", 1)
+	StatService.Check(player, "LifetimeCredits", "LifetimeShards")
+	task.spawn(PlayerDataService.Save, player)
+	return true
+end
 
 function DailyStreakService.Init()
-	Remotes.Get("RedeemDaily").OnServerEvent:Connect(function(player)
-		if not DailyStreakService._limiter:Allow(player.UserId) then
-			return
+	PlayerDataService.OnLoaded(function(player, profile)
+		ProgressionRules.OnLogin(profile, os.time())
+		PlayerDataService.MarkDirty(player)
+		if ProgressionRules.CanClaimDaily(profile, os.time()) then
+			JuiceService.Send(player, "DailyReady", { Day = profile.DailyStreak })
 		end
-		if DailyStreakService._claimedToday[player.UserId] then
-			Remotes.Get("JuiceEvent"):FireClient(player, { Kind = "DailyFail", Message = "Already claimed today" })
-			return
-		end
-		local data = PlayerDataService.Get(player)
-		if not data then
-			return
-		end
-		local day = math.clamp(data.DailyStreak or 1, 1, 7)
-		local reward = DAY_REWARDS[day]
-		PlayerDataService.Mutate(player, function(d)
-			d.Credits += reward.Credits or 0
-			d.VoidShards += reward.VoidShards or 0
-			if reward.TrialPerk then
-				d.TrialVouchers[reward.TrialPerk] = os.time() + (reward.TrialHours or 24) * 3600
-			end
-		end)
-		DailyStreakService._claimedToday[player.UserId] = true
-		PlayerDataService.Save(player)
-		Remotes.Get("JuiceEvent"):FireClient(player, {
-			Kind = "DailySuccess",
-			Day = day,
-			Reward = reward,
-		})
+	end)
+	ValidateRemote.Bind("RedeemDaily", { Rate = 1, Burst = 2 }, function(player)
+		DailyStreakService.Claim(player)
 	end)
 end
 

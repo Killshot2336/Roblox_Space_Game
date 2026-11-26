@@ -1,48 +1,73 @@
+--!strict
+-- Void Rebirth: at Station Tier 10, reset credits/tiers/drill/cargo for a
+-- permanent credit multiplier and a shard payout. Passes, tokens, relics,
+-- Codex, cosmetics, drone slots/evolution and discovered sectors are kept.
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
 local RebirthConfig = require(Voidline.Config.RebirthConfig)
-local Remotes = require(Voidline.Remotes)
-local RateLimiter = require(Voidline.Modules.RateLimiter)
-local PlayerDataService = require(script.Parent.PlayerDataService)
+local ProgressionRules = require(Voidline.Rules.ProgressionRules)
 
-local RebirthService = {
-	_limiter = RateLimiter.new(2),
-}
+local ValidateRemote = require(script.Parent.Parent.Security.ValidateRemote)
+local PlayerDataService = require(script.Parent.PlayerDataService)
+local JuiceService = require(script.Parent.JuiceService)
+local StatService = require(script.Parent.StatService)
+
+local RebirthService = {}
+
+local rebirthCallbacks: { (Player) -> () } = {}
+
+function RebirthService.OnRebirth(callback: (Player) -> ())
+	table.insert(rebirthCallbacks, callback)
+end
+
+function RebirthService.Rebirth(player: Player): boolean
+	local profile = PlayerDataService.Get(player)
+	if not profile or not ProgressionRules.CanRebirth(profile) then
+		JuiceService.Send(player, "Rebirth", {
+			Ok = false,
+			Required = RebirthConfig.RequiredStationTier,
+		})
+		return false
+	end
+	local n, shards = 0, 0
+	PlayerDataService.Mutate(player, function(p)
+		n, shards = ProgressionRules.Rebirth(p)
+	end)
+	JuiceService.Send(player, "Rebirth", {
+		Ok = true,
+		Count = n,
+		Shards = shards,
+		Multiplier = RebirthConfig.CreditMultiplier(n),
+	})
+	StatService.Check(player, "Rebirths", "LifetimeShards")
+	for _, callback in rebirthCallbacks do
+		task.spawn(callback, player)
+	end
+	task.spawn(PlayerDataService.Save, player)
+	return true
+end
 
 function RebirthService.Init()
-	Remotes.Get("RequestRebirth").OnServerEvent:Connect(function(player)
-		if not RebirthService._limiter:Allow(player.UserId) then
-			return
-		end
-		local data = PlayerDataService.Get(player)
-		if not data or data.StationTier < RebirthConfig.RequiredStationTier then
-			return
-		end
-		local nextRebirth = data.Rebirths + 1
-		local shards = RebirthConfig.ShardPayout(nextRebirth)
-		PlayerDataService.Mutate(player, function(d)
-			d.Rebirths = nextRebirth
-			d.CreditMult = RebirthConfig.CreditMultiplier(nextRebirth)
-			d.Credits = 0
-			d.Ore = 0
-			d.StationTier = 1
-			d.DrillLevel = 1
-			d.CargoLevel = 1
-			-- Keep drone slots as quality-of-life; design said basic drill/cargo + pads reset
-			d.VoidShards += shards
-			d.Cosmetics.Title = "VOID " .. tostring(nextRebirth)
-			d.GalaxyFlags.Nebula = false
-			d.GalaxyFlags.VoidRim = false
-			d.GalaxyFlags.Celestial = false
-			d.GalaxyFlags.Starter = true
-		end)
-		PlayerDataService.Save(player)
-		Remotes.Get("JuiceEvent"):FireAllClients({
-			Kind = "RebirthShockwave",
-			PlayerName = player.DisplayName,
-			Rebirths = nextRebirth,
-		})
+	ValidateRemote.Bind("RequestRebirth", { Rate = 2, Burst = 1 }, function(player)
+		RebirthService.Rebirth(player)
 	end)
+	local map = Workspace:FindFirstChild("VoidlineMap")
+	local hub = map and map:FindFirstChild("Hub")
+	local pad = hub and hub:FindFirstChild("RebirthPad")
+	if pad then
+		local prompt = Instance.new("ProximityPrompt")
+		prompt.ActionText = "Rebirth"
+		prompt.ObjectText = ("Void Rebirth · Station Tier %d"):format(RebirthConfig.RequiredStationTier)
+		prompt.HoldDuration = 1.5
+		prompt.MaxActivationDistance = 12
+		prompt.RequiresLineOfSight = false
+		prompt.Parent = pad
+		prompt.Triggered:Connect(function(player)
+			RebirthService.Rebirth(player)
+		end)
+	end
 end
 
 return RebirthService

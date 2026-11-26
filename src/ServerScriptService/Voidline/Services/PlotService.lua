@@ -1,130 +1,189 @@
+--!strict
+-- Plot ownership. Every pilot gets the lowest free plot as soon as their
+-- profile loads, spawns there, and keeps it until they leave. The Energy
+-- Bridge to the hub is lit once onboarding is done (returning pilots join
+-- with it already lit).
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
-local Remotes = require(Voidline.Remotes)
-local RateLimiter = require(Voidline.Modules.RateLimiter)
+local GameConfig = require(Voidline.Config.GameConfig)
+local PlotLayout = require(Voidline.Modules.PlotLayout)
+
 local PlayerDataService = require(script.Parent.PlayerDataService)
 
 local PlotService = {
 	Owners = {} :: { [number]: Player },
-	ByPlayer = {} :: { [number]: number },
-	_limiter = RateLimiter.new(0.5),
+	ByUserId = {} :: { [number]: number },
 }
 
-local function getPlot(index: number): Folder?
+local claimedCallbacks: { (Player, number) -> () } = {}
+local releasedCallbacks: { (Player, number) -> () } = {}
+
+-- Horizontal radius that counts as "on your plot" (drones mine the belt).
+local ON_PLOT_RADIUS = 46
+
+local function plotFolder(index: number): Instance?
 	local map = Workspace:FindFirstChild("VoidlineMap")
-	if not map then
-		return nil
-	end
-	local plots = map:FindFirstChild("Plots")
+	local plots = map and map:FindFirstChild("Plots")
 	return plots and plots:FindFirstChild("Plot_" .. index)
 end
+PlotService.Folder = plotFolder
 
-function PlotService.GetPlayerPlot(player: Player): Folder?
-	local idx = PlotService.ByPlayer[player.UserId]
-	if not idx then
-		return nil
-	end
-	return getPlot(idx)
+function PlotService.IndexOf(player: Player): number?
+	return PlotService.ByUserId[player.UserId]
 end
 
-function PlotService.TeleportToPlot(player: Player, plotIndex: number)
-	local plot = getPlot(plotIndex)
+function PlotService.PlotOf(player: Player): Instance?
+	local index = PlotService.ByUserId[player.UserId]
+	return if index then plotFolder(index) else nil
+end
+
+function PlotService.OnClaimed(callback: (Player, number) -> ())
+	table.insert(claimedCallbacks, callback)
+end
+
+function PlotService.OnReleased(callback: (Player, number) -> ())
+	table.insert(releasedCallbacks, callback)
+end
+
+function PlotService.World(player: Player, localOffset: Vector3): Vector3?
+	local index = PlotService.ByUserId[player.UserId]
+	return if index then PlotLayout.World(index, localOffset) else nil
+end
+
+function PlotService.GrinderPosition(player: Player): Vector3?
+	return PlotService.World(player, PlotLayout.Grinder)
+end
+
+function PlotService.SpawnCFrame(index: number): CFrame
+	local plotCFrame = PlotLayout.PlotCFrame(index)
+	local position = plotCFrame:PointToWorldSpace(PlotLayout.Spawn + Vector3.new(0, 3, 0))
+	-- Face the hub so the bridge and Monolith are in view on spawn.
+	return CFrame.lookAt(position, Vector3.new(0, position.Y, 0))
+end
+
+function PlotService.RootPart(player: Player): BasePart?
+	local character = player.Character
+	local root = character and character:FindFirstChild("HumanoidRootPart")
+	return if root and root:IsA("BasePart") then root else nil
+end
+
+function PlotService.IsOnPlot(player: Player): boolean
+	local index = PlotService.ByUserId[player.UserId]
+	local root = PlotService.RootPart(player)
+	if not index or not root then
+		return false
+	end
+	local center = PlotLayout.PlotCFrame(index).Position
+	local offset = root.Position - center
+	return Vector3.new(offset.X, 0, offset.Z).Magnitude <= ON_PLOT_RADIUS and math.abs(offset.Y) < 40
+end
+
+local function moveToPlot(player: Player)
+	local index = PlotService.ByUserId[player.UserId]
+	local character = player.Character
+	if not index or not character then
+		return
+	end
+	character:PivotTo(PlotService.SpawnCFrame(index))
+end
+
+local function setBridge(index: number, lit: boolean)
+	local plot = plotFolder(index)
 	if not plot then
 		return
 	end
-	local spawn = plot:FindFirstChild("PlayerSpawn")
-	local char = player.Character or player.CharacterAdded:Wait()
-	local hrp = char:WaitForChild("HumanoidRootPart")
-	if spawn and spawn:IsA("BasePart") then
-		hrp.CFrame = spawn.CFrame + Vector3.new(0, 3, 0)
+	plot:SetAttribute("BridgeIgnited", lit)
+	plot:SetAttribute("BridgeIgnitedAt", if lit then Workspace:GetServerTimeNow() else 0)
+	local bridge = plot:FindFirstChild("EnergyBridge")
+	if not bridge then
+		return
 	end
-end
-
-function PlotService.Claim(player: Player, plotIndex: number): boolean
-	if PlotService.ByPlayer[player.UserId] then
-		return false
+	for _, segment in bridge:GetChildren() do
+		if segment:IsA("BasePart") then
+			segment.CanCollide = lit
+			segment.Transparency = if lit then 0.15 else 0.85
+		end
 	end
-	if PlotService.Owners[plotIndex] then
-		return false
-	end
-	local plot = getPlot(plotIndex)
-	if not plot then
-		return false
-	end
-	PlotService.Owners[plotIndex] = player
-	PlotService.ByPlayer[player.UserId] = plotIndex
-	plot:SetAttribute("Claimed", true)
-	plot:SetAttribute("OwnerUserId", player.UserId)
-	PlayerDataService.Mutate(player, function(data)
-		data.PlotIndex = plotIndex
-	end)
-	PlotService.TeleportToPlot(player, plotIndex)
-	Remotes.Get("JuiceEvent"):FireClient(player, { Kind = "ClaimPlot", PlotIndex = plotIndex })
-	return true
 end
 
 function PlotService.IgniteBridge(player: Player)
-	local plot = PlotService.GetPlayerPlot(player)
-	if not plot then
+	local index = PlotService.ByUserId[player.UserId]
+	if index then
+		local plot = plotFolder(index)
+		if plot and plot:GetAttribute("BridgeIgnited") ~= true then
+			setBridge(index, true)
+		end
+	end
+end
+
+local function claim(player: Player, profile: any)
+	if PlotService.ByUserId[player.UserId] or player.Parent ~= Players then
 		return
 	end
-	local bridge = plot:FindFirstChild("BridgeAttach")
-	local beam = bridge and bridge:FindFirstChild("EnergyBridge")
-	if beam and beam:IsA("BasePart") then
-		beam.Transparency = 0.15
-		beam:SetAttribute("Ignited", true)
+	local index: number? = nil
+	for i = 1, GameConfig.PlotCount do
+		if not PlotService.Owners[i] then
+			index = i
+			break
+		end
 	end
-	Remotes.Get("JuiceEvent"):FireClient(player, { Kind = "BridgeIgnition" })
+	if not index then
+		warn("[Voidline] no free plot for " .. player.Name)
+		return
+	end
+	PlotService.Owners[index] = player
+	PlotService.ByUserId[player.UserId] = index
+	player:SetAttribute("PlotIndex", index)
+	local plot = plotFolder(index)
+	if plot then
+		plot:SetAttribute("OwnerUserId", player.UserId)
+		plot:SetAttribute("OwnerName", player.DisplayName)
+	end
+	setBridge(index, profile.TutorialComplete == true)
+	moveToPlot(player)
+	for _, callback in claimedCallbacks do
+		task.spawn(callback, player, index)
+	end
+end
+
+local function release(player: Player)
+	local index = PlotService.ByUserId[player.UserId]
+	if not index then
+		return
+	end
+	for _, callback in releasedCallbacks do
+		local ok, err = pcall(callback :: (Player, number) -> ...any, player, index)
+		if not ok then
+			warn("[Voidline] plot release callback failed: " .. tostring(err))
+		end
+	end
+	PlotService.Owners[index] = nil
+	PlotService.ByUserId[player.UserId] = nil
+	local plot = plotFolder(index)
+	if plot then
+		plot:SetAttribute("OwnerUserId", 0)
+		plot:SetAttribute("OwnerName", "")
+	end
+	setBridge(index, false)
 end
 
 function PlotService.Init()
-	Remotes.Get("ClaimPlot").OnServerEvent:Connect(function(player, plotIndex)
-		if not PlotService._limiter:Allow(player.UserId) then
-			return
-		end
-		if typeof(plotIndex) ~= "number" then
-			return
-		end
-		plotIndex = math.floor(plotIndex)
-		if plotIndex < 1 or plotIndex > 12 then
-			return
-		end
-		PlotService.Claim(player, plotIndex)
-	end)
-
-	-- Auto-claim first free plot on join for instant action
+	PlayerDataService.OnLoaded(claim)
 	Players.PlayerAdded:Connect(function(player)
 		player.CharacterAdded:Connect(function()
-			task.wait(0.5)
-			if PlotService.ByPlayer[player.UserId] then
-				PlotService.TeleportToPlot(player, PlotService.ByPlayer[player.UserId])
-				return
-			end
-			for i = 1, 12 do
-				if not PlotService.Owners[i] then
-					PlotService.Claim(player, i)
-					break
-				end
-			end
+			-- Wait a frame so the character is fully parented before moving it.
+			task.defer(moveToPlot, player)
 		end)
 	end)
-
-	Players.PlayerRemoving:Connect(function(player)
-		local idx = PlotService.ByPlayer[player.UserId]
-		if idx then
-			PlotService.Owners[idx] = nil
-			local plot = getPlot(idx)
-			if plot then
-				plot:SetAttribute("Claimed", false)
-				plot:SetAttribute("OwnerUserId", nil)
-			end
-		end
-		PlotService.ByPlayer[player.UserId] = nil
-		PlotService._limiter:Clear(player.UserId)
-	end)
+	for _, player in Players:GetPlayers() do
+		player.CharacterAdded:Connect(function()
+			task.defer(moveToPlot, player)
+		end)
+	end
+	Players.PlayerRemoving:Connect(release)
 end
 
 return PlotService

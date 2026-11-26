@@ -1,39 +1,73 @@
+--!strict
+-- AFK idle orbit: after AfkIdleSeconds without input or movement a pilot's
+-- drones settle into a calm orbit and stop mining. Nobody is ever kicked;
+-- any input or movement wakes the fleet again.
 local Players = game:GetService("Players")
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
 local GameConfig = require(Voidline.Config.GameConfig)
-local Remotes = require(Voidline.Remotes)
-local DroneService = require(script.Parent.DroneService)
 
-local AfkService = {
-	_lastInput = {} :: { [number]: number },
-}
+local ValidateRemote = require(script.Parent.Parent.Security.ValidateRemote)
+local JuiceService = require(script.Parent.JuiceService)
+
+local AfkService = {}
+
+local CHECK_INTERVAL = 5
+local MOVE_EPSILON = 2
+
+AfkService._lastActive = {} :: { [number]: number }
+AfkService._lastPos = {} :: { [number]: Vector3 }
+
+local function setAfk(player: Player, afk: boolean)
+	if (player:GetAttribute("Afk") == true) == afk then
+		return
+	end
+	player:SetAttribute("Afk", afk)
+	JuiceService.Send(player, if afk then "AfkIdle" else "AfkResume", {})
+end
+
+function AfkService.MarkActive(player: Player)
+	AfkService._lastActive[player.UserId] = os.clock()
+	setAfk(player, false)
+end
+
+function AfkService.Check(now: number)
+	for _, player in Players:GetPlayers() do
+		local userId = player.UserId
+		local character = player.Character
+		local root = character and character:FindFirstChild("HumanoidRootPart") :: BasePart?
+		if root then
+			local last = AfkService._lastPos[userId]
+			if last and (root.Position - last).Magnitude > MOVE_EPSILON then
+				AfkService.MarkActive(player)
+			end
+			AfkService._lastPos[userId] = root.Position
+		end
+		local lastActive = AfkService._lastActive[userId] or now
+		AfkService._lastActive[userId] = lastActive
+		if now - lastActive >= GameConfig.AfkIdleSeconds then
+			setAfk(player, true)
+		end
+	end
+end
 
 function AfkService.Init()
-	Remotes.Get("PlayerInput").OnServerEvent:Connect(function(player)
-		AfkService._lastInput[player.UserId] = os.clock()
-		DroneService.SetAfk(player, false)
+	ValidateRemote.Bind("PlayerInput", { Rate = 1, Burst = 3, Args = {} }, function(player)
+		AfkService.MarkActive(player)
 	end)
-
 	Players.PlayerAdded:Connect(function(player)
-		AfkService._lastInput[player.UserId] = os.clock()
+		AfkService._lastActive[player.UserId] = os.clock()
+		player:SetAttribute("Afk", false)
 	end)
 	Players.PlayerRemoving:Connect(function(player)
-		AfkService._lastInput[player.UserId] = nil
+		AfkService._lastActive[player.UserId] = nil
+		AfkService._lastPos[player.UserId] = nil
 	end)
-
 	task.spawn(function()
 		while true do
-			task.wait(5)
-			local now = os.clock()
-			for _, player in Players:GetPlayers() do
-				local last = AfkService._lastInput[player.UserId] or now
-				if now - last >= GameConfig.AfkIdleSeconds then
-					DroneService.SetAfk(player, true)
-					Remotes.Get("JuiceEvent"):FireClient(player, { Kind = "AfkIdle" })
-				end
-			end
+			task.wait(CHECK_INTERVAL)
+			AfkService.Check(os.clock())
 		end
 	end)
 end
