@@ -23,6 +23,7 @@ local StoreController = require(Controllers.StoreController)
 local MenuController = require(Controllers.MenuController)
 local InteractController = require(Controllers.InteractController)
 local JuiceController = require(Controllers.JuiceController)
+local AudioController = require(Controllers.AudioController)
 
 -- Input pings keep the server's idle detector honest without any anti-idle
 -- tricks: they only fire on real player input.
@@ -81,6 +82,7 @@ HotbarController.Init({
 	ToggleClip = toggleClip,
 })
 JuiceController.Init()
+AudioController.Init()
 task.spawn(InteractController.Init, {
 	OpenStore = openStore,
 	OpenMenu = function(tab: string?)
