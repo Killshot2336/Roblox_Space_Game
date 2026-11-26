@@ -243,10 +243,21 @@ local function makePrompt(parent: Instance, action: string, object: string, key:
 	prompt.ObjectText = object
 	prompt.KeyboardKeyCode = key
 	prompt.HoldDuration = 0
-	prompt.MaxActivationDistance = 12
-	prompt.RequiresLineOfSight = false
+	prompt.MaxActivationDistance = 10
+	prompt.RequiresLineOfSight = true
+	prompt.Enabled = false -- enabled only while a pilot owns this plot
 	prompt.Parent = parent
 	return prompt
+end
+
+local function setPlotPromptsEnabled(index: number, enabled: boolean)
+	local set = prompts[index]
+	if not set then
+		return
+	end
+	for _, prompt in set do
+		prompt.Enabled = enabled
+	end
 end
 
 local function buildPrompts(index: number)
@@ -336,7 +347,8 @@ function EconomyService.Init()
 	for index = 1, GameConfig.PlotCount do
 		buildPrompts(index)
 	end
-	PlotService.OnClaimed(function(player)
+	PlotService.OnClaimed(function(player, index)
+		setPlotPromptsEnabled(index, true)
 		EconomyService.RefreshPrompts(player)
 	end)
 

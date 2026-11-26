@@ -16,8 +16,9 @@ HubLayout.OverlookGate = Vector3.new(-34, 1.5, -34)
 HubLayout.RiftGate = Vector3.new(34, 1.5, -34)
 HubLayout.Spawn = Vector3.new(0, 1.5, 38)
 
--- Leaderboards sit between bridge landings (bridges arrive every 30 deg).
-HubLayout.BoardRadius = 36
+-- Leaderboards sit on the hub rim, facing outward so the Monolith center
+-- is not a wall of SurfaceGui text.
+HubLayout.BoardRadius = 52
 HubLayout.Boards = {
 	{ Id = "TopCredits", Title = "TOP CREDITS", Angle = 15 },
 	{ Id = "TopRebirths", Title = "TOP REBIRTHS", Angle = 105 },
@@ -28,7 +29,13 @@ HubLayout.Boards = {
 function HubLayout.BoardCFrame(angleDegrees: number): CFrame
 	local a = math.rad(angleDegrees)
 	local pos = Vector3.new(math.cos(a) * HubLayout.BoardRadius, 10, math.sin(a) * HubLayout.BoardRadius)
-	return CFrame.lookAt(pos, Vector3.new(0, 10, 0))
+	local outward = Vector3.new(pos.X, 0, pos.Z)
+	if outward.Magnitude < 0.01 then
+		outward = Vector3.new(0, 0, 1)
+	else
+		outward = outward.Unit
+	end
+	return CFrame.lookAt(pos, pos + outward)
 end
 
 -- Shared deep-space rocks float in a ring just beyond the hub edge, in drone

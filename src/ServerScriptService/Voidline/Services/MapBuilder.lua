@@ -61,18 +61,21 @@ local function folder(name: string, parent: Instance): Folder
 	return f
 end
 
+-- World labels are near-only. Long MaxDistance + hub density caused a gold
+-- billboard wall at the Monolith (unreadable in Studio playtests).
 local function label(parent: Instance, text: string, height: number, maxDistance: number, color: Color3?): BillboardGui
 	local bb = Instance.new("BillboardGui")
 	bb.Name = "Label"
-	bb.Size = UDim2.fromOffset(200, 34)
+	bb.Size = UDim2.fromOffset(160, 28)
 	bb.StudsOffset = Vector3.new(0, height, 0)
 	bb.AlwaysOnTop = false
 	bb.MaxDistance = maxDistance
+	bb.SizeOffset = Vector2.new(0, 0.5)
 	bb.LightInfluence = 0
 	bb.Parent = parent
 	local text_ = Instance.new("TextLabel")
 	text_.Name = "Text"
-	text_.BackgroundTransparency = 0.3
+	text_.BackgroundTransparency = 0.45
 	text_.BackgroundColor3 = COLORS.Obsidian
 	text_.Size = UDim2.fromScale(1, 1)
 	text_.Font = Enum.Font.GothamBold
@@ -81,16 +84,16 @@ local function label(parent: Instance, text: string, height: number, maxDistance
 	text_.Text = text
 	text_.Parent = bb
 	local corner = Instance.new("UICorner")
-	corner.CornerRadius = UDim.new(0, 8)
+	corner.CornerRadius = UDim.new(0, 6)
 	corner.Parent = text_
 	local stroke = Instance.new("UIStroke")
 	stroke.Color = COLORS.Gold
-	stroke.Transparency = 0.5
+	stroke.Transparency = 0.65
 	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	stroke.Parent = text_
 	local padding = Instance.new("UIPadding")
-	padding.PaddingLeft = UDim.new(0, 8)
-	padding.PaddingRight = UDim.new(0, 8)
+	padding.PaddingLeft = UDim.new(0, 6)
+	padding.PaddingRight = UDim.new(0, 6)
 	padding.Parent = text_
 	return bb
 end
@@ -196,7 +199,7 @@ local function buildHub(root: Instance)
 		Transparency = 1,
 	})
 	core:SetAttribute("Exposed", false)
-	label(monolith:FindFirstChild("MonolithLeft") :: Instance, "THE VOIDLINE MONOLITH", 42, 160)
+	label(monolith:FindFirstChild("MonolithLeft") :: Instance, "THE VOIDLINE MONOLITH", 42, 48)
 	local monolithHalfSize = Vector3.new(size.X / 2, size.Y, size.Z)
 	for side, sign in sides do
 		local half = monolith:FindFirstChild("Monolith" .. side)
@@ -248,7 +251,8 @@ local function buildHub(root: Instance)
 			Color = color,
 			Material = Enum.Material.Neon,
 		})
-		label(p, text, 4, 70)
+		-- Near-only: readable when standing on the pad, invisible from hub center.
+		label(p, text, 3.2, 16)
 		return p
 	end
 	pad("RebirthPad", HubLayout.RebirthPad, Vector3.new(12, 1, 12), COLORS.Gold, "VOID REBIRTH")
@@ -265,7 +269,7 @@ local function buildHub(root: Instance)
 		CFrame = CFrame.lookAt(HubLayout.CodeTerminal, Vector3.new(0, HubLayout.CodeTerminal.Y, 0)),
 		Material = Enum.Material.Metal,
 	})
-	label(terminal, "CODE TERMINAL", 7, 60)
+	label(terminal, "CODE TERMINAL", 6, 14)
 
 	-- "Created by Killshot2336" monument: obsidian plinth, gold obelisk, plaque.
 	local monument = folder("CreatorMonument", hub)
@@ -315,7 +319,7 @@ local function buildHub(root: Instance)
 	plaqueText.TextColor3 = COLORS.Gold
 	plaqueText.Text = "Created by " .. GameConfig.BrandCreator
 	plaqueText.Parent = surface
-	label(plinth, "Created by " .. GameConfig.BrandCreator, 26, 120)
+	-- Plaque SurfaceGui is the readable credit; no floating billboard (was stacking at hub).
 	part({
 		Name = "MonumentHalo",
 		Parent = monument,
@@ -344,10 +348,11 @@ local function buildHub(root: Instance)
 		})
 		pad:SetAttribute("ClipShotId", shot.Id)
 		pad:SetAttribute("LookAt", shot.LookAt)
+		pad:SetAttribute("ClipHint", shot.Hint)
 		if shot.Fov then
 			pad:SetAttribute("ClipFov", shot.Fov)
 		end
-		label(pad, shot.Hint, 3, 55, COLORS.GoldBright)
+		-- No world label — ClipShot pads are framing marks; hints stay on attributes.
 	end
 
 	-- Leaderboard frames; LeaderboardService draws the holographic lists.
@@ -568,7 +573,7 @@ local function buildPlot(plots: Instance, index: number)
 		Color = COLORS.Gold,
 		Material = Enum.Material.Neon,
 	})
-	label(refinery, "REFINERY", 4, 60)
+	label(refinery, "REFINERY", 3.5, 14)
 	part({
 		Name = "RefineryTower",
 		Parent = station,
@@ -596,7 +601,7 @@ local function buildPlot(plots: Instance, index: number)
 		CanCollide = false,
 		CanQuery = false,
 	})
-	label(grinder, "GRINDER CORE", 7, 60)
+	label(grinder, "GRINDER CORE", 5, 14)
 
 	local pads = folder("UpgradePads", station)
 	for upgradeId, offset in PlotLayout.Pads do
@@ -620,7 +625,7 @@ local function buildPlot(plots: Instance, index: number)
 		Color = Color3.fromRGB(90, 220, 255),
 		Material = Enum.Material.Neon,
 	})
-	label(tuner, "LASER TUNER", 3, 40)
+	label(tuner, "LASER TUNER", 2.8, 12)
 
 	folder("Pedestals", plot)
 	folder("Citadel", plot)
