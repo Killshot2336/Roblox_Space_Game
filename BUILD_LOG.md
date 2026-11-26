@@ -23,13 +23,35 @@ Run `rojo serve` (or `./serve.sh`), connect the Rojo plugin in Studio, press Pla
 10. **Menus** — Codex, Quests, Squads, Pilot Card inspect, leaderboards.
 11. **Energy Bridge sweep** — first warp/rebirth VFX along segmented bridge.
 
+## Publish readiness (agent-complete vs owner-only)
+
+| Area | Status | Notes |
+|------|--------|-------|
+| `scripts/verify.sh` | **GREEN** | selene, luau-lsp, stylua, Lune tests, content report, Rojo build |
+| Headless E2E | **GREEN** | Onboarding, 12 plots, save/rejoin, ProcessReceipt idempotency |
+| ProcessReceipt | **GREEN** | `PurchaseId` in profile; `PurchaseGranted` only after `SaveNow` |
+| PolicyService / paid random | **GREEN** | Starfall blocked when restricted; odds in store UI |
+| DataStore / Marketplace | **GREEN** | pcall + degrade when API off or ids `0` |
+| ValidateRemote / economy | **GREEN** | Typed args, rate limits, server-authoritative numbers |
+| Tow / rocks | **GREEN** | Server-anchored parts; tow timeline on attributes |
+| Client shell | **Shipped** | **needs Studio playtest** for feel/layout/mobile |
+| Pass/product IDs | **Owner** | Paste Dashboard ids into `MonetizationConfig` |
+| Publish + API Services | **Owner** | Published place + Studio API access for DataStores |
+| Real SFX assets | **Owner** | `AudioConfig.lua` placeholders (`AssetId ""`) |
+| Authored art / tuning | **Owner** | Map polish, mobile perf after first Studio session |
+
+**Agent-complete (this publish wrap):** AudioController stub + `AudioConfig`; BUILD_LOG/README owner steps;
+headless ProcessReceipt test; rebuilt `VoidlineDeepSpace.rbxlx`.
+
+**Still requires Studio before soft launch:** run the 11-item checklist below (feel/unverified UI).
+
 ## Owner TODOs
 
-- Create **10 game passes** and **2 developer products** in Creator Dashboard; paste IDs into
-  `src/ReplicatedStorage/Voidline/Config/MonetizationConfig.lua` (`0` = Studio-only grant).
-- Publish place; enable **Game Settings → Security → Enable Studio Access to API Services** for DataStores.
-- Replace procedural map/placeholder visuals with authored assets when ready.
-- Tune drone VFX perf on low-end mobile after first Studio session.
+- **Creator Dashboard → Monetization:** create 10 passes + 2 dev products; paste ids into
+  `src/ReplicatedStorage/Voidline/Config/MonetizationConfig.lua` (`GamePassId` / `ProductId`, replace `0`).
+- **Publish place;** **Game Settings → Security → Enable Studio Access to API Services** for DataStores.
+- Optional: wire `rbxassetid://…` in `src/ReplicatedStorage/Voidline/Config/AudioConfig.lua`.
+- Replace procedural map/placeholder visuals when ready; tune drone VFX on low-end mobile after Studio playtest.
 
 ## Content totals
 
@@ -103,7 +125,7 @@ Baseline verification: 31 tests, GREEN on Phase 0 completion.
 selene:    0 errors, 1 warnings
 luau-lsp:  0 errors, 1 warnings
 stylua:    0 files need formatting
-tests:     74 passed, 0 failed, 291420 assertions
+tests:     75 passed, 0 failed, 291425 assertions
 content:   CONTENT TOTAL 1126
 rojo:      OK (~499 KB place)
 RESULT:    GREEN

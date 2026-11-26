@@ -103,9 +103,25 @@ Roblox_Space_Game/
     StarterPlayer/.../Voidline/     ClientBoot + Controllers
 ```
 
-## Monetization placeholders
+## Owner TODOs before publish
 
-Pass / DevProduct IDs in `MonetizationConfig` are `0`. Replace with Creator Dashboard IDs before publishing. With ID `0`, Studio test grants still work for passes.
+1. **Creator Dashboard → Monetization**
+   - Create **10 game passes** and **2 developer products** matching the names and Robux prices in
+     [`src/ReplicatedStorage/Voidline/Config/MonetizationConfig.lua`](src/ReplicatedStorage/Voidline/Config/MonetizationConfig.lua).
+   - Paste each Roblox numeric id into the matching `GamePassId` or `ProductId` field (replace `0`).
+     Keys: `StarterBundle`, `AutoSellWarpLink`, `Credits2x`, `ShardRelicLuck2x`, `DroneSlots3`,
+     `MegaSwarm5`, `LaserOverclock`, `DeepSpaceWarpPass`, `VoidSovereignVIP`, `EternalArchitect`;
+     products `SummonVoidStarfall`, `ServerLuckSurge`.
+2. **Publish the place** and open **Game Settings → Security → Enable Studio Access to API Services** so
+   DataStores and OrderedDataStore leaderboards work.
+3. **Optional audio** — paste real `rbxassetid://…` strings into
+   [`src/ReplicatedStorage/Voidline/Config/AudioConfig.lua`](src/ReplicatedStorage/Voidline/Config/AudioConfig.lua)
+   (`AssetId = ""` means silent).
+
+While ids are `0`, **Robux purchase buttons stay hidden** (`Coming soon` on summons; no Robux button on passes).
+**Voidline Token purchases still work** for passes in Studio/local play for testing perks.
+
+Full Studio playtest steps: [`BUILD_LOG.md`](./BUILD_LOG.md).
 
 ## Roadmap
 
