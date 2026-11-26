@@ -7700,6 +7700,33 @@ local function buildDeepSpace(root: Instance)
 		CanCollide = false,
 		CanQuery = false,
 	})
+	-- Thumbnail-readable Deep Space rim: tall neon pylons between hub and plot ring.
+	for i = 1, 12 do
+		local angle = (i - 0.5) / 12 * math.pi * 2
+		local rim = (HubLayout.ZoneRadius + GameConfig.PlotRingRadius) * 0.52
+		local pos = Vector3.new(math.cos(angle) * rim, 6, math.sin(angle) * rim)
+		part({
+			Name = "DeepSpacePylon" .. i,
+			Parent = deep,
+			Size = Vector3.new(1.4, 22, 1.4),
+			CFrame = CFrame.new(pos),
+			Color = if i % 2 == 0 then COLORS.VoidAccent else COLORS.GoldBright,
+			Material = Enum.Material.Neon,
+			Transparency = 0.2,
+			CanCollide = false,
+			CanQuery = false,
+		})
+	end
+	part({
+		Name = "DeepSpaceFloor",
+		Parent = deep,
+		Size = Vector3.new(HubLayout.ZoneRadius * 1.85, 0.6, HubLayout.ZoneRadius * 1.85),
+		CFrame = CFrame.new(0, -8, 0),
+		Color = Color3.fromRGB(8, 6, 14),
+		Material = Enum.Material.Slate,
+		CanCollide = false,
+		CanQuery = false,
+	})
 	folder("SharedRocks", deep)
 	folder("EventTargets", deep)
 	folder("Hazards", deep)
@@ -11807,6 +11834,8 @@ local MenuController = require(Controllers.MenuController)
 local InteractController = require(Controllers.InteractController)
 local JuiceController = require(Controllers.JuiceController)
 local AudioController = require(Controllers.AudioController)
+local MovementController = require(Controllers.MovementController)
+local ThrusterCosmeticController = require(Controllers.ThrusterCosmeticController)
 
 -- Input pings keep the server's idle detector honest without any anti-idle
 -- tricks: they only fire on real player input.
@@ -11841,6 +11870,7 @@ local function applyClipMode()
 	VFXController.SetClipHidden(clip)
 	HUDController.SetVisible(not clip)
 	HotbarController.SetVisible(not clip)
+	MovementController.SetVisible(not clip)
 	pcall(function()
 		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, not clip)
 		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, not clip)
@@ -11884,6 +11914,8 @@ HotbarController.Init({
 })
 JuiceController.Init()
 AudioController.Init()
+MovementController.Init()
+ThrusterCosmeticController.Init()
 
 TowController.OnArrive(function(tow)
 	if tow.Owner ~= Players.LocalPlayer.UserId then
@@ -11978,10 +12010,25 @@ local function getOrCreate(key: string): Sound?
 	return newSound
 end
 
+local PITCH_BAND: { [string]: { number } } = {
+	Mine = { 0.95, 1.05 },
+	Sell = { 0.98, 1.08 },
+	Upgrade = { 0.92, 1.02 },
+	TowArrive = { 0.94, 1.04 },
+	Starfall = { 0.9, 1.0 },
+	Rebirth = { 0.88, 0.98 },
+	StoreSuccess = { 1.0, 1.1 },
+	BridgeIgnite = { 0.96, 1.06 },
+}
+
 local function playKey(key: string)
 	local sound = getOrCreate(key)
 	if not sound then
 		return
+	end
+	local band = PITCH_BAND[key]
+	if band then
+		sound.PlaybackSpeed = band[1] + math.random() * (band[2] - band[1])
 	end
 	sound.TimePosition = 0
 	sound:Play()
@@ -12031,10 +12078,14 @@ local Workspace = game:GetService("Workspace")
 local Client = script.Parent.Parent.Client
 local Ui = require(Client.Ui)
 
+local TowController = require(script.Parent.TowController)
+
 local CameraController = {}
 
 local BASE_FOV = 70
 local BEAM_LINK_FOV = 8
+local TOW_FOV = 5
+local HALO_FOV = 4
 local FOV_RATE = 4
 local MAX_SHAKE = 1.2
 
@@ -12049,6 +12100,19 @@ local shakeDuration = 1
 local function beamLinkEngaged(): boolean
 	local targets = player:GetAttribute("DroneTargets")
 	return player:GetAttribute("Formation") == 2 and type(targets) == "string" and targets ~= ""
+end
+
+local function sovereignHalo(): boolean
+	return player:GetAttribute("Formation") == 3
+end
+
+local function localTowActive(): boolean
+	for _, tow in TowController.ForUser(player.UserId) do
+		if tow.Alpha < 0.98 then
+			return true
+		end
+	end
+	return false
 end
 
 function CameraController.Punch(fovDelta: number, seconds: number)
@@ -12072,8 +12136,14 @@ local function step(dt: number)
 	end
 	local now = os.clock()
 	local target = BASE_FOV
+	local motion = if Ui.ReducedMotion then 0.5 else 1
 	if beamLinkEngaged() then
-		target += BEAM_LINK_FOV * (if Ui.ReducedMotion then 0.5 else 1)
+		target += BEAM_LINK_FOV * motion
+	elseif sovereignHalo() then
+		target += HALO_FOV * motion
+	end
+	if localTowActive() then
+		target += TOW_FOV * motion
 	end
 	if now < punchUntil then
 		target += punch
@@ -13463,6 +13533,11 @@ function HotbarController.Init(hotbarActions: Actions)
 	sellButton = slotButton("Sell", "⇪", "SELL", "R", 13, function()
 		ClientState.Fire("SellOre")
 	end)
+	if Ui.IsTouch() then
+		slotButton("Clip", "▣", "CLIP", "K", 14, function()
+			actions.ToggleClip()
+		end)
+	end
 
 	bindKey("VoidlineUpgrade", quickUpgrade, Enum.KeyCode.U)
 	bindKey("VoidlineFormation1", function()
@@ -14971,6 +15046,193 @@ return MenuController
           </Item>
           <Item class="ModuleScript" referent="103">
             <Properties>
+              <string name="Name">MovementController</string>
+              <string name="Source"><![CDATA[--!strict
+-- Low-G sprint: faster walk while holding Shift (desktop) or the sprint chip
+-- (touch). Small gold foot thrusters when sprinting; respects Hide Jetpack.
+local ContextActionService = game:GetService("ContextActionService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local GameConfig = require(Voidline.Config.GameConfig)
+
+local Client = script.Parent.Parent.Client
+local Ui = require(Client.Ui)
+local ClientState = require(Client.ClientState)
+
+local MovementController = {}
+
+local BASE_WALK = 16
+local SPRINT_WALK = 26
+local SPRINT_JUMP = 52
+
+local player = Players.LocalPlayer
+local sprinting = false
+local sprintGui: ScreenGui?
+local footL: ParticleEmitter?
+local footR: ParticleEmitter?
+
+local function humanoid(): Humanoid?
+	local character = player.Character
+	return if character then character:FindFirstChildOfClass("Humanoid") else nil
+end
+
+local function hideJetpack(): boolean
+	return player:GetAttribute("HideJetpack") == true or ClientState.Profile.Settings.HideJetpack == true
+end
+
+local function setFootFx(on: boolean)
+	local show = on and not hideJetpack()
+	if footL then
+		footL.Enabled = show
+	end
+	if footR then
+		footR.Enabled = show
+	end
+end
+
+local function applySpeed()
+	local hum = humanoid()
+	if not hum then
+		return
+	end
+	if sprinting then
+		hum.WalkSpeed = SPRINT_WALK
+		hum.JumpPower = SPRINT_JUMP
+	else
+		hum.WalkSpeed = BASE_WALK
+		hum.JumpPower = 50
+	end
+	setFootFx(sprinting)
+end
+
+local function setSprint(on: boolean)
+	if sprinting == on then
+		return
+	end
+	sprinting = on
+	applySpeed()
+end
+
+local function attachFootFx(character: Model)
+	footL, footR = nil, nil
+	for _, name in { "LeftFoot", "RightFoot", "Left Leg", "Right Leg" } do
+		local foot = character:FindFirstChild(name)
+		if foot and foot:IsA("BasePart") then
+			local existing = foot:FindFirstChild("VoidlineSprintThruster")
+			local emitter: ParticleEmitter
+			if existing and existing:IsA("ParticleEmitter") then
+				emitter = existing
+			else
+				emitter = Instance.new("ParticleEmitter") :: ParticleEmitter
+				emitter.Name = "VoidlineSprintThruster"
+				emitter.Texture = ""
+				emitter.Rate = 0
+				emitter.Lifetime = NumberRange.new(0.15, 0.3)
+				emitter.Speed = NumberRange.new(2, 5)
+				emitter.SpreadAngle = Vector2.new(25, 25)
+				emitter.Color = ColorSequence.new(GameConfig.Colors.GoldBright, GameConfig.Colors.Gold)
+				emitter.LightEmission = 0.8
+				emitter.Size = NumberSequence.new({
+					NumberSequenceKeypoint.new(0, 0.35),
+					NumberSequenceKeypoint.new(1, 0),
+				})
+				emitter.Enabled = false
+				emitter.Parent = foot
+			end
+			if name:find("Left") then
+				footL = emitter
+			else
+				footR = emitter
+			end
+		end
+	end
+	applySpeed()
+end
+
+local function bindDesktopSprint()
+	ContextActionService:BindAction("VoidlineSprint", function(_, state)
+		if state == Enum.UserInputState.Begin then
+			setSprint(true)
+		elseif state == Enum.UserInputState.End or state == Enum.UserInputState.Cancel then
+			setSprint(false)
+		end
+		return Enum.ContextActionResult.Pass
+	end, false, Enum.KeyCode.LeftShift, Enum.KeyCode.RightShift)
+end
+
+local function buildTouchSprint()
+	if not Ui.IsTouch() then
+		return
+	end
+	sprintGui = Ui.Screen("VoidlineSprintChip", 5)
+	local button = Ui.Button({
+		Name = "Sprint",
+		AnchorPoint = Vector2.new(1, 1),
+		Position = UDim2.new(1, -18, 1, -140),
+		Size = UDim2.fromOffset(Ui.TOUCH, Ui.TOUCH),
+		Text = "SPRINT",
+		Font = Ui.Font.Bold,
+		TextSize = 11,
+		TextColor3 = Ui.Colors.GoldBright,
+		Parent = sprintGui,
+	}, function() end)
+	Ui.Make("UISizeConstraint", { MinSize = Vector2.new(Ui.TOUCH, Ui.TOUCH), Parent = button })
+	button.MouseButton1Down:Connect(function()
+		setSprint(true)
+	end)
+	button.MouseButton1Up:Connect(function()
+		setSprint(false)
+	end)
+	button.MouseLeave:Connect(function()
+		setSprint(false)
+	end)
+	ClientState.OnChanged(function(changed)
+		if changed.Settings or changed.Loaded then
+			button.Visible = ClientState.Profile.Settings.ClipMode ~= true
+		end
+	end)
+end
+
+function MovementController.SetVisible(on: boolean)
+	if sprintGui then
+		sprintGui.Enabled = on
+	end
+end
+
+function MovementController.Init()
+	bindDesktopSprint()
+	buildTouchSprint()
+	local function onCharacter(character: Model)
+		task.defer(function()
+			local humInst = character:WaitForChild("Humanoid", 10)
+			if humInst and humInst:IsA("Humanoid") then
+				humInst.WalkSpeed = BASE_WALK
+			end
+			attachFootFx(character)
+		end)
+	end
+	player.CharacterAdded:Connect(onCharacter)
+	if player.Character then
+		onCharacter(player.Character)
+	end
+	player:GetAttributeChangedSignal("HideJetpack"):Connect(function()
+		setFootFx(sprinting)
+	end)
+	ClientState.OnChanged(function(changed)
+		if changed.Settings or changed.Loaded then
+			setFootFx(sprinting)
+		end
+	end)
+end
+
+return MovementController
+]]></string>
+            </Properties>
+          </Item>
+          <Item class="ModuleScript" referent="104">
+            <Properties>
               <string name="Name">OnboardingController</string>
               <string name="Source"><![CDATA[--!strict
 -- Diegetic onboarding: a golden floor beam from the pilot to the next thing
@@ -15312,7 +15574,7 @@ return OnboardingController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="104">
+          <Item class="ModuleScript" referent="105">
             <Properties>
               <string name="Name">SettingsController</string>
               <string name="Source"><![CDATA[local Players = game:GetService("Players")
@@ -15423,7 +15685,7 @@ return SettingsController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="105">
+          <Item class="ModuleScript" referent="106">
             <Properties>
               <string name="Name">StationInteractController</string>
               <string name="Source"><![CDATA[local Players = game:GetService("Players")
@@ -15556,7 +15818,7 @@ return StationInteractController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="106">
+          <Item class="ModuleScript" referent="107">
             <Properties>
               <string name="Name">StoreController</string>
               <string name="Source"><![CDATA[--!strict
@@ -15952,7 +16214,7 @@ return StoreController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="107">
+          <Item class="ModuleScript" referent="108">
             <Properties>
               <string name="Name">ThrusterCosmeticController</string>
               <string name="Source"><![CDATA[local Players = game:GetService("Players")
@@ -16028,7 +16290,7 @@ return ThrusterCosmeticController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="108">
+          <Item class="ModuleScript" referent="109">
             <Properties>
               <string name="Name">TowController</string>
               <string name="Source"><![CDATA[--!strict
@@ -16170,7 +16432,7 @@ return TowController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="109">
+          <Item class="ModuleScript" referent="110">
             <Properties>
               <string name="Name">VFXController</string>
               <string name="Source"><![CDATA[--!strict
@@ -16407,7 +16669,7 @@ return VFXController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="110">
+          <Item class="ModuleScript" referent="111">
             <Properties>
               <string name="Name">WorldController</string>
               <string name="Source"><![CDATA[--!strict
@@ -16657,7 +16919,7 @@ return WorldController
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="111">
+  <Item class="Workspace" referent="112">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">60</float>

@@ -240,6 +240,11 @@ function HotbarController.Init(hotbarActions: Actions)
 	sellButton = slotButton("Sell", "⇪", "SELL", "R", 13, function()
 		ClientState.Fire("SellOre")
 	end)
+	if Ui.IsTouch() then
+		slotButton("Clip", "▣", "CLIP", "K", 14, function()
+			actions.ToggleClip()
+		end)
+	end
 
 	bindKey("VoidlineUpgrade", quickUpgrade, Enum.KeyCode.U)
 	bindKey("VoidlineFormation1", function()

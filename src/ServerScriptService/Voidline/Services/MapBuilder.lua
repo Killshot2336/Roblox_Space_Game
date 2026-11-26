@@ -362,6 +362,33 @@ local function buildDeepSpace(root: Instance)
 		CanCollide = false,
 		CanQuery = false,
 	})
+	-- Thumbnail-readable Deep Space rim: tall neon pylons between hub and plot ring.
+	for i = 1, 12 do
+		local angle = (i - 0.5) / 12 * math.pi * 2
+		local rim = (HubLayout.ZoneRadius + GameConfig.PlotRingRadius) * 0.52
+		local pos = Vector3.new(math.cos(angle) * rim, 6, math.sin(angle) * rim)
+		part({
+			Name = "DeepSpacePylon" .. i,
+			Parent = deep,
+			Size = Vector3.new(1.4, 22, 1.4),
+			CFrame = CFrame.new(pos),
+			Color = if i % 2 == 0 then COLORS.VoidAccent else COLORS.GoldBright,
+			Material = Enum.Material.Neon,
+			Transparency = 0.2,
+			CanCollide = false,
+			CanQuery = false,
+		})
+	end
+	part({
+		Name = "DeepSpaceFloor",
+		Parent = deep,
+		Size = Vector3.new(HubLayout.ZoneRadius * 1.85, 0.6, HubLayout.ZoneRadius * 1.85),
+		CFrame = CFrame.new(0, -8, 0),
+		Color = Color3.fromRGB(8, 6, 14),
+		Material = Enum.Material.Slate,
+		CanCollide = false,
+		CanQuery = false,
+	})
 	folder("SharedRocks", deep)
 	folder("EventTargets", deep)
 	folder("Hazards", deep)

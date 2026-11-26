@@ -9,10 +9,14 @@ local Workspace = game:GetService("Workspace")
 local Client = script.Parent.Parent.Client
 local Ui = require(Client.Ui)
 
+local TowController = require(script.Parent.TowController)
+
 local CameraController = {}
 
 local BASE_FOV = 70
 local BEAM_LINK_FOV = 8
+local TOW_FOV = 5
+local HALO_FOV = 4
 local FOV_RATE = 4
 local MAX_SHAKE = 1.2
 
@@ -27,6 +31,19 @@ local shakeDuration = 1
 local function beamLinkEngaged(): boolean
 	local targets = player:GetAttribute("DroneTargets")
 	return player:GetAttribute("Formation") == 2 and type(targets) == "string" and targets ~= ""
+end
+
+local function sovereignHalo(): boolean
+	return player:GetAttribute("Formation") == 3
+end
+
+local function localTowActive(): boolean
+	for _, tow in TowController.ForUser(player.UserId) do
+		if tow.Alpha < 0.98 then
+			return true
+		end
+	end
+	return false
 end
 
 function CameraController.Punch(fovDelta: number, seconds: number)
@@ -50,8 +67,14 @@ local function step(dt: number)
 	end
 	local now = os.clock()
 	local target = BASE_FOV
+	local motion = if Ui.ReducedMotion then 0.5 else 1
 	if beamLinkEngaged() then
-		target += BEAM_LINK_FOV * (if Ui.ReducedMotion then 0.5 else 1)
+		target += BEAM_LINK_FOV * motion
+	elseif sovereignHalo() then
+		target += HALO_FOV * motion
+	end
+	if localTowActive() then
+		target += TOW_FOV * motion
 	end
 	if now < punchUntil then
 		target += punch

@@ -24,6 +24,8 @@ local MenuController = require(Controllers.MenuController)
 local InteractController = require(Controllers.InteractController)
 local JuiceController = require(Controllers.JuiceController)
 local AudioController = require(Controllers.AudioController)
+local MovementController = require(Controllers.MovementController)
+local ThrusterCosmeticController = require(Controllers.ThrusterCosmeticController)
 
 -- Input pings keep the server's idle detector honest without any anti-idle
 -- tricks: they only fire on real player input.
@@ -58,6 +60,7 @@ local function applyClipMode()
 	VFXController.SetClipHidden(clip)
 	HUDController.SetVisible(not clip)
 	HotbarController.SetVisible(not clip)
+	MovementController.SetVisible(not clip)
 	pcall(function()
 		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, not clip)
 		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, not clip)
@@ -101,6 +104,8 @@ HotbarController.Init({
 })
 JuiceController.Init()
 AudioController.Init()
+MovementController.Init()
+ThrusterCosmeticController.Init()
 
 TowController.OnArrive(function(tow)
 	if tow.Owner ~= Players.LocalPlayer.UserId then

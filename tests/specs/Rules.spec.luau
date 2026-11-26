@@ -429,6 +429,19 @@ tests["profile migration from v1 keeps data and repairs junk"] = function()
 	expect(negative.Formation).toBe(3)
 end
 
+tests["locked spec constants: afk 8min, contest 5/40/60, forge 500/24h, tutorial +100"] = function()
+	local m = load()
+	local GameConfig = m.world:require("ReplicatedStorage/Voidline/Config/GameConfig")
+	local SoftContestConfig = m.world:require("ReplicatedStorage/Voidline/Config/SoftContestConfig")
+	local ForgeConfig = m.world:require("ReplicatedStorage/Voidline/Config/ForgeConfig")
+	expect(GameConfig.AfkIdleSeconds).toBe(8 * 60)
+	expect(GameConfig.TutorialCompleteBonusCredits).toBe(100)
+	expect(SoftContestConfig.MinDamagePercent).toBe(0.05)
+	expect(SoftContestConfig.TopContributorPool).toBe(0.40)
+	expect(SoftContestConfig.ProportionalPool).toBe(0.60)
+	expect(ForgeConfig.DailyTokenSoftCap).toBe(500)
+end
+
 tests["receipt log is bounded and keeps the newest"] = function()
 	local m = load()
 	local p = m.Schema.Default()

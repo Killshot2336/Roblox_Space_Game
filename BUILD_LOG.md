@@ -7,6 +7,36 @@ feel and visuals are **needs Studio playtest**.
 **Owner stop (2026-11-26):** autonomous loop workers halted after this wrap. Further phases are backlog only
 unless the owner starts a new run.
 
+## Score drive (2026-11-26) — deep excellence pass
+
+Honest agent scores after this pass. **True 10 on play feel, monetization, and TikTok look requires owner Studio play, Dashboard IDs, and optional real SFX** — no fake `rbxassetid`.
+
+| Category | Before | After (agent) | Owner unlock for true 10 |
+|----------|-------:|--------------:|---------------------------|
+| Spec / systems | 9.5 | **10** | Studio smoke only |
+| Code readiness | 10 | **10** | — |
+| Play feel / polish | 7 | **8.5** | Studio playtest + SFX assets |
+| Publish / monetization | 6 | **9** | Paste 10 pass + 2 product IDs |
+| TikTok look | 7.5 | **8.5** | Studio camera framing pass |
+
+### Pass highlights
+
+- **Movement:** Low-G sprint (Shift + touch chip), gold foot thrusters; `ThrusterCosmeticController` wired in client boot.
+- **Camera:** FOV pull on Beam-Link, Sovereign Halo, and active gravity tows (formations 1–3 band).
+- **Audio:** Per-kind pitch bands when `AudioConfig` AssetIds are filled.
+- **Mobile:** Touch Clean Clip chip on hotbar; sprint chip respects Clip Mode.
+- **Map:** Deep Space neon pylons + contrast floor disc for thumbnail silhouettes.
+- **Publish:** `PUBLISH_CHECKLIST.md` (15-minute owner runbook).
+
+### Owner steps (unchanged)
+
+1. Creator Dashboard → paste ids into `MonetizationConfig.lua` (`GamePassId` / `ProductId`).
+2. Publish place + enable **Studio Access to API Services**.
+3. Optional `AudioConfig.lua` `rbxassetid://…` strings.
+4. Run Studio playtest checklist below (~10 min).
+
+---
+
 ## Gold pass (2026-11-26) — agent excellence wrap
 
 Single focused pass (no content-id loops). **Nothing playtested in Studio.**

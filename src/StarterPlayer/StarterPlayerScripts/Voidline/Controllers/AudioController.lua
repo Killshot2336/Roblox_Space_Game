@@ -46,10 +46,25 @@ local function getOrCreate(key: string): Sound?
 	return newSound
 end
 
+local PITCH_BAND: { [string]: { number } } = {
+	Mine = { 0.95, 1.05 },
+	Sell = { 0.98, 1.08 },
+	Upgrade = { 0.92, 1.02 },
+	TowArrive = { 0.94, 1.04 },
+	Starfall = { 0.9, 1.0 },
+	Rebirth = { 0.88, 0.98 },
+	StoreSuccess = { 1.0, 1.1 },
+	BridgeIgnite = { 0.96, 1.06 },
+}
+
 local function playKey(key: string)
 	local sound = getOrCreate(key)
 	if not sound then
 		return
+	end
+	local band = PITCH_BAND[key]
+	if band then
+		sound.PlaybackSpeed = band[1] + math.random() * (band[2] - band[1])
 	end
 	sound.TimePosition = 0
 	sound:Play()

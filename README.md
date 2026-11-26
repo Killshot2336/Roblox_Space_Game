@@ -85,6 +85,7 @@ Roblox std are fetched/generated into the gitignored `tools/` folder on first ru
 Run a subset of tests: `lune run tests/run.luau ContributionSplit`.
 
 Build history, owner TODOs and the Studio playtest checklist live in [`BUILD_LOG.md`](./BUILD_LOG.md).
+A one-page publish runbook: [`PUBLISH_CHECKLIST.md`](./PUBLISH_CHECKLIST.md).
 
 ## Project layout
 
