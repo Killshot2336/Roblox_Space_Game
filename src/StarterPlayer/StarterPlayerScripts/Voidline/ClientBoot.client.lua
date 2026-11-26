@@ -43,12 +43,30 @@ end
 local function applySettings()
 	local settings = ClientState.Profile.Settings
 	Ui.ReducedMotion = settings.ReducedMotion == true or systemReducedMotion()
-	DroneController.SetPerfMode(settings.PerfMode == true)
-	WorldController.SetPerfMode(settings.PerfMode == true)
+	local perf = settings.PerfMode == true
+	DroneController.SetPerfMode(perf)
+	WorldController.SetPerfMode(perf)
+	VFXController.SetPerfMode(perf)
+end
+
+local function applyClipMode()
+	local clip = ClientState.Profile.Settings.ClipMode == true
+	if clip then
+		StoreController.Close()
+		MenuController.Close()
+	end
+	VFXController.SetClipHidden(clip)
+	HUDController.SetVisible(not clip)
+	HotbarController.SetVisible(not clip)
+	pcall(function()
+		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, not clip)
+		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, not clip)
+	end)
 end
 
 local function toggleClip()
 	ClientState.Fire("SettingsUpdate", { ClipMode = ClientState.Profile.Settings.ClipMode ~= true })
+	task.defer(applyClipMode)
 end
 
 local function openStore(tab: string?)
@@ -83,6 +101,14 @@ HotbarController.Init({
 })
 JuiceController.Init()
 AudioController.Init()
+
+TowController.OnArrive(function(tow)
+	if tow.Owner ~= Players.LocalPlayer.UserId then
+		return
+	end
+	VFXController.Popup("TOW HOME", Ui.Colors.GoldBright, tow.To)
+	CameraController.Shake(0.28, 0.28)
+end)
 task.spawn(InteractController.Init, {
 	OpenStore = openStore,
 	OpenMenu = function(tab: string?)
@@ -94,9 +120,11 @@ task.spawn(InteractController.Init, {
 ClientState.OnChanged(function(changed)
 	if changed.Settings or changed.Loaded then
 		applySettings()
+		applyClipMode()
 	end
 end)
 applySettings()
+applyClipMode()
 
 local lastPing = -math.huge
 UserInputService.InputBegan:Connect(function()

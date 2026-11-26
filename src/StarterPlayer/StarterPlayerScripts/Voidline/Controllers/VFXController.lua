@@ -31,6 +31,9 @@ local worldPool: { WorldPopup } = {}
 local screenPool: { ScreenPopup } = {}
 local worldNext = 1
 local screenNext = 1
+local clipHidden = false
+local perfMode = false
+local flashGui: ScreenGui
 
 local function plotFolder(): Instance?
 	local index = player:GetAttribute("PlotIndex")
@@ -99,7 +102,24 @@ end
 
 -- Floating text. With a position it rises in the world, otherwise under the
 -- top pill.
+function VFXController.SetClipHidden(on: boolean)
+	clipHidden = on
+	if screenGui then
+		screenGui.Enabled = not on
+	end
+	if flashGui then
+		flashGui.Enabled = not on
+	end
+end
+
+function VFXController.SetPerfMode(on: boolean)
+	perfMode = on
+end
+
 function VFXController.Popup(text: string, color: Color3?, position: Vector3?)
+	if clipHidden then
+		return
+	end
 	if position then
 		local popup = worldPool[worldNext]
 		worldNext = worldNext % WORLD_POOL + 1
@@ -124,7 +144,7 @@ function VFXController.Popup(text: string, color: Color3?, position: Vector3?)
 end
 
 function VFXController.ScreenFlash(color: Color3?, seconds: number?)
-	if Ui.ReducedMotion then
+	if clipHidden or perfMode or Ui.ReducedMotion then
 		return
 	end
 	flashFrame.BackgroundColor3 = color or Color3.new(1, 1, 1)
@@ -188,7 +208,7 @@ end
 function VFXController.Init()
 	folder = Ui.Make("Folder", { Name = "VoidlineVFX", Parent = Workspace })
 	screenGui = Ui.Screen("VoidlineVFX", 8)
-	local flashGui = Ui.Screen("VoidlineFlash", 30)
+	flashGui = Ui.Screen("VoidlineFlash", 30)
 	flashGui.IgnoreGuiInset = true
 	flashGui.ScreenInsets = Enum.ScreenInsets.None
 	flashFrame = Ui.Make("Frame", {

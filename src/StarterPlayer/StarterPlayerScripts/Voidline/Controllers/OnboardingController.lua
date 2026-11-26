@@ -170,7 +170,16 @@ local function render()
 		finished = true
 		return
 	end
-	gui.Enabled = profile.Settings.ClipMode ~= true
+	local clip = profile.Settings.ClipMode == true
+	gui.Enabled = not clip
+	if clip then
+		local _, _, b = ensureWorld()
+		b.Enabled = false
+		if ring then
+			ring.CFrame = CFrame.new(0, -500, 0)
+		end
+		return
+	end
 	local step = if inFinale then TutorialRules.DoneStep else profile.TutorialStep
 	local info = TutorialRules.Steps[step]
 	tickerText.Text = if info then info.Ticker else ""

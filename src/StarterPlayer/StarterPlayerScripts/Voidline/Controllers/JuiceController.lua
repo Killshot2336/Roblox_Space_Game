@@ -131,7 +131,7 @@ HANDLERS.Sell = function(m)
 		VFXController.OwnPlotWorld(PlotLayout.Refinery)
 	)
 	HUDController.Pulse("Credits")
-	CameraController.Shake(0.2, 0.15)
+	CameraController.Shake(0.22, 0.2)
 end
 
 HANDLERS.Credits = function(m)
@@ -164,7 +164,7 @@ HANDLERS.Upgrade = function(m)
 	if type(m.Id) == "string" then
 		VFXController.PadFlash(m.Id)
 	end
-	CameraController.Shake(0.15, 0.12)
+	CameraController.Shake(0.2, 0.25)
 end
 
 HANDLERS.UpgradeFail = function(m)

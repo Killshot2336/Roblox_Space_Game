@@ -5,7 +5,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
 local Remotes = require(Voidline.Remotes)
 local GameConfig = require(Voidline.Config.GameConfig)
-local DroneConfig = require(Voidline.Config.DroneConfig)
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
