@@ -7511,6 +7511,47 @@ local function buildHub(root: Instance)
 	})
 	core:SetAttribute("Exposed", false)
 	label(monolith:FindFirstChild("MonolithLeft") :: Instance, "THE VOIDLINE MONOLITH", 42, 160)
+	local monolithHalfSize = Vector3.new(size.X / 2, size.Y, size.Z)
+	for side, sign in sides do
+		local half = monolith:FindFirstChild("Monolith" .. side)
+		if half and half:IsA("BasePart") then
+			part({
+				Name = "SpireCrown",
+				Parent = half,
+				Size = Vector3.new(monolithHalfSize.X * 0.35, 5, monolithHalfSize.Z * 0.35),
+				CFrame = half.CFrame * CFrame.new(0, size.Y / 2 + 2.5, 0),
+				Color = COLORS.GoldBright,
+				Material = Enum.Material.Neon,
+				CanCollide = false,
+				CanQuery = false,
+			})
+			part({
+				Name = "SpireFin",
+				Parent = half,
+				Size = Vector3.new(1.2, 14, 1.2),
+				CFrame = half.CFrame
+					* CFrame.new(sign * (monolithHalfSize.X * 0.28), size.Y / 2 + 9, 0)
+					* CFrame.Angles(0, 0, sign * math.rad(8)),
+				Color = COLORS.VoidAccent,
+				Material = Enum.Material.Glass,
+				Transparency = 0.15,
+				CanCollide = false,
+				CanQuery = false,
+			})
+		end
+	end
+	part({
+		Name = "HubSilhouetteRing",
+		Parent = hub,
+		Size = Vector3.new(2, HubLayout.HubSize.X * 1.45, HubLayout.HubSize.Z * 1.45),
+		CFrame = hubCFrame * CFrame.Angles(0, 0, math.rad(90)),
+		Shape = Enum.PartType.Cylinder,
+		Color = COLORS.Gold,
+		Material = Enum.Material.Neon,
+		Transparency = 0.82,
+		CanCollide = false,
+		CanQuery = false,
+	})
 
 	local function pad(name: string, position: Vector3, padSize: Vector3, color: Color3, text: string)
 		local p = part({
@@ -7728,6 +7769,25 @@ local function buildPlot(plots: Instance, index: number)
 		Color = COLORS.Obsidian,
 	})
 	goldTrim(plot, baseCFrame, PlotLayout.BaseSize)
+	local half = PlotLayout.BaseSize / 2
+	local pylonOffsets = {
+		Vector3.new(-half.X + 2, 2, -half.Z + 2),
+		Vector3.new(half.X - 2, 2, -half.Z + 2),
+		Vector3.new(-half.X + 2, 2, half.Z - 2),
+		Vector3.new(half.X - 2, 2, half.Z - 2),
+	}
+	for i, offset in pylonOffsets do
+		part({
+			Name = "PlotPylon" .. i,
+			Parent = plot,
+			Size = Vector3.new(1.4, 7, 1.4),
+			CFrame = plotCFrame * CFrame.new(offset),
+			Color = COLORS.GoldBright,
+			Material = Enum.Material.Neon,
+			CanCollide = false,
+			CanQuery = false,
+		})
+	end
 
 	local spawnMarker = part({
 		Name = "PlayerSpawn",
@@ -7828,6 +7888,28 @@ local function buildPlot(plots: Instance, index: number)
 			CanCollide = false,
 		})
 		segment:SetAttribute("SegmentIndex", i)
+		part({
+			Name = "Rail" .. i,
+			Parent = bridge,
+			Size = Vector3.new(0.35, 2.2, segmentLength * 0.92),
+			CFrame = segment.CFrame * CFrame.new(3.4, 1.2, 0),
+			Color = Color3.fromRGB(120, 200, 255),
+			Material = Enum.Material.Glass,
+			Transparency = 0.35,
+			CanCollide = false,
+			CanQuery = false,
+		})
+		part({
+			Name = "RailL" .. i,
+			Parent = bridge,
+			Size = Vector3.new(0.35, 2.2, segmentLength * 0.92),
+			CFrame = segment.CFrame * CFrame.new(-3.4, 1.2, 0),
+			Color = Color3.fromRGB(120, 200, 255),
+			Material = Enum.Material.Glass,
+			Transparency = 0.35,
+			CanCollide = false,
+			CanQuery = false,
+		})
 	end
 	return plot
 end
@@ -11744,12 +11826,30 @@ end
 local function applySettings()
 	local settings = ClientState.Profile.Settings
 	Ui.ReducedMotion = settings.ReducedMotion == true or systemReducedMotion()
-	DroneController.SetPerfMode(settings.PerfMode == true)
-	WorldController.SetPerfMode(settings.PerfMode == true)
+	local perf = settings.PerfMode == true
+	DroneController.SetPerfMode(perf)
+	WorldController.SetPerfMode(perf)
+	VFXController.SetPerfMode(perf)
+end
+
+local function applyClipMode()
+	local clip = ClientState.Profile.Settings.ClipMode == true
+	if clip then
+		StoreController.Close()
+		MenuController.Close()
+	end
+	VFXController.SetClipHidden(clip)
+	HUDController.SetVisible(not clip)
+	HotbarController.SetVisible(not clip)
+	pcall(function()
+		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, not clip)
+		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, not clip)
+	end)
 end
 
 local function toggleClip()
 	ClientState.Fire("SettingsUpdate", { ClipMode = ClientState.Profile.Settings.ClipMode ~= true })
+	task.defer(applyClipMode)
 end
 
 local function openStore(tab: string?)
@@ -11784,6 +11884,14 @@ HotbarController.Init({
 })
 JuiceController.Init()
 AudioController.Init()
+
+TowController.OnArrive(function(tow)
+	if tow.Owner ~= Players.LocalPlayer.UserId then
+		return
+	end
+	VFXController.Popup("TOW HOME", Ui.Colors.GoldBright, tow.To)
+	CameraController.Shake(0.28, 0.28)
+end)
 task.spawn(InteractController.Init, {
 	OpenStore = openStore,
 	OpenMenu = function(tab: string?)
@@ -11795,9 +11903,11 @@ task.spawn(InteractController.Init, {
 ClientState.OnChanged(function(changed)
 	if changed.Settings or changed.Loaded then
 		applySettings()
+		applyClipMode()
 	end
 end)
 applySettings()
+applyClipMode()
 
 local lastPing = -math.huge
 UserInputService.InputBegan:Connect(function()
@@ -13666,7 +13776,7 @@ HANDLERS.Sell = function(m)
 		VFXController.OwnPlotWorld(PlotLayout.Refinery)
 	)
 	HUDController.Pulse("Credits")
-	CameraController.Shake(0.2, 0.15)
+	CameraController.Shake(0.22, 0.2)
 end
 
 HANDLERS.Credits = function(m)
@@ -13699,7 +13809,7 @@ HANDLERS.Upgrade = function(m)
 	if type(m.Id) == "string" then
 		VFXController.PadFlash(m.Id)
 	end
-	CameraController.Shake(0.15, 0.12)
+	CameraController.Shake(0.2, 0.25)
 end
 
 HANDLERS.UpgradeFail = function(m)
@@ -15034,7 +15144,16 @@ local function render()
 		finished = true
 		return
 	end
-	gui.Enabled = profile.Settings.ClipMode ~= true
+	local clip = profile.Settings.ClipMode == true
+	gui.Enabled = not clip
+	if clip then
+		local _, _, b = ensureWorld()
+		b.Enabled = false
+		if ring then
+			ring.CFrame = CFrame.new(0, -500, 0)
+		end
+		return
+	end
 	local step = if inFinale then TutorialRules.DoneStep else profile.TutorialStep
 	local info = TutorialRules.Steps[step]
 	tickerText.Text = if info then info.Ticker else ""
@@ -15203,7 +15322,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
 local Remotes = require(Voidline.Remotes)
 local GameConfig = require(Voidline.Config.GameConfig)
-local DroneConfig = require(Voidline.Config.DroneConfig)
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -16088,6 +16206,9 @@ local worldPool: { WorldPopup } = {}
 local screenPool: { ScreenPopup } = {}
 local worldNext = 1
 local screenNext = 1
+local clipHidden = false
+local perfMode = false
+local flashGui: ScreenGui
 
 local function plotFolder(): Instance?
 	local index = player:GetAttribute("PlotIndex")
@@ -16156,7 +16277,24 @@ end
 
 -- Floating text. With a position it rises in the world, otherwise under the
 -- top pill.
+function VFXController.SetClipHidden(on: boolean)
+	clipHidden = on
+	if screenGui then
+		screenGui.Enabled = not on
+	end
+	if flashGui then
+		flashGui.Enabled = not on
+	end
+end
+
+function VFXController.SetPerfMode(on: boolean)
+	perfMode = on
+end
+
 function VFXController.Popup(text: string, color: Color3?, position: Vector3?)
+	if clipHidden then
+		return
+	end
 	if position then
 		local popup = worldPool[worldNext]
 		worldNext = worldNext % WORLD_POOL + 1
@@ -16181,7 +16319,7 @@ function VFXController.Popup(text: string, color: Color3?, position: Vector3?)
 end
 
 function VFXController.ScreenFlash(color: Color3?, seconds: number?)
-	if Ui.ReducedMotion then
+	if clipHidden or perfMode or Ui.ReducedMotion then
 		return
 	end
 	flashFrame.BackgroundColor3 = color or Color3.new(1, 1, 1)
@@ -16245,7 +16383,7 @@ end
 function VFXController.Init()
 	folder = Ui.Make("Folder", { Name = "VoidlineVFX", Parent = Workspace })
 	screenGui = Ui.Screen("VoidlineVFX", 8)
-	local flashGui = Ui.Screen("VoidlineFlash", 30)
+	flashGui = Ui.Screen("VoidlineFlash", 30)
 	flashGui.IgnoreGuiInset = true
 	flashGui.ScreenInsets = Enum.ScreenInsets.None
 	flashFrame = Ui.Make("Frame", {

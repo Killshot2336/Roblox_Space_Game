@@ -7,6 +7,39 @@ feel and visuals are **needs Studio playtest**.
 **Owner stop (2026-11-26):** autonomous loop workers halted after this wrap. Further phases are backlog only
 unless the owner starts a new run.
 
+## Gold pass (2026-11-26) — agent excellence wrap
+
+Single focused pass (no content-id loops). **Nothing playtested in Studio.**
+
+### Readiness scores (1–10)
+
+| Area | Agent | Owner-blocked cap | Notes |
+|------|------:|------------------:|-------|
+| Spec / systems | **9.5** | 10 | GAME_DESIGN loop wired; forge/rebirth/formation/contest headless-covered |
+| Code readiness | **10** | 10 | `verify.sh` GREEN, 0 selene/lsp warnings, 78 Lune tests |
+| Play feel | **7** | ~8.5 | Juice/tow/upgrade/sell timing 0.2–0.3s, Beam-Link FOV, monolith split VFX — **needs Studio playtest** |
+| Monetization | **6** | 10 | Token path + PolicyService + odds UI; pass/product ids stay `0` |
+| TikTok look | **7.5** | ~9 | Hub ring, monolith spires, plot pylons, glass bridge rails; **needs Studio camera** |
+
+### Gold pass changes
+
+- **Clean Clip Mode:** closes Store/Menu, hides HUD/hotbar/onboarding/VFX overlays, disables Chat + PlayerList core GUI.
+- **Juice:** tow-arrival popup + shake; sell/upgrade shake aligned to 0.2–0.3s feel band.
+- **Performance Mode:** VFX screen flashes suppressed; bloom taper already in WorldController.
+- **MapBuilder:** thumbnail silhouettes (hub neon ring, monolith crowns/fins, plot corner pylons, bridge glass rails).
+- **Tests:** `SetFormation`, full forge shard→artifact→token, station-tier-10 rebirth.
+
+### Verification (gold pass tip)
+
+```
+selene:    0 errors, 0 warnings
+luau-lsp:  0 errors, 0 warnings
+tests:     78 passed, 0 failed
+content:   CONTENT TOTAL 1126
+rojo:      OK (~506 KB place)
+RESULT:    GREEN
+```
+
 ## Studio playtest checklist
 
 Run `rojo serve` (or `./serve.sh`), connect the Rojo plugin in Studio, press Play (F5).
