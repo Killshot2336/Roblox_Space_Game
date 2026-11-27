@@ -6,6 +6,7 @@ local ContextActionService = game:GetService("ContextActionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local ArtResolve = require(Voidline.Modules.ArtResolve)
 local EconomyConfig = require(Voidline.Config.EconomyConfig)
 local DroneConfig = require(Voidline.Config.DroneConfig)
 local EconomyRules = require(Voidline.Rules.EconomyRules)
@@ -229,33 +230,25 @@ function HotbarController.Init(hotbarActions: Actions)
 	keyHint(upgradeButton, "U")
 
 	for n = 1, 3 do
-		local caption = string.split(DroneConfig.FormationLabels[n], " ")
-		formationButtons[n] = slotButton(
-			"Formation" .. n,
-			FORMATION_GLYPHS[n],
-			caption[#caption],
-			tostring(n),
-			1 + n,
-			function()
-				setFormation(n)
-			end,
-			"Formation" .. n
-		)
+		local caption = ArtResolve.UiLabel("Hotbar", "Formation" .. n, FORMATION_GLYPHS[n])
+		formationButtons[n] = slotButton("Formation" .. n, FORMATION_GLYPHS[n], caption, tostring(n), 1 + n, function()
+			setFormation(n)
+		end, "Formation" .. n)
 	end
-	slotButton("Store", "⬡", "STORE", "B", 10, function()
+	slotButton("Store", "⬡", ArtResolve.UiLabel("Hotbar", "Store", "STORE"), "B", 10, function()
 		actions.OpenStore()
 	end, "Store")
-	slotButton("Menu", "☰", "CODEX", "C", 11, function()
+	slotButton("Menu", "☰", ArtResolve.UiLabel("Hotbar", "Menu", "CODEX"), "C", 11, function()
 		actions.OpenMenu(nil)
 	end, "Menu")
-	slotButton("Home", "⌂", "HOME", "H", 12, function()
+	slotButton("Home", "⌂", ArtResolve.UiLabel("Hotbar", "Home", "HOME"), "H", 12, function()
 		ClientState.Fire("WarpRequest", "Home")
 	end, "Home")
-	sellButton = slotButton("Sell", "⇪", "SELL", "R", 13, function()
+	sellButton = slotButton("Sell", "⇪", ArtResolve.UiLabel("Hotbar", "Sell", "SELL"), "R", 13, function()
 		ClientState.Fire("SellOre")
 	end, "Sell")
 	if Ui.IsTouch() then
-		slotButton("Clip", "▣", "CLIP", "K", 14, function()
+		slotButton("Clip", "▣", ArtResolve.UiLabel("Hotbar", "Clip", "CLIP"), "K", 14, function()
 			actions.ToggleClip()
 		end, "Clip")
 	end

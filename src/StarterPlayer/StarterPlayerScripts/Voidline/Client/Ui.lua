@@ -150,11 +150,12 @@ function Ui.Screen(name: string, order: number): ScreenGui
 	})
 end
 
--- Frosted obsidian panel with a thin gold edge.
+-- Frosted obsidian panel with a thin gold edge (`Premium` = sharper sim HUD bar).
 function Ui.Glass(props: { [string]: any }): Frame
+	local premium = props.Premium == true
 	local frame = Ui.Make("Frame", {
 		BackgroundColor3 = Ui.Colors.Glass,
-		BackgroundTransparency = 0.18,
+		BackgroundTransparency = if premium then 0.12 else 0.18,
 		BorderSizePixel = 0,
 	}) :: Frame
 	for key, value in props do
@@ -163,12 +164,12 @@ function Ui.Glass(props: { [string]: any }): Frame
 		end
 	end
 	Ui.Corner(frame, props.CornerRadius or 14)
-	Ui.Stroke(frame)
+	Ui.Stroke(frame, Ui.Colors.Gold, if premium then 1.75 else 1.5, if premium then 0.42 else 0.55)
 	Ui.Make("UIGradient", {
 		Rotation = 90,
 		Transparency = NumberSequence.new({
-			NumberSequenceKeypoint.new(0, 0),
-			NumberSequenceKeypoint.new(1, 0.2),
+			NumberSequenceKeypoint.new(0, if premium then 0 else 0),
+			NumberSequenceKeypoint.new(1, if premium then 0.12 else 0.2),
 		}),
 		Color = ColorSequence.new(Ui.Colors.GlassLight, Ui.Colors.Glass),
 		Parent = frame,
@@ -308,19 +309,27 @@ function Ui.ArtIcon(parent: Instance, artGroup: string, artKey: string, glyph: s
 		ScaleType = Enum.ScaleType.Fit,
 		Parent = parent,
 	}) :: ImageLabel
-	Ui.Label({
-		Name = "Glyph",
-		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = UDim2.new(0.5, 0, 0, 4 + dim / 2),
-		Size = UDim2.fromOffset(dim, dim),
-		Text = glyph,
-		Font = Ui.Font.Title,
-		TextSize = math.floor(dim * 0.78),
-		TextColor3 = Ui.Colors.GoldBright,
-		TextTransparency = 0.15,
-		BackgroundTransparency = 1,
-		Parent = parent,
-	})
+	local hideGlyph = (function()
+		local ok, ArtResolve = pcall(function()
+			return require(ReplicatedStorage:WaitForChild("Voidline").Modules.ArtResolve)
+		end)
+		return ok and ArtResolve and ArtResolve.UiHasUpload(artGroup, artKey)
+	end)()
+	if not hideGlyph then
+		Ui.Label({
+			Name = "Glyph",
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.new(0.5, 0, 0, 4 + dim / 2),
+			Size = UDim2.fromOffset(dim, dim),
+			Text = glyph,
+			Font = Ui.Font.Title,
+			TextSize = math.floor(dim * 0.72),
+			TextColor3 = Ui.Colors.GoldBright,
+			TextTransparency = 0.08,
+			BackgroundTransparency = 1,
+			Parent = parent,
+		})
+	end
 	return image
 end
 

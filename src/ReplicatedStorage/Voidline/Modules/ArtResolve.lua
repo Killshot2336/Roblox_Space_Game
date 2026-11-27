@@ -50,6 +50,21 @@ function ArtResolve.UiImage(group: string, key: string): string
 	return ArtConfig.UI.FallbackImage
 end
 
+function ArtResolve.UiHasUpload(group: string, key: string): boolean
+	local bucket = (ArtConfig.UI :: any)[group]
+	local entry = if type(bucket) == "table" then bucket[key] else nil
+	return type(entry) == "table" and type(entry.AssetId) == "number" and entry.AssetId > 0
+end
+
+function ArtResolve.UiLabel(group: string, key: string, fallback: string?): string
+	local bucket = (ArtConfig.UI :: any)[group]
+	local entry = if type(bucket) == "table" then bucket[key] else nil
+	if type(entry) == "table" and type(entry.Label) == "string" and entry.Label ~= "" then
+		return entry.Label
+	end
+	return fallback or key
+end
+
 function ArtResolve.HasUploadedMesh(meshKey: string): boolean
 	local entry = (ArtConfig.Meshes :: any)[meshKey]
 	return type(entry) == "table" and type(entry.MeshId) == "number" and entry.MeshId > 0

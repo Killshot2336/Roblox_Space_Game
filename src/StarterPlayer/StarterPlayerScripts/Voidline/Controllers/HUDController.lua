@@ -11,6 +11,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
 local JuiceConfig = require(Voidline.Config.JuiceConfig)
 local EconomyRules = require(Voidline.Rules.EconomyRules)
+local HudCueRules = require(Voidline.Rules.HudCueRules)
+local ArtResolve = require(Voidline.Modules.ArtResolve)
 local BiomeRegistry = require(Voidline.Content.BiomeRegistry)
 local WorldEventRegistry = require(Voidline.Content.WorldEventRegistry)
 local Remotes = require(Voidline.Remotes)
@@ -27,13 +29,23 @@ local TOAST_MAX = 3
 local CONTEST_RANGE = 220
 local CONTEST_TIMEOUT = 4
 
-type Chip = { Frame: Frame, Value: TextLabel, Shown: number, Target: number, Format: (number) -> string }
+type Chip = {
+	Frame: Frame,
+	Value: TextLabel,
+	Title: TextLabel,
+	Shown: number,
+	Target: number,
+	Format: (number) -> string,
+}
 
 local gui: ScreenGui
 local pill: Frame
 local chips: { [string]: Chip } = {}
 local worldLine: TextLabel
 local eventLine: TextLabel
+local goalLine: TextLabel
+local comebackLine: TextLabel
+local comebackFrame: Frame
 local bannerFrame: Frame
 local bannerText: TextLabel
 local toastHolder: Frame
@@ -48,39 +60,60 @@ local bannerBusy = false
 local contest: { Id: number, Seen: number, Done: boolean }? = nil
 local visible = true
 
-local function makeChip(order: number, icon: string, color: Color3, format: (number) -> string): Chip
+local STAT_TITLES = { Credits = "CREDITS", Ore = "CARGO", Shards = "SHARDS", Tokens = "TOKENS" }
+
+local function makeChip(order: number, icon: string, statKey: string, color: Color3, format: (number) -> string): Chip
 	local frame = Ui.Make("Frame", {
 		Name = "Chip" .. order,
 		BackgroundTransparency = 1,
 		AutomaticSize = Enum.AutomaticSize.X,
-		Size = UDim2.fromOffset(0, 36),
+		Size = UDim2.fromOffset(0, 46),
 		LayoutOrder = order,
 		Parent = pill,
 	}) :: Frame
-	Ui.List(frame, Enum.FillDirection.Horizontal, 4)
-	Ui.Label({
-		Name = "Icon",
-		Text = icon,
-		TextColor3 = color,
-		Font = Ui.Font.Title,
-		TextSize = 18,
-		AutomaticSize = Enum.AutomaticSize.X,
-		Size = UDim2.fromOffset(0, 36),
-		LayoutOrder = 1,
+	Ui.List(frame, Enum.FillDirection.Horizontal, 6)
+	Ui.ArtIcon(frame, "Hud", statKey, icon, 22)
+	local textStack = Ui.Make("Frame", {
+		Name = "TextStack",
+		BackgroundTransparency = 1,
+		AutomaticSize = Enum.AutomaticSize.XY,
+		Size = UDim2.fromOffset(0, 46),
+		LayoutOrder = 2,
 		Parent = frame,
+	}) :: Frame
+	Ui.List(textStack, Enum.FillDirection.Vertical, 0, Enum.HorizontalAlignment.Left)
+	local title = Ui.Label({
+		Name = "Title",
+		Text = STAT_TITLES[statKey] or statKey,
+		Font = Ui.Font.Bold,
+		TextSize = 9,
+		TextColor3 = Ui.Colors.Muted,
+		AutomaticSize = Enum.AutomaticSize.X,
+		Size = UDim2.fromOffset(0, 12),
+		LayoutOrder = 1,
+		Parent = textStack,
+		Visible = not ArtResolve.UiHasUpload("Hud", statKey),
 	})
 	local value = Ui.Label({
 		Name = "Value",
 		Text = "0",
-		Font = Ui.Font.Bold,
-		TextSize = 18,
+		Font = Ui.Font.Title,
+		TextSize = 22,
 		TextWrapped = false,
 		AutomaticSize = Enum.AutomaticSize.X,
-		Size = UDim2.fromOffset(0, 36),
+		Size = UDim2.fromOffset(0, 28),
 		LayoutOrder = 2,
-		Parent = frame,
+		Parent = textStack,
 	})
-	return { Frame = frame, Value = value, Shown = 0, Target = 0, Format = format }
+	value.TextColor3 = color
+	return {
+		Frame = frame,
+		Value = value,
+		Title = title,
+		Shown = 0,
+		Target = 0,
+		Format = format,
+	}
 end
 
 local function build()
@@ -90,19 +123,20 @@ local function build()
 		Name = "TopPill",
 		AnchorPoint = Vector2.new(0.5, 0),
 		Position = UDim2.new(0.5, 0, 0, 6),
-		Size = UDim2.fromOffset(0, 44),
+		Size = UDim2.fromOffset(0, 52),
 		AutomaticSize = Enum.AutomaticSize.X,
-		CornerRadius = 22,
+		CornerRadius = 24,
+		Premium = true,
 		Parent = gui,
 	})
-	Ui.Padding(pill, 16, 4)
-	Ui.List(pill, Enum.FillDirection.Horizontal, 18)
-	chips.Credits = makeChip(1, "◆", Ui.Colors.GoldBright, Ui.Compact)
-	chips.Ore = makeChip(2, "⬢", Color3.fromRGB(255, 170, 90), function(n)
+	Ui.Padding(pill, 18, 6)
+	Ui.List(pill, Enum.FillDirection.Horizontal, 22)
+	chips.Credits = makeChip(1, "◆", "Credits", Ui.Colors.GoldBright, Ui.Compact)
+	chips.Ore = makeChip(2, "⬢", "Ore", Color3.fromRGB(255, 170, 90), function(n)
 		return ("%d/%d"):format(n, EconomyRules.CargoCap(ClientState.Profile))
 	end)
-	chips.Shards = makeChip(3, "✦", Ui.Colors.Void, Ui.Compact)
-	chips.Tokens = makeChip(4, "⬡", Ui.Colors.Cyan, Ui.Compact)
+	chips.Shards = makeChip(3, "✦", "Shards", Ui.Colors.Void, Ui.Compact)
+	chips.Tokens = makeChip(4, "⬡", "Tokens", Ui.Colors.Cyan, Ui.Compact)
 	cargoTag = Ui.Label({
 		Name = "CargoFull",
 		Text = "FULL · REFINE",
@@ -121,7 +155,7 @@ local function build()
 	worldLine = Ui.Label({
 		Name = "WorldClock",
 		AnchorPoint = Vector2.new(0.5, 0),
-		Position = UDim2.new(0.5, 0, 0, 52),
+		Position = UDim2.new(0.5, 0, 0, 60),
 		Size = UDim2.new(0.9, 0, 0, 18),
 		Font = Ui.Font.Bold,
 		TextSize = 13,
@@ -133,7 +167,7 @@ local function build()
 	eventLine = Ui.Label({
 		Name = "EventClock",
 		AnchorPoint = Vector2.new(0.5, 0),
-		Position = UDim2.new(0.5, 0, 0, 70),
+		Position = UDim2.new(0.5, 0, 0, 78),
 		Size = UDim2.new(0.9, 0, 0, 18),
 		Font = Ui.Font.Bold,
 		TextSize = 13,
@@ -142,11 +176,45 @@ local function build()
 		Text = "",
 		Parent = gui,
 	})
+	goalLine = Ui.Label({
+		Name = "NextGoal",
+		AnchorPoint = Vector2.new(0.5, 0),
+		Position = UDim2.new(0.5, 0, 0, 96),
+		Size = UDim2.new(0.92, 0, 0, 18),
+		Font = Ui.Font.Bold,
+		TextSize = 14,
+		TextColor3 = Ui.Colors.GoldBright,
+		TextStrokeTransparency = 0.65,
+		TextTruncate = Enum.TextTruncate.AtEnd,
+		Text = "",
+		Parent = gui,
+	})
+	comebackFrame = Ui.Glass({
+		Name = "ComebackCue",
+		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.new(0, 12, 1, -72),
+		Size = UDim2.fromOffset(0, 30),
+		AutomaticSize = Enum.AutomaticSize.X,
+		CornerRadius = 12,
+		Visible = false,
+		Parent = gui,
+	})
+	Ui.Padding(comebackFrame, 12, 6)
+	comebackLine = Ui.Label({
+		Name = "Text",
+		Font = Ui.Font.Bold,
+		TextSize = 13,
+		TextColor3 = Ui.Colors.GoldBright,
+		AutomaticSize = Enum.AutomaticSize.X,
+		Size = UDim2.fromOffset(0, 18),
+		Text = "",
+		Parent = comebackFrame,
+	})
 
 	bannerFrame = Ui.Glass({
 		Name = "Banner",
 		AnchorPoint = Vector2.new(0.5, 0),
-		Position = UDim2.new(0.5, 0, 0, 96),
+		Position = UDim2.new(0.5, 0, 0, 118),
 		Size = UDim2.new(0.8, 0, 0, 46),
 		Visible = false,
 		Parent = gui,
@@ -174,7 +242,7 @@ local function build()
 	contestFrame = Ui.Glass({
 		Name = "Contest",
 		AnchorPoint = Vector2.new(0.5, 0),
-		Position = UDim2.new(0.5, 0, 0, 148),
+		Position = UDim2.new(0.5, 0, 0, 170),
 		Size = UDim2.fromOffset(340, 64),
 		Visible = false,
 		Parent = gui,
@@ -354,6 +422,22 @@ function HUDController.Pulse(statName: string)
 	end
 end
 
+local function updateGoalAndCue()
+	local profile = ClientState.Profile
+	goalLine.Text = HudCueRules.NextGoalLine(profile, ClientState.Ctx())
+	local cue = HudCueRules.ComebackCue(profile, os.time())
+	local showCue = cue ~= nil and visible
+	if showCue ~= comebackFrame.Visible then
+		comebackFrame.Visible = showCue
+		if showCue then
+			Ui.Pop(comebackFrame, 0.9)
+		end
+	end
+	if cue then
+		comebackLine.Text = cue
+	end
+end
+
 -- World clock -----------------------------------------------------------------
 
 local function updateClock()
@@ -470,6 +554,7 @@ function HUDController.Init()
 	gui.Enabled = true
 	visible = true
 	setTargets()
+	updateGoalAndCue()
 	ClientState.OnChanged(function(changed)
 		if
 			changed.Credits
@@ -477,9 +562,15 @@ function HUDController.Init()
 			or changed.VoidShards
 			or changed.VoidlineTokens
 			or changed.CargoLevel
+			or changed.TutorialFlags
+			or changed.TutorialComplete
+			or changed.Quests
+			or changed.ForgeJobEndsAt
+			or changed.LastDailyClaimDay
 			or changed.Loaded
 		then
 			setTargets()
+			updateGoalAndCue()
 		end
 		if changed.Settings or changed.Loaded then
 			HUDController.SetVisible(ClientState.Profile.Settings.ClipMode ~= true)
@@ -490,6 +581,7 @@ function HUDController.Init()
 	task.spawn(function()
 		while gui.Parent do
 			updateClock()
+			updateGoalAndCue()
 			stepContest()
 			task.wait(0.5)
 		end
