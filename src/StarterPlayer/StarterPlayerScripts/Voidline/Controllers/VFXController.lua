@@ -8,6 +8,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
 local PlotLayout = require(Voidline.Modules.PlotLayout)
+local VisualBibleConfig = require(Voidline.Config.VisualBibleConfig)
+local HubLayout = require(Voidline.Modules.HubLayout)
 
 local Client = script.Parent.Parent.Client
 local Ui = require(Client.Ui)
@@ -192,6 +194,138 @@ function VFXController.PadFlash(upgradeId: string)
 		pad.Color = Color3.new(1, 1, 1)
 		Ui.Tween(pad, 0.4, { Color = Ui.Colors.Gold })
 	end
+end
+
+local function shockRing(parent: Instance, center: Vector3, maxSize: number, color: Color3, seconds: number)
+	local ring = Ui.Make("Part", {
+		Name = "ShockRing",
+		Anchored = true,
+		CanCollide = false,
+		CanQuery = false,
+		CanTouch = false,
+		CastShadow = false,
+		Shape = Enum.PartType.Cylinder,
+		Material = Enum.Material.Neon,
+		Color = color,
+		Size = Vector3.new(0.35, 4, 4),
+		CFrame = CFrame.new(center.X, center.Y + 0.2, center.Z) * CFrame.Angles(0, 0, math.rad(90)),
+		Transparency = 0.35,
+		Parent = parent,
+	}) :: Part
+	Ui.Tween(ring, seconds, {
+		Size = Vector3.new(0.15, maxSize, maxSize),
+		Transparency = 1,
+	}, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+	task.delay(seconds + 0.05, function()
+		ring:Destroy()
+	end)
+end
+
+function VFXController.MonolithSplitCrack()
+	if clipHidden or perfMode then
+		return
+	end
+	local map = Workspace:FindFirstChild("VoidlineMap")
+	local hub = map and map:FindFirstChild("Hub")
+	local monolith = hub and hub:FindFirstChild("VoidlineMonolith")
+	local seam = monolith and monolith:FindFirstChild("MonolithSplitSeam")
+	if not (seam and seam:IsA("BasePart")) then
+		return
+	end
+	local cfg = VisualBibleConfig.MonolithSplit
+	Ui.Tween(seam, cfg.Duration * 0.35, {
+		Transparency = cfg.SeamPulseTransparency[1],
+		Size = Vector3.new(0.65, seam.Size.Y * 1.02, seam.Size.Z * 1.05),
+	})
+	task.delay(cfg.Duration * 0.4, function()
+		Ui.Tween(seam, cfg.Duration * 0.5, { Transparency = cfg.SeamPulseTransparency[2] })
+	end)
+	for i = 1, 8 do
+		local spark = Ui.Make("Part", {
+			Name = "SplitSpark",
+			Anchored = true,
+			CanCollide = false,
+			CanQuery = false,
+			Size = Vector3.new(0.35, 0.35, 2.4),
+			CFrame = seam.CFrame * CFrame.new(0, -seam.Size.Y / 2 + i * (seam.Size.Y / 9), 0),
+			Color = VisualBibleConfig.Palette.GoldBright,
+			Material = Enum.Material.Neon,
+			Parent = folder,
+		}) :: Part
+		Ui.Tween(spark, 0.9, { Transparency = 1, Size = Vector3.new(0.1, 0.1, 3.6) })
+		task.delay(0.95, spark.Destroy, spark)
+	end
+	VFXController.ScreenFlash(VisualBibleConfig.Palette.GoldCore, 0.55)
+end
+
+function VFXController.StarfallSkyBurst()
+	if clipHidden or perfMode then
+		return
+	end
+	local cfg = VisualBibleConfig.Starfall
+	local origin = HubLayout.VoidCore + Vector3.new(0, 40, 0)
+	for i = 1, cfg.StreakCount do
+		local angle = (i / cfg.StreakCount) * math.pi * 2
+		local offset = Vector3.new(math.cos(angle) * 80, cfg.StreakSpeed, math.sin(angle) * 80)
+		local streak = Ui.Make("Part", {
+			Name = "StarfallStreak",
+			Anchored = true,
+			CanCollide = false,
+			CanQuery = false,
+			Size = Vector3.new(0.5, 0.5, 14),
+			CFrame = CFrame.lookAt(origin + offset, origin),
+			Color = VisualBibleConfig.Palette.GoldBright,
+			Material = Enum.Material.Neon,
+			Parent = folder,
+		}) :: Part
+		Ui.Tween(streak, 0.65, {
+			CFrame = CFrame.new(origin) * CFrame.Angles(math.rad(90), angle, 0),
+			Transparency = 1,
+		})
+		task.delay(0.7, streak.Destroy, streak)
+	end
+	shockRing(folder, HubLayout.MonolithCenter, cfg.ShockRingMax, VisualBibleConfig.Palette.Gold, cfg.ShockRingSeconds)
+end
+
+function VFXController.StarfallImpact(position: Vector3?)
+	if clipHidden then
+		return
+	end
+	local center = position or HubLayout.MonolithCenter
+	shockRing(
+		folder,
+		center,
+		if perfMode then 22 else VisualBibleConfig.Starfall.ShockRingMax * 0.65,
+		VisualBibleConfig.Palette.GoldCore,
+		VisualBibleConfig.Starfall.ShockRingSeconds * 0.75
+	)
+	if not perfMode then
+		VFXController.ScreenFlash(VisualBibleConfig.Palette.GoldBright, 0.35)
+	end
+end
+
+function VFXController.TowArriveShock(position: Vector3)
+	if clipHidden then
+		return
+	end
+	local cfg = VisualBibleConfig.Tow
+	shockRing(
+		folder,
+		position,
+		if perfMode then cfg.ShockRadius * 0.7 else cfg.ShockRadius,
+		VisualBibleConfig.Palette.Gold,
+		cfg.ShockSeconds
+	)
+	if not perfMode then
+		CameraController.Punch(3, 0.45)
+	end
+end
+
+function VFXController.SovereignHaloPulse()
+	if clipHidden or perfMode then
+		return
+	end
+	VFXController.ScreenFlash(VisualBibleConfig.Palette.GoldBright, 0.28)
 end
 
 function VFXController.GrinderPulse()

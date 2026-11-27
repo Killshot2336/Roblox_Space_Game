@@ -256,6 +256,9 @@ HANDLERS.CodexMilestone = function(m)
 end
 
 HANDLERS.ContestShare = function(m)
+	if typeof(m.Position) == "Vector3" then
+		VFXController.StarfallImpact(m.Position)
+	end
 	local share = if type(m.Share) == "number" then math.floor(m.Share * 100 + 0.5) else 0
 	HUDController.Banner(
 		("%s%s · %d%% SHARE · %s"):format(
@@ -408,7 +411,8 @@ end
 
 HANDLERS.WorldEvent = function(m)
 	if m.Phase == "start" then
-		CameraController.Punch(3, 0.8)
+		CameraController.Punch(4, 1.0)
+		VFXController.StarfallSkyBurst()
 	end
 end
 

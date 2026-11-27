@@ -54,6 +54,10 @@ local AudioConfig = {
 		BridgeIgnite = { AssetId = "rbxasset://sounds/flashbulb.mp3", Volume = 0.65 },
 		Starfall = { AssetId = "rbxasset://sounds/collide.mp3", Volume = 0.55 },
 		MonolithSplit = { AssetId = "rbxasset://sounds/impact_water.mp3", Volume = 0.58 },
+		MonolithCore = { AssetId = "rbxasset://sounds/bass.mp3", Volume = 0.52 },
+		HaloForm = { AssetId = "rbxasset://sounds/snap.mp3", Volume = 0.42 },
+		TowLatch = { AssetId = "rbxasset://sounds/Kerplunk.mp3", Volume = 0.48 },
+		StarfallStreak = { AssetId = "rbxasset://sounds/swordlunge.mp3", Volume = 0.4 },
 		Rebirth = { AssetId = "rbxasset://sounds/victory.mp3", Volume = 0.55 },
 		StoreSuccess = { AssetId = "rbxasset://sounds/electronicpingshort.mp3", Volume = 0.45 },
 		-- Extra juice
@@ -822,12 +826,117 @@ return SquadConfig
 ]]></string>
           </Properties>
         </Item>
+        <Item class="ModuleScript" referent="19">
+          <Properties>
+            <string name="Name">VisualBibleConfig</string>
+            <string name="Source"><![CDATA[--!strict
+-- Code-only visual tokens: obsidian + gold brand grade, hero moment tuning,
+-- and perf/clip gates. Controllers read these instead of scattering magic numbers.
+local VisualBibleConfig = {
+	Palette = {
+		Obsidian = Color3.fromRGB(10, 10, 16),
+		ObsidianLift = Color3.fromRGB(18, 16, 24),
+		Gold = Color3.fromRGB(232, 186, 74),
+		GoldBright = Color3.fromRGB(255, 220, 120),
+		GoldCore = Color3.fromRGB(255, 198, 88),
+		VoidMist = Color3.fromRGB(48, 38, 72),
+		DeckInset = Color3.fromRGB(255, 210, 120),
+		BeamCyan = Color3.fromRGB(120, 200, 255),
+		TetherRibbon = Color3.fromRGB(255, 210, 140),
+	},
+	Lighting = {
+		Ambient = Color3.fromRGB(22, 18, 32),
+		OutdoorAmbient = Color3.fromRGB(28, 22, 38),
+		Brightness = 2.2,
+		ClockTime = 0,
+		FogColor = Color3.fromRGB(8, 6, 18),
+		FogStart = 280,
+		FogEnd = 2200,
+		Bloom = {
+			Intensity = 0.72,
+			IntensityPerf = 0.32,
+			Threshold = 0.82,
+			Size = 28,
+		},
+		Atmosphere = {
+			Color = Color3.fromRGB(52, 40, 88),
+			Decay = Color3.fromRGB(14, 10, 28),
+			Density = 0.32,
+			Haze = 1.35,
+			Glare = 0.12,
+			Offset = 0.12,
+		},
+		Grade = {
+			Saturation = 0.08,
+			Contrast = 0.12,
+			Tint = Color3.fromRGB(255, 248, 235),
+		},
+		DepthOfField = {
+			Enabled = true,
+			InFocusRadius = 28,
+			NearIntensity = 0.12,
+			FarIntensity = 0.28,
+		},
+		DeepSpaceBoost = {
+			BloomAdd = 0.16,
+			DensityAdd = 0.08,
+			HazeAdd = 0.3,
+			SaturationAdd = 0.1,
+		},
+	},
+	HubDeck = {
+		TileStuds = 8,
+		Gap = 0.22,
+		PlateThickness = 0.55,
+		InsetDepth = 0.18,
+		EdgeLightThickness = 0.22,
+		EdgeLightHeight = 0.08,
+		TrimRingRadii = { 44, 50, 54 },
+		TrimRingHeight = 0.35,
+	},
+	MonolithSplit = {
+		GapStuds = 7.5,
+		TiltRadians = math.rad(7),
+		Duration = 2.6,
+		SeamPulseTransparency = { 0.08, 0.35 },
+		CoreRevealColor = Color3.fromRGB(255, 198, 88),
+		CameraPunchFov = 8,
+		CameraPunchSeconds = 1.8,
+		CameraShake = 0.75,
+		ShakeSeconds = 1.35,
+	},
+	SovereignHalo = {
+		LinkWidth = 0.38,
+		RingThickness = 0.36,
+		RingSpinRate = 1.45,
+		SecondaryRingScale = 0.72,
+		CameraFovAdd = 6,
+	},
+	Starfall = {
+		StreakCount = 6,
+		StreakSpeed = 140,
+		ShockRingMax = 42,
+		ShockRingSeconds = 1.4,
+	},
+	Tow = {
+		RibbonSegments = 14,
+		RibbonWidth0 = 0.72,
+		RibbonWidth1 = 0.38,
+		ShockRadius = 14,
+		ShockSeconds = 0.9,
+	},
+}
+
+return VisualBibleConfig
+]]></string>
+          </Properties>
+        </Item>
       </Item>
-      <Item class="Folder" referent="19">
+      <Item class="Folder" referent="20">
         <Properties>
           <string name="Name">Content</string>
         </Properties>
-        <Item class="ModuleScript" referent="20">
+        <Item class="ModuleScript" referent="21">
           <Properties>
             <string name="Name">AchievementRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -1293,7 +1402,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="21">
+        <Item class="ModuleScript" referent="22">
           <Properties>
             <string name="Name">BiomeRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -1719,7 +1828,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="22">
+        <Item class="ModuleScript" referent="23">
           <Properties>
             <string name="Name">CitadelRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -1832,7 +1941,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="23">
+        <Item class="ModuleScript" referent="24">
           <Properties>
             <string name="Name">ContentIndex</string>
             <string name="Source"><![CDATA[--!strict
@@ -1929,7 +2038,7 @@ return ContentIndex
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="24">
+        <Item class="ModuleScript" referent="25">
           <Properties>
             <string name="Name">ContentUtil</string>
             <string name="Source"><![CDATA[--!strict
@@ -2043,7 +2152,7 @@ return ContentUtil
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="25">
+        <Item class="ModuleScript" referent="26">
           <Properties>
             <string name="Name">DroneRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -2317,7 +2426,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="26">
+        <Item class="ModuleScript" referent="27">
           <Properties>
             <string name="Name">OreRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -2649,7 +2758,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="27">
+        <Item class="ModuleScript" referent="28">
           <Properties>
             <string name="Name">Prng</string>
             <string name="Source"><![CDATA[--!strict
@@ -2740,7 +2849,7 @@ return Prng
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="28">
+        <Item class="ModuleScript" referent="29">
           <Properties>
             <string name="Name">QuestRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -2874,7 +2983,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="29">
+        <Item class="ModuleScript" referent="30">
           <Properties>
             <string name="Name">RelicRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -3185,7 +3294,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="30">
+        <Item class="ModuleScript" referent="31">
           <Properties>
             <string name="Name">TitleRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -3315,7 +3424,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="31">
+        <Item class="ModuleScript" referent="32">
           <Properties>
             <string name="Name">WorldEventRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -3480,11 +3589,11 @@ return registry
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="32">
+      <Item class="Folder" referent="33">
         <Properties>
           <string name="Name">Modules</string>
         </Properties>
-        <Item class="ModuleScript" referent="33">
+        <Item class="ModuleScript" referent="34">
           <Properties>
             <string name="Name">ContributionSplit</string>
             <string name="Source"><![CDATA[--!strict
@@ -3602,7 +3711,7 @@ return ContributionSplit
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="34">
+        <Item class="ModuleScript" referent="35">
           <Properties>
             <string name="Name">FormatNumber</string>
             <string name="Source"><![CDATA[local FormatNumber = {}
@@ -3623,7 +3732,7 @@ return FormatNumber
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="35">
+        <Item class="ModuleScript" referent="36">
           <Properties>
             <string name="Name">HubLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -3706,7 +3815,7 @@ return HubLayout
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="36">
+        <Item class="ModuleScript" referent="37">
           <Properties>
             <string name="Name">OreMath</string>
             <string name="Source"><![CDATA[local EconomyConfig = require(script.Parent.Parent.Config.EconomyConfig)
@@ -3730,7 +3839,7 @@ return OreMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="37">
+        <Item class="ModuleScript" referent="38">
           <Properties>
             <string name="Name">PlotLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -3820,7 +3929,7 @@ return PlotLayout
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="38">
+        <Item class="ModuleScript" referent="39">
           <Properties>
             <string name="Name">ProfileSchema</string>
             <string name="Source"><![CDATA[--!strict
@@ -4032,7 +4141,7 @@ return ProfileSchema
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="39">
+        <Item class="ModuleScript" referent="40">
           <Properties>
             <string name="Name">RateLimiter</string>
             <string name="Source"><![CDATA[--!strict
@@ -4089,7 +4198,7 @@ return RateLimiter
           </Properties>
         </Item>
       </Item>
-      <Item class="ModuleScript" referent="40">
+      <Item class="ModuleScript" referent="41">
         <Properties>
           <string name="Name">Remotes</string>
           <string name="Source"><![CDATA[--!strict
@@ -4207,11 +4316,11 @@ return Remotes
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Folder" referent="41">
+      <Item class="Folder" referent="42">
         <Properties>
           <string name="Name">Rules</string>
         </Properties>
-        <Item class="ModuleScript" referent="42">
+        <Item class="ModuleScript" referent="43">
           <Properties>
             <string name="Name">AchievementRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -4342,7 +4451,7 @@ return AchievementRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="43">
+        <Item class="ModuleScript" referent="44">
           <Properties>
             <string name="Name">EconomyRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -4543,7 +4652,7 @@ return EconomyRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="44">
+        <Item class="ModuleScript" referent="45">
           <Properties>
             <string name="Name">MiningRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -4646,7 +4755,7 @@ return MiningRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="45">
+        <Item class="ModuleScript" referent="46">
           <Properties>
             <string name="Name">ProgressionRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -4839,7 +4948,7 @@ return ProgressionRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="46">
+        <Item class="ModuleScript" referent="47">
           <Properties>
             <string name="Name">QuestRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -4951,7 +5060,7 @@ return QuestRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="47">
+        <Item class="ModuleScript" referent="48">
           <Properties>
             <string name="Name">StoreRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -5033,7 +5142,7 @@ return StoreRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="48">
+        <Item class="ModuleScript" referent="49">
           <Properties>
             <string name="Name">TutorialRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -5148,15 +5257,15 @@ return TutorialRules
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="49">
+  <Item class="ServerScriptService" referent="50">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="50">
+    <Item class="Folder" referent="51">
       <Properties>
         <string name="Name">Voidline</string>
       </Properties>
-      <Item class="Script" referent="51">
+      <Item class="Script" referent="52">
         <Properties>
           <string name="Name">Boot</string>
           <token name="RunContext">0</token>
@@ -5229,11 +5338,11 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Folder" referent="52">
+      <Item class="Folder" referent="53">
         <Properties>
           <string name="Name">Security</string>
         </Properties>
-        <Item class="ModuleScript" referent="53">
+        <Item class="ModuleScript" referent="54">
           <Properties>
             <string name="Name">ValidateRemote</string>
             <string name="Source"><![CDATA[--!strict
@@ -5389,11 +5498,11 @@ return ValidateRemote
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="54">
+      <Item class="Folder" referent="55">
         <Properties>
           <string name="Name">Services</string>
         </Properties>
-        <Item class="ModuleScript" referent="55">
+        <Item class="ModuleScript" referent="56">
           <Properties>
             <string name="Name">AfkService</string>
             <string name="Source"><![CDATA[--!strict
@@ -5474,7 +5583,7 @@ return AfkService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="56">
+        <Item class="ModuleScript" referent="57">
           <Properties>
             <string name="Name">BeltService</string>
             <string name="Source"><![CDATA[--!strict
@@ -5691,7 +5800,7 @@ return BeltService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="57">
+        <Item class="ModuleScript" referent="58">
           <Properties>
             <string name="Name">CitadelService</string>
             <string name="Source"><![CDATA[--!strict
@@ -5945,7 +6054,7 @@ return CitadelService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="58">
+        <Item class="ModuleScript" referent="59">
           <Properties>
             <string name="Name">CodeService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6001,7 +6110,7 @@ return CodeService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="59">
+        <Item class="ModuleScript" referent="60">
           <Properties>
             <string name="Name">CodexService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6093,7 +6202,7 @@ return CodexService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="60">
+        <Item class="ModuleScript" referent="61">
           <Properties>
             <string name="Name">CosmeticService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6248,7 +6357,7 @@ return CosmeticService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="61">
+        <Item class="ModuleScript" referent="62">
           <Properties>
             <string name="Name">DailyStreakService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6305,7 +6414,7 @@ return DailyStreakService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="62">
+        <Item class="ModuleScript" referent="63">
           <Properties>
             <string name="Name">DroneService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6561,7 +6670,7 @@ return DroneService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="63">
+        <Item class="ModuleScript" referent="64">
           <Properties>
             <string name="Name">EconomyService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6965,7 +7074,7 @@ return EconomyService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="64">
+        <Item class="ModuleScript" referent="65">
           <Properties>
             <string name="Name">ForgeService</string>
             <string name="Source"><![CDATA[--!strict
@@ -7092,7 +7201,7 @@ return ForgeService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="65">
+        <Item class="ModuleScript" referent="66">
           <Properties>
             <string name="Name">InspectService</string>
             <string name="Source"><![CDATA[--!strict
@@ -7171,7 +7280,7 @@ return InspectService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="66">
+        <Item class="ModuleScript" referent="67">
           <Properties>
             <string name="Name">JuiceService</string>
             <string name="Source"><![CDATA[--!strict
@@ -7211,7 +7320,7 @@ return JuiceService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="67">
+        <Item class="ModuleScript" referent="68">
           <Properties>
             <string name="Name">LeaderboardService</string>
             <string name="Source"><![CDATA[--!strict
@@ -7451,7 +7560,7 @@ return LeaderboardService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="68">
+        <Item class="ModuleScript" referent="69">
           <Properties>
             <string name="Name">MapBuilder</string>
             <string name="Source"><![CDATA[--!strict
@@ -7465,6 +7574,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
 local GameConfig = require(Voidline.Config.GameConfig)
+local VisualBibleConfig = require(Voidline.Config.VisualBibleConfig)
 local ClipFramingConfig = require(Voidline.Config.ClipFramingConfig)
 local PlotLayout = require(Voidline.Modules.PlotLayout)
 local HubLayout = require(Voidline.Modules.HubLayout)
@@ -7472,6 +7582,8 @@ local HubLayout = require(Voidline.Modules.HubLayout)
 local MapBuilder = {}
 
 local COLORS = GameConfig.Colors
+local PALETTE = VisualBibleConfig.Palette
+local DECK = VisualBibleConfig.HubDeck
 
 type PartProps = {
 	Name: string?,
@@ -7577,16 +7689,80 @@ local function goldTrim(parent: Instance, base: CFrame, size: Vector3)
 	end
 end
 
-local function buildHub(root: Instance)
-	local hub = folder("Hub", root)
-	local hubCFrame = CFrame.new(0, 0, 0)
+-- Procedural obsidian-gold plated deck: inset tiles, edge lights, trim rings.
+local function buildPlatedHubDeck(hub: Instance, hubCFrame: CFrame)
+	local deck = folder("HubPlatedDeck", hub)
+	local tile = DECK.TileStuds
+	local gap = DECK.Gap
+	local halfX = HubLayout.HubSize.X / 2
+	local halfZ = HubLayout.HubSize.Z / 2
+	local baseY = hubCFrame.Position.Y
+	local tileCount = 0
+	for ix = 0, math.floor((HubLayout.HubSize.X - gap) / tile) - 1 do
+		for iz = 0, math.floor((HubLayout.HubSize.Z - gap) / tile) - 1 do
+			local cx = -halfX + gap + tile / 2 + ix * tile
+			local cz = -halfZ + gap + tile / 2 + iz * tile
+			local inset = (ix + iz) % 2 == 0
+			local thickness = if inset then DECK.PlateThickness - DECK.InsetDepth else DECK.PlateThickness
+			local y = baseY + thickness / 2 - DECK.PlateThickness / 2
+			part({
+				Name = if inset then "DeckTileInset" else "DeckTile",
+				Parent = deck,
+				Size = Vector3.new(tile - gap, thickness, tile - gap),
+				CFrame = CFrame.new(cx, y, cz),
+				Color = if inset then PALETTE.ObsidianLift else PALETTE.Obsidian,
+				Material = if inset then Enum.Material.DiamondPlate else Enum.Material.Slate,
+			})
+			if inset then
+				local edge = DECK.EdgeLightThickness
+				part({
+					Name = "DeckEdgeLight",
+					Parent = deck,
+					Size = Vector3.new(tile - gap * 2, DECK.EdgeLightHeight, edge),
+					CFrame = CFrame.new(
+						cx,
+						y + thickness / 2 + DECK.EdgeLightHeight / 2,
+						cz + (tile - gap) / 2 - edge / 2
+					),
+					Color = PALETTE.DeckInset,
+					Material = Enum.Material.Neon,
+					Transparency = 0.25,
+					CanCollide = false,
+					CanQuery = false,
+				})
+			end
+			tileCount += 1
+		end
+	end
+	deck:SetAttribute("TileCount", tileCount)
+	for ri, radius in DECK.TrimRingRadii do
+		part({
+			Name = "HubTrimRing" .. ri,
+			Parent = deck,
+			Size = Vector3.new(DECK.TrimRingHeight, radius * 2, radius * 2),
+			CFrame = hubCFrame * CFrame.new(0, 0.25 + ri * 0.02, 0) * CFrame.Angles(0, 0, math.rad(90)),
+			Shape = Enum.PartType.Cylinder,
+			Color = PALETTE.Gold,
+			Material = Enum.Material.Neon,
+			Transparency = 0.78 + ri * 0.04,
+			CanCollide = false,
+			CanQuery = false,
+		})
+	end
 	part({
 		Name = "HubPad",
 		Parent = hub,
-		Size = HubLayout.HubSize,
-		CFrame = hubCFrame,
+		Size = Vector3.new(HubLayout.HubSize.X, 0.4, HubLayout.HubSize.Z),
+		CFrame = hubCFrame * CFrame.new(0, -0.35, 0),
+		Color = PALETTE.Obsidian,
 		Material = Enum.Material.Basalt,
 	})
+end
+
+local function buildHub(root: Instance)
+	local hub = folder("Hub", root)
+	local hubCFrame = CFrame.new(0, 0, 0)
+	buildPlatedHubDeck(hub, hubCFrame)
 	goldTrim(hub, hubCFrame, HubLayout.HubSize)
 
 	-- Monolith: two halves (split along X) plus gold bands and the Void Core.
@@ -7648,7 +7824,7 @@ local function buildHub(root: Instance)
 		Parent = monolith,
 		Size = Vector3.new(7, 7, 7),
 		CFrame = CFrame.new(HubLayout.VoidCore),
-		Color = COLORS.VoidAccent,
+		Color = PALETTE.GoldCore,
 		Material = Enum.Material.Neon,
 		Shape = Enum.PartType.Ball,
 		CanCollide = false,
@@ -8167,7 +8343,7 @@ return MapBuilder
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="69">
+        <Item class="ModuleScript" referent="70">
           <Properties>
             <string name="Name">MonetizationService</string>
             <string name="Source"><![CDATA[--!strict
@@ -8381,7 +8557,7 @@ return MonetizationService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="70">
+        <Item class="ModuleScript" referent="71">
           <Properties>
             <string name="Name">PlayerDataService</string>
             <string name="Source"><![CDATA[--!strict
@@ -9013,7 +9189,7 @@ return PlayerDataService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="71">
+        <Item class="ModuleScript" referent="72">
           <Properties>
             <string name="Name">PlotService</string>
             <string name="Source"><![CDATA[--!strict
@@ -9208,7 +9384,7 @@ return PlotService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="72">
+        <Item class="ModuleScript" referent="73">
           <Properties>
             <string name="Name">RebirthService</string>
             <string name="Source"><![CDATA[--!strict
@@ -9287,7 +9463,7 @@ return RebirthService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="73">
+        <Item class="ModuleScript" referent="74">
           <Properties>
             <string name="Name">RelicService</string>
             <string name="Source"><![CDATA[--!strict
@@ -9471,7 +9647,7 @@ return RelicService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="74">
+        <Item class="ModuleScript" referent="75">
           <Properties>
             <string name="Name">RiftService</string>
             <string name="Source"><![CDATA[--!strict
@@ -9576,7 +9752,7 @@ return RiftService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="75">
+        <Item class="ModuleScript" referent="76">
           <Properties>
             <string name="Name">RockService</string>
             <string name="Source"><![CDATA[--!strict
@@ -9869,7 +10045,7 @@ return RockService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="76">
+        <Item class="ModuleScript" referent="77">
           <Properties>
             <string name="Name">SoftContestService</string>
             <string name="Source"><![CDATA[--!strict
@@ -10101,7 +10277,7 @@ return SoftContestService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="77">
+        <Item class="ModuleScript" referent="78">
           <Properties>
             <string name="Name">SquadService</string>
             <string name="Source"><![CDATA[--!strict
@@ -10444,7 +10620,7 @@ return SquadService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="78">
+        <Item class="ModuleScript" referent="79">
           <Properties>
             <string name="Name">StatService</string>
             <string name="Source"><![CDATA[--!strict
@@ -10572,7 +10748,7 @@ return StatService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="79">
+        <Item class="ModuleScript" referent="80">
           <Properties>
             <string name="Name">SummonService</string>
             <string name="Source"><![CDATA[--!strict
@@ -10718,7 +10894,7 @@ return SummonService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="80">
+        <Item class="ModuleScript" referent="81">
           <Properties>
             <string name="Name">TowService</string>
             <string name="Source"><![CDATA[--!strict
@@ -10823,7 +10999,7 @@ return TowService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="81">
+        <Item class="ModuleScript" referent="82">
           <Properties>
             <string name="Name">TutorialService</string>
             <string name="Source"><![CDATA[--!strict
@@ -10925,7 +11101,7 @@ return TutorialService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="82">
+        <Item class="ModuleScript" referent="83">
           <Properties>
             <string name="Name">WarpService</string>
             <string name="Source"><![CDATA[--!strict
@@ -11102,7 +11278,7 @@ return WarpService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="83">
+        <Item class="ModuleScript" referent="84">
           <Properties>
             <string name="Name">WorldEventService</string>
             <string name="Source"><![CDATA[--!strict
@@ -11427,7 +11603,7 @@ return WorldEventService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="84">
+        <Item class="ModuleScript" referent="85">
           <Properties>
             <string name="Name">WorldState</string>
             <string name="Source"><![CDATA[--!strict
@@ -11518,15 +11694,15 @@ return WorldState
       </Item>
     </Item>
   </Item>
-  <Item class="ServerStorage" referent="85">
+  <Item class="ServerStorage" referent="86">
     <Properties>
       <string name="Name">ServerStorage</string>
     </Properties>
-    <Item class="Folder" referent="86">
+    <Item class="Folder" referent="87">
       <Properties>
         <string name="Name">Voidline</string>
       </Properties>
-      <Item class="ModuleScript" referent="87">
+      <Item class="ModuleScript" referent="88">
         <Properties>
           <string name="Name">README</string>
           <string name="Source"><![CDATA[-- ServerStorage.Voidline holds runtime templates if needed.
@@ -11537,23 +11713,23 @@ return {}
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="88">
+  <Item class="StarterPlayer" referent="89">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="89">
+    <Item class="StarterPlayerScripts" referent="90">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="90">
+      <Item class="Folder" referent="91">
         <Properties>
           <string name="Name">Voidline</string>
         </Properties>
-        <Item class="Folder" referent="91">
+        <Item class="Folder" referent="92">
           <Properties>
             <string name="Name">Client</string>
           </Properties>
-          <Item class="ModuleScript" referent="92">
+          <Item class="ModuleScript" referent="93">
             <Properties>
               <string name="Name">ClientState</string>
               <string name="Source"><![CDATA[--!strict
@@ -11716,7 +11892,7 @@ return ClientState
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="93">
+          <Item class="ModuleScript" referent="94">
             <Properties>
               <string name="Name">Ui</string>
               <string name="Source"><![CDATA[--!strict
@@ -12013,7 +12189,7 @@ return Ui
             </Properties>
           </Item>
         </Item>
-        <Item class="LocalScript" referent="94">
+        <Item class="LocalScript" referent="95">
           <Properties>
             <string name="Name">ClientBoot</string>
             <string name="Source"><![CDATA[--!strict
@@ -12138,6 +12314,8 @@ TowController.OnArrive(function(tow)
 		return
 	end
 	VFXController.Popup("TOW HOME", Ui.Colors.GoldBright, tow.To)
+	VFXController.TowArriveShock(tow.To)
+	AudioController.Play("TowLatch")
 	CameraController.Shake(0.28, 0.28)
 end)
 task.spawn(InteractController.Init, {
@@ -12171,11 +12349,11 @@ print(("[Voidline] Client online for %s"):format(Players.LocalPlayer.Name))
 ]]></string>
           </Properties>
         </Item>
-        <Item class="Folder" referent="95">
+        <Item class="Folder" referent="96">
           <Properties>
             <string name="Name">Controllers</string>
           </Properties>
-          <Item class="ModuleScript" referent="96">
+          <Item class="ModuleScript" referent="97">
             <Properties>
               <string name="Name">AudioController</string>
               <string name="Source"><![CDATA[--!strict
@@ -12248,6 +12426,11 @@ local PITCH_BAND: { [string]: { number } } = {
 	Warn = { 0.85, 0.95 },
 	Relic = { 0.92, 1.06 },
 	Codex = { 1.05, 1.15 },
+	MonolithSplit = { 0.9, 1.02 },
+	MonolithCore = { 0.82, 0.96 },
+	HaloForm = { 0.96, 1.08 },
+	TowLatch = { 0.94, 1.05 },
+	StarfallStreak = { 0.88, 1.02 },
 }
 
 local function getOrCreate(key: string): Sound?
@@ -12350,6 +12533,9 @@ local function onJuice(message: any)
 		end
 		return
 	end
+	if kind == "WorldEvent" and message.Phase == "start" then
+		AudioController.Play("StarfallStreak")
+	end
 	if kind == "WorldEvent" and message.Phase ~= "start" then
 		return
 	end
@@ -12401,7 +12587,7 @@ return AudioController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="97">
+          <Item class="ModuleScript" referent="98">
             <Properties>
               <string name="Name">CameraController</string>
               <string name="Source"><![CDATA[--!strict
@@ -12416,6 +12602,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
 local ClipFramingConfig = require(Voidline.Config.ClipFramingConfig)
+local VisualBibleConfig = require(Voidline.Config.VisualBibleConfig)
 
 local Client = script.Parent.Parent.Client
 local Ui = require(Client.Ui)
@@ -12427,7 +12614,7 @@ local CameraController = {}
 local BASE_FOV = 70
 local BEAM_LINK_FOV = 8
 local TOW_FOV = 5
-local HALO_FOV = 4
+local HALO_FOV = VisualBibleConfig.SovereignHalo.CameraFovAdd
 local FOV_RATE = 4
 local MAX_SHAKE = 1.2
 
@@ -12528,7 +12715,7 @@ return CameraController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="98">
+          <Item class="ModuleScript" referent="99">
             <Properties>
               <string name="Name">DroneController</string>
               <string name="Source"><![CDATA[--!strict
@@ -12544,11 +12731,13 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
 local DroneConfig = require(Voidline.Config.DroneConfig)
+local VisualBibleConfig = require(Voidline.Config.VisualBibleConfig)
 local DroneRegistry = require(Voidline.Content.DroneRegistry)
 
 local Client = script.Parent.Parent.Client
 local Ui = require(Client.Ui)
 local TowController = require(script.Parent.TowController)
+local CameraController = require(script.Parent.CameraController)
 
 local DroneController = {}
 
@@ -12603,7 +12792,9 @@ local aimAttachments: { [BasePart]: Attachment } = {}
 local hitEmitters: { [BasePart]: ParticleEmitter } = {}
 local perfMode = false
 local haloRing: Part
+local haloRingInner: Part
 local haloSpin = 0
+local localFormation = 0
 
 -- Rocks -----------------------------------------------------------------------
 
@@ -12723,12 +12914,12 @@ local function newDrone(): Drone
 		FaceCamera = true,
 		LightEmission = 1,
 		LightInfluence = 0,
-		Segments = 10,
-		CurveSize0 = 1.5,
-		CurveSize1 = -1.5,
-		Width0 = 0.42,
-		Width1 = 0.5,
-		Color = ColorSequence.new(Color3.fromRGB(150, 230, 255), Color3.fromRGB(255, 230, 150)),
+		Segments = VisualBibleConfig.Tow.RibbonSegments,
+		CurveSize0 = 1.8,
+		CurveSize1 = -1.2,
+		Width0 = VisualBibleConfig.Tow.RibbonWidth0,
+		Width1 = VisualBibleConfig.Tow.RibbonWidth1,
+		Color = ColorSequence.new(VisualBibleConfig.Palette.BeamCyan, VisualBibleConfig.Palette.TetherRibbon),
 		Transparency = NumberSequence.new(0.2, 0.5),
 		Parent = body,
 	}) :: Beam
@@ -13058,8 +13249,15 @@ local function stepFleet(
 		drone.Trail.Enabled = not far and not perfMode and (isLocal or (drone.Position - cameraPos).Magnitude < 120)
 	end
 
-	-- Orbital Beam-Link: chain the ring of drones around the shared target.
-	local linkCount = if formation == 2 and #targets > 0 and miners >= 3 and not far then miners else 0
+	-- Orbital Beam-Link + Sovereign Halo machine ring (beams between drones).
+	local linkCount = 0
+	if not far then
+		if formation == 2 and #targets > 0 and miners >= 3 then
+			linkCount = miners
+		elseif formation == 3 and n >= 3 then
+			linkCount = n
+		end
+	end
 	while #fleet.Links > linkCount do
 		local beam = table.remove(fleet.Links)
 		if beam then
@@ -13070,19 +13268,21 @@ local function stepFleet(
 	while #fleet.Links < linkCount and #fleet.Links < LINK_POOL_MAX do
 		table.insert(fleet.Links, acquireLink())
 	end
+	local ringMembers = if formation == 3 then n else miners
 	for i, beam in fleet.Links do
 		local a = fleet.Drones[i]
-		local b = fleet.Drones[i % miners + 1]
+		local b = fleet.Drones[i % ringMembers + 1]
 		beam.Attachment0 = a.Attach
 		beam.Attachment1 = b.Attach
 		beam.Color = ColorSequence.new(fleet.LaserColor)
 		beam.Enabled = true
+		local haloWidth = if formation == 3 then VisualBibleConfig.SovereignHalo.LinkWidth else 0.34
 		if isLocal and not perfMode then
-			beam.Width0 = 0.34
-			beam.Width1 = 0.34
+			beam.Width0 = haloWidth
+			beam.Width1 = haloWidth
 		else
-			beam.Width0 = 0.24
-			beam.Width1 = 0.24
+			beam.Width0 = haloWidth * 0.7
+			beam.Width1 = haloWidth * 0.7
 		end
 	end
 end
@@ -13121,14 +13321,44 @@ local function step(dt: number)
 			end
 		end
 	end
+	local cfg = VisualBibleConfig.SovereignHalo
 	if localHalo and localHaloCenter then
-		haloSpin += dt * 1.2
-		haloRing.CFrame = CFrame.new(localHaloCenter + Vector3.new(0, 3.1, 0))
-			* CFrame.Angles(0, haloSpin, math.rad(90))
-		haloRing.Size = Vector3.new(0.32, localHaloScale, localHaloScale)
-		haloRing.Transparency = 0.42
+		haloSpin += dt * cfg.RingSpinRate
+		local cf = CFrame.new(localHaloCenter + Vector3.new(0, 3.1, 0)) * CFrame.Angles(0, haloSpin, math.rad(90))
+		haloRing.CFrame = cf
+		haloRing.Size = Vector3.new(cfg.RingThickness, localHaloScale, localHaloScale)
+		haloRing.Transparency = 0.38
+		haloRingInner.CFrame = cf * CFrame.Angles(0, -haloSpin * 0.6, 0)
+		haloRingInner.Size = Vector3.new(
+			cfg.RingThickness * 0.65,
+			localHaloScale * cfg.SecondaryRingScale,
+			localHaloScale * cfg.SecondaryRingScale
+		)
+		haloRingInner.Transparency = 0.55
 	else
 		haloRing.CFrame = HIDDEN
+		haloRingInner.CFrame = HIDDEN
+	end
+	local localPlayer = Players.LocalPlayer
+	local form = localPlayer:GetAttribute("Formation")
+	local f = if type(form) == "number" then form else 0
+	if f ~= localFormation then
+		localFormation = f
+		if f == 3 and not perfMode then
+			local okVfx, vfx = pcall(function()
+				return require(script.Parent.VFXController)
+			end)
+			if okVfx and vfx and vfx.SovereignHaloPulse then
+				vfx.SovereignHaloPulse()
+			end
+			local okAud, aud = pcall(function()
+				return require(script.Parent.AudioController)
+			end)
+			if okAud and aud and aud.Play then
+				aud.Play("HaloForm")
+			end
+			CameraController.Punch(VisualBibleConfig.SovereignHalo.CameraFovAdd, 0.9)
+		end
 	end
 	if #parts > 0 then
 		Workspace:BulkMoveTo(parts, cframes, Enum.BulkMoveMode.FireCFrameChanged)
@@ -13183,6 +13413,21 @@ function DroneController.Init()
 		CFrame = HIDDEN,
 		Parent = folder,
 	}) :: Part
+	haloRingInner = Ui.Make("Part", {
+		Name = "SovereignHaloInner",
+		Anchored = true,
+		CanCollide = false,
+		CanQuery = false,
+		CanTouch = false,
+		CastShadow = false,
+		Shape = Enum.PartType.Cylinder,
+		Material = Enum.Material.Neon,
+		Color = VisualBibleConfig.Palette.Gold,
+		Transparency = 1,
+		Size = Vector3.new(0.22, 4, 4),
+		CFrame = HIDDEN,
+		Parent = folder,
+	}) :: Part
 	CollectionService:GetInstanceAddedSignal(ROCK_TAG):Connect(indexRock)
 	for _, part in CollectionService:GetTagged(ROCK_TAG) do
 		indexRock(part)
@@ -13195,7 +13440,7 @@ return DroneController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="99">
+          <Item class="ModuleScript" referent="100">
             <Properties>
               <string name="Name">HUDController</string>
               <string name="Source"><![CDATA[--!strict
@@ -13698,7 +13943,7 @@ return HUDController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="100">
+          <Item class="ModuleScript" referent="101">
             <Properties>
               <string name="Name">HotbarController</string>
               <string name="Source"><![CDATA[--!strict
@@ -14011,7 +14256,7 @@ return HotbarController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="101">
+          <Item class="ModuleScript" referent="102">
             <Properties>
               <string name="Name">InteractController</string>
               <string name="Source"><![CDATA[--!strict
@@ -14131,7 +14376,7 @@ return InteractController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="102">
+          <Item class="ModuleScript" referent="103">
             <Properties>
               <string name="Name">JuiceController</string>
               <string name="Source"><![CDATA[--!strict
@@ -14392,6 +14637,9 @@ HANDLERS.CodexMilestone = function(m)
 end
 
 HANDLERS.ContestShare = function(m)
+	if typeof(m.Position) == "Vector3" then
+		VFXController.StarfallImpact(m.Position)
+	end
 	local share = if type(m.Share) == "number" then math.floor(m.Share * 100 + 0.5) else 0
 	HUDController.Banner(
 		("%s%s · %d%% SHARE · %s"):format(
@@ -14544,7 +14792,8 @@ end
 
 HANDLERS.WorldEvent = function(m)
 	if m.Phase == "start" then
-		CameraController.Punch(3, 0.8)
+		CameraController.Punch(4, 1.0)
+		VFXController.StarfallSkyBurst()
 	end
 end
 
@@ -14575,7 +14824,7 @@ return JuiceController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="103">
+          <Item class="ModuleScript" referent="104">
             <Properties>
               <string name="Name">MenuController</string>
               <string name="Source"><![CDATA[--!strict
@@ -15460,7 +15709,7 @@ return MenuController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="104">
+          <Item class="ModuleScript" referent="105">
             <Properties>
               <string name="Name">MovementController</string>
               <string name="Source"><![CDATA[--!strict
@@ -15647,7 +15896,7 @@ return MovementController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="105">
+          <Item class="ModuleScript" referent="106">
             <Properties>
               <string name="Name">OnboardingController</string>
               <string name="Source"><![CDATA[--!strict
@@ -15995,7 +16244,7 @@ return OnboardingController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="106">
+          <Item class="ModuleScript" referent="107">
             <Properties>
               <string name="Name">SettingsController</string>
               <string name="Source"><![CDATA[local Players = game:GetService("Players")
@@ -16106,7 +16355,7 @@ return SettingsController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="107">
+          <Item class="ModuleScript" referent="108">
             <Properties>
               <string name="Name">StationInteractController</string>
               <string name="Source"><![CDATA[local Players = game:GetService("Players")
@@ -16239,7 +16488,7 @@ return StationInteractController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="108">
+          <Item class="ModuleScript" referent="109">
             <Properties>
               <string name="Name">StoreController</string>
               <string name="Source"><![CDATA[--!strict
@@ -16635,7 +16884,7 @@ return StoreController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="109">
+          <Item class="ModuleScript" referent="110">
             <Properties>
               <string name="Name">ThrusterCosmeticController</string>
               <string name="Source"><![CDATA[local Players = game:GetService("Players")
@@ -16711,7 +16960,7 @@ return ThrusterCosmeticController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="110">
+          <Item class="ModuleScript" referent="111">
             <Properties>
               <string name="Name">TowController</string>
               <string name="Source"><![CDATA[--!strict
@@ -16853,7 +17102,7 @@ return TowController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="111">
+          <Item class="ModuleScript" referent="112">
             <Properties>
               <string name="Name">VFXController</string>
               <string name="Source"><![CDATA[--!strict
@@ -16866,6 +17115,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
 local PlotLayout = require(Voidline.Modules.PlotLayout)
+local VisualBibleConfig = require(Voidline.Config.VisualBibleConfig)
+local HubLayout = require(Voidline.Modules.HubLayout)
 
 local Client = script.Parent.Parent.Client
 local Ui = require(Client.Ui)
@@ -17052,6 +17303,138 @@ function VFXController.PadFlash(upgradeId: string)
 	end
 end
 
+local function shockRing(parent: Instance, center: Vector3, maxSize: number, color: Color3, seconds: number)
+	local ring = Ui.Make("Part", {
+		Name = "ShockRing",
+		Anchored = true,
+		CanCollide = false,
+		CanQuery = false,
+		CanTouch = false,
+		CastShadow = false,
+		Shape = Enum.PartType.Cylinder,
+		Material = Enum.Material.Neon,
+		Color = color,
+		Size = Vector3.new(0.35, 4, 4),
+		CFrame = CFrame.new(center.X, center.Y + 0.2, center.Z) * CFrame.Angles(0, 0, math.rad(90)),
+		Transparency = 0.35,
+		Parent = parent,
+	}) :: Part
+	Ui.Tween(ring, seconds, {
+		Size = Vector3.new(0.15, maxSize, maxSize),
+		Transparency = 1,
+	}, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+	task.delay(seconds + 0.05, function()
+		ring:Destroy()
+	end)
+end
+
+function VFXController.MonolithSplitCrack()
+	if clipHidden or perfMode then
+		return
+	end
+	local map = Workspace:FindFirstChild("VoidlineMap")
+	local hub = map and map:FindFirstChild("Hub")
+	local monolith = hub and hub:FindFirstChild("VoidlineMonolith")
+	local seam = monolith and monolith:FindFirstChild("MonolithSplitSeam")
+	if not (seam and seam:IsA("BasePart")) then
+		return
+	end
+	local cfg = VisualBibleConfig.MonolithSplit
+	Ui.Tween(seam, cfg.Duration * 0.35, {
+		Transparency = cfg.SeamPulseTransparency[1],
+		Size = Vector3.new(0.65, seam.Size.Y * 1.02, seam.Size.Z * 1.05),
+	})
+	task.delay(cfg.Duration * 0.4, function()
+		Ui.Tween(seam, cfg.Duration * 0.5, { Transparency = cfg.SeamPulseTransparency[2] })
+	end)
+	for i = 1, 8 do
+		local spark = Ui.Make("Part", {
+			Name = "SplitSpark",
+			Anchored = true,
+			CanCollide = false,
+			CanQuery = false,
+			Size = Vector3.new(0.35, 0.35, 2.4),
+			CFrame = seam.CFrame * CFrame.new(0, -seam.Size.Y / 2 + i * (seam.Size.Y / 9), 0),
+			Color = VisualBibleConfig.Palette.GoldBright,
+			Material = Enum.Material.Neon,
+			Parent = folder,
+		}) :: Part
+		Ui.Tween(spark, 0.9, { Transparency = 1, Size = Vector3.new(0.1, 0.1, 3.6) })
+		task.delay(0.95, spark.Destroy, spark)
+	end
+	VFXController.ScreenFlash(VisualBibleConfig.Palette.GoldCore, 0.55)
+end
+
+function VFXController.StarfallSkyBurst()
+	if clipHidden or perfMode then
+		return
+	end
+	local cfg = VisualBibleConfig.Starfall
+	local origin = HubLayout.VoidCore + Vector3.new(0, 40, 0)
+	for i = 1, cfg.StreakCount do
+		local angle = (i / cfg.StreakCount) * math.pi * 2
+		local offset = Vector3.new(math.cos(angle) * 80, cfg.StreakSpeed, math.sin(angle) * 80)
+		local streak = Ui.Make("Part", {
+			Name = "StarfallStreak",
+			Anchored = true,
+			CanCollide = false,
+			CanQuery = false,
+			Size = Vector3.new(0.5, 0.5, 14),
+			CFrame = CFrame.lookAt(origin + offset, origin),
+			Color = VisualBibleConfig.Palette.GoldBright,
+			Material = Enum.Material.Neon,
+			Parent = folder,
+		}) :: Part
+		Ui.Tween(streak, 0.65, {
+			CFrame = CFrame.new(origin) * CFrame.Angles(math.rad(90), angle, 0),
+			Transparency = 1,
+		})
+		task.delay(0.7, streak.Destroy, streak)
+	end
+	shockRing(folder, HubLayout.MonolithCenter, cfg.ShockRingMax, VisualBibleConfig.Palette.Gold, cfg.ShockRingSeconds)
+end
+
+function VFXController.StarfallImpact(position: Vector3?)
+	if clipHidden then
+		return
+	end
+	local center = position or HubLayout.MonolithCenter
+	shockRing(
+		folder,
+		center,
+		if perfMode then 22 else VisualBibleConfig.Starfall.ShockRingMax * 0.65,
+		VisualBibleConfig.Palette.GoldCore,
+		VisualBibleConfig.Starfall.ShockRingSeconds * 0.75
+	)
+	if not perfMode then
+		VFXController.ScreenFlash(VisualBibleConfig.Palette.GoldBright, 0.35)
+	end
+end
+
+function VFXController.TowArriveShock(position: Vector3)
+	if clipHidden then
+		return
+	end
+	local cfg = VisualBibleConfig.Tow
+	shockRing(
+		folder,
+		position,
+		if perfMode then cfg.ShockRadius * 0.7 else cfg.ShockRadius,
+		VisualBibleConfig.Palette.Gold,
+		cfg.ShockSeconds
+	)
+	if not perfMode then
+		CameraController.Punch(3, 0.45)
+	end
+end
+
+function VFXController.SovereignHaloPulse()
+	if clipHidden or perfMode then
+		return
+	end
+	VFXController.ScreenFlash(VisualBibleConfig.Palette.GoldBright, 0.28)
+end
+
 function VFXController.GrinderPulse()
 	local plot = plotFolder()
 	local station = plot and plot:FindFirstChild("Station")
@@ -17090,7 +17473,7 @@ return VFXController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="112">
+          <Item class="ModuleScript" referent="113">
             <Properties>
               <string name="Name">WorldController</string>
               <string name="Source"><![CDATA[--!strict
@@ -17107,17 +17490,21 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
 local BiomeRegistry = require(Voidline.Content.BiomeRegistry)
 local WorldEventRegistry = require(Voidline.Content.WorldEventRegistry)
+local VisualBibleConfig = require(Voidline.Config.VisualBibleConfig)
 
 local Client = script.Parent.Parent.Client
 local Ui = require(Client.Ui)
 local CameraController = require(script.Parent.CameraController)
+local VFXController = require(script.Parent.VFXController)
 
 local WorldController = {}
 
-local SPLIT_DISTANCE = 6
-local SPLIT_TILT = math.rad(6)
-local SPLIT_SECONDS = 2.4
+local SPLIT = VisualBibleConfig.MonolithSplit
+local SPLIT_DISTANCE = SPLIT.GapStuds
+local SPLIT_TILT = SPLIT.TiltRadians
+local SPLIT_SECONDS = SPLIT.Duration
 local GRADE_SECONDS = 3
+local LIGHT = VisualBibleConfig.Lighting
 local HAZARD_POOL = 4
 local CALM_TINT = Color3.fromRGB(255, 244, 228)
 local HAZARD_IMPULSE = 38
@@ -17126,6 +17513,7 @@ local player = Players.LocalPlayer
 local atmosphere: Atmosphere
 local grade: ColorCorrectionEffect
 local bloom: BloomEffect
+local depthOfField: DepthOfFieldEffect?
 local hazardParts: { Part } = {}
 local hazardNext = 1
 local perfMode = false
@@ -17134,16 +17522,16 @@ local deepSpaceSampleAt = 0
 local DEEP_SPACE_RADIUS = 72
 
 local BASE = {
-	Ambient = Lighting.Ambient,
-	Tint = Color3.new(1, 1, 1),
-	AtmosphereColor = Color3.fromRGB(70, 50, 120),
-	AtmosphereDecay = Color3.fromRGB(30, 20, 60),
-	Density = 0.25,
-	Haze = 1,
-	Glare = 0,
-	Bloom = 0.6,
-	Saturation = 0.05,
-	Contrast = 0.05,
+	Ambient = LIGHT.Ambient,
+	Tint = LIGHT.Grade.Tint,
+	AtmosphereColor = LIGHT.Atmosphere.Color,
+	AtmosphereDecay = LIGHT.Atmosphere.Decay,
+	Density = LIGHT.Atmosphere.Density,
+	Haze = LIGHT.Atmosphere.Haze,
+	Glare = LIGHT.Atmosphere.Glare,
+	Bloom = LIGHT.Bloom.Intensity,
+	Saturation = LIGHT.Grade.Saturation,
+	Contrast = LIGHT.Grade.Contrast,
 }
 
 local function ensureEffects()
@@ -17152,7 +17540,31 @@ local function ensureEffects()
 	grade = Lighting:FindFirstChild("VoidlineGrade") :: ColorCorrectionEffect?
 		or Ui.Make("ColorCorrectionEffect", { Name = "VoidlineGrade", Parent = Lighting })
 	bloom = Lighting:FindFirstChild("VoidlineBloom") :: BloomEffect?
-		or Ui.Make("BloomEffect", { Name = "VoidlineBloom", Threshold = 0.9, Size = 24, Parent = Lighting })
+		or Ui.Make("BloomEffect", {
+			Name = "VoidlineBloom",
+			Threshold = LIGHT.Bloom.Threshold,
+			Size = LIGHT.Bloom.Size,
+			Parent = Lighting,
+		})
+	if LIGHT.DepthOfField.Enabled then
+		depthOfField = Lighting:FindFirstChild("VoidlineDoF") :: DepthOfFieldEffect?
+			or Ui.Make("DepthOfFieldEffect", {
+				Name = "VoidlineDoF",
+				InFocusRadius = LIGHT.DepthOfField.InFocusRadius,
+				NearIntensity = LIGHT.DepthOfField.NearIntensity,
+				FarIntensity = LIGHT.DepthOfField.FarIntensity,
+				Enabled = false,
+				Parent = Lighting,
+			})
+	end
+	Lighting.Ambient = LIGHT.Ambient
+	Lighting.OutdoorAmbient = LIGHT.OutdoorAmbient
+	Lighting.Brightness = LIGHT.Brightness
+	Lighting.ClockTime = LIGHT.ClockTime
+	Lighting.FogColor = LIGHT.FogColor
+	Lighting.FogStart = LIGHT.FogStart
+	Lighting.FogEnd = LIGHT.FogEnd
+	atmosphere.Offset = LIGHT.Atmosphere.Offset
 end
 
 local function currentBiome(): BiomeRegistry.Biome?
@@ -17182,9 +17594,9 @@ local function applyGrade()
 	local saturation = if calm then -0.05 elseif sky then sky.Saturation else BASE.Saturation
 	local contrast = if sky then sky.Contrast else BASE.Contrast
 	if deepSpaceBoost and not calm then
-		saturation += 0.12
+		saturation += LIGHT.DeepSpaceBoost.SaturationAdd
 		contrast += 0.1
-		tint = tint:Lerp(Color3.fromRGB(120, 90, 200), 0.08)
+		tint = tint:Lerp(VisualBibleConfig.Palette.VoidMist, 0.08)
 	end
 	Ui.Tween(grade, GRADE_SECONDS, {
 		TintColor = tint,
@@ -17194,8 +17606,8 @@ local function applyGrade()
 	local density = if sky then sky.Density else BASE.Density
 	local haze = if sky then sky.Haze else BASE.Haze
 	if deepSpaceBoost and not calm then
-		density += 0.06
-		haze += 0.25
+		density += LIGHT.DeepSpaceBoost.DensityAdd
+		haze += LIGHT.DeepSpaceBoost.HazeAdd
 	end
 	Ui.Tween(atmosphere, GRADE_SECONDS, {
 		Color = if sky then sky.AtmosphereColor else BASE.AtmosphereColor,
@@ -17206,9 +17618,15 @@ local function applyGrade()
 	})
 	local bloomIntensity = if sky then sky.Bloom else BASE.Bloom
 	if deepSpaceBoost and not calm then
-		bloomIntensity += 0.14
+		bloomIntensity += LIGHT.DeepSpaceBoost.BloomAdd
 	end
-	Ui.Tween(bloom, GRADE_SECONDS, { Intensity = if perfMode then bloomIntensity * 0.4 else bloomIntensity })
+	local bloomTarget = if perfMode
+		then bloomIntensity * (LIGHT.Bloom.IntensityPerf / LIGHT.Bloom.Intensity)
+		else bloomIntensity
+	Ui.Tween(bloom, GRADE_SECONDS, { Intensity = bloomTarget })
+	if depthOfField then
+		depthOfField.Enabled = LIGHT.DepthOfField.Enabled and not perfMode
+	end
 end
 
 -- Monolith -------------------------------------------------------------------------
@@ -17258,16 +17676,27 @@ local function applySplit(split: boolean)
 	end
 	local core = root:FindFirstChild("VoidCore")
 	if core and core:IsA("BasePart") then
-		Ui.Tween(core, SPLIT_SECONDS, { Transparency = if split then 0.05 else 1 })
+		Ui.Tween(core, SPLIT_SECONDS, {
+			Transparency = if split then 0.05 else 1,
+			Color = if split then SPLIT.CoreRevealColor else VisualBibleConfig.Palette.GoldCore,
+			Size = if split then Vector3.new(8.5, 8.5, 8.5) else Vector3.new(7, 7, 7),
+		})
 	end
 	if split then
-		CameraController.Shake(0.6, 1.2)
-		CameraController.Punch(6, 1.6)
+		VFXController.MonolithSplitCrack()
+		CameraController.Shake(SPLIT.CameraShake, SPLIT.ShakeSeconds)
+		CameraController.Punch(SPLIT.CameraPunchFov, SPLIT.CameraPunchSeconds)
 		local ok, audio = pcall(function()
 			return require(script.Parent.AudioController)
 		end)
 		if ok and audio and audio.Play then
 			audio.Play("MonolithSplit")
+			audio.Play("MonolithCore")
+		end
+	else
+		local seam = root:FindFirstChild("MonolithSplitSeam")
+		if seam and seam:IsA("BasePart") then
+			Ui.Tween(seam, SPLIT_SECONDS, { Transparency = 0.2 })
 		end
 	end
 end
@@ -17386,7 +17815,7 @@ return WorldController
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="113">
+  <Item class="Workspace" referent="114">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">60</float>

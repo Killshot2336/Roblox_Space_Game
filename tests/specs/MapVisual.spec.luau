@@ -41,6 +41,18 @@ tests["MapBuilder ships TikTok silhouette anchors"] = function()
 	expect(type(clip:GetAttribute("ClipHint"))).toBe("string")
 end
 
+tests["hub ships procedural plated deck tiles"] = function()
+	local world = Harness.new()
+	world:runScript("ServerScriptService/Voidline/Services/MapBuilder")
+	local MapBuilder = world:require("ServerScriptService/Voidline/Services/MapBuilder")
+	local root = MapBuilder.Build()
+	local deck = findDescendant(root, "HubPlatedDeck")
+	expect(deck ~= nil).toBe(true)
+	expect((deck :: any):GetAttribute("TileCount")).toBeGreaterThan(40)
+	expect(findDescendant(root, "HubTrimRing1") ~= nil).toBe(true)
+	expect(findDescendant(root, "DeckTileInset") ~= nil).toBe(true)
+end
+
 tests["hub world labels are near-only (no billboard sludge)"] = function()
 	local world = Harness.new()
 	world:runScript("ServerScriptService/Voidline/Services/MapBuilder")

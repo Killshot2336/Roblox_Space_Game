@@ -12,17 +12,21 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
 local BiomeRegistry = require(Voidline.Content.BiomeRegistry)
 local WorldEventRegistry = require(Voidline.Content.WorldEventRegistry)
+local VisualBibleConfig = require(Voidline.Config.VisualBibleConfig)
 
 local Client = script.Parent.Parent.Client
 local Ui = require(Client.Ui)
 local CameraController = require(script.Parent.CameraController)
+local VFXController = require(script.Parent.VFXController)
 
 local WorldController = {}
 
-local SPLIT_DISTANCE = 6
-local SPLIT_TILT = math.rad(6)
-local SPLIT_SECONDS = 2.4
+local SPLIT = VisualBibleConfig.MonolithSplit
+local SPLIT_DISTANCE = SPLIT.GapStuds
+local SPLIT_TILT = SPLIT.TiltRadians
+local SPLIT_SECONDS = SPLIT.Duration
 local GRADE_SECONDS = 3
+local LIGHT = VisualBibleConfig.Lighting
 local HAZARD_POOL = 4
 local CALM_TINT = Color3.fromRGB(255, 244, 228)
 local HAZARD_IMPULSE = 38
@@ -31,6 +35,7 @@ local player = Players.LocalPlayer
 local atmosphere: Atmosphere
 local grade: ColorCorrectionEffect
 local bloom: BloomEffect
+local depthOfField: DepthOfFieldEffect?
 local hazardParts: { Part } = {}
 local hazardNext = 1
 local perfMode = false
@@ -39,16 +44,16 @@ local deepSpaceSampleAt = 0
 local DEEP_SPACE_RADIUS = 72
 
 local BASE = {
-	Ambient = Lighting.Ambient,
-	Tint = Color3.new(1, 1, 1),
-	AtmosphereColor = Color3.fromRGB(70, 50, 120),
-	AtmosphereDecay = Color3.fromRGB(30, 20, 60),
-	Density = 0.25,
-	Haze = 1,
-	Glare = 0,
-	Bloom = 0.6,
-	Saturation = 0.05,
-	Contrast = 0.05,
+	Ambient = LIGHT.Ambient,
+	Tint = LIGHT.Grade.Tint,
+	AtmosphereColor = LIGHT.Atmosphere.Color,
+	AtmosphereDecay = LIGHT.Atmosphere.Decay,
+	Density = LIGHT.Atmosphere.Density,
+	Haze = LIGHT.Atmosphere.Haze,
+	Glare = LIGHT.Atmosphere.Glare,
+	Bloom = LIGHT.Bloom.Intensity,
+	Saturation = LIGHT.Grade.Saturation,
+	Contrast = LIGHT.Grade.Contrast,
 }
 
 local function ensureEffects()
@@ -57,7 +62,31 @@ local function ensureEffects()
 	grade = Lighting:FindFirstChild("VoidlineGrade") :: ColorCorrectionEffect?
 		or Ui.Make("ColorCorrectionEffect", { Name = "VoidlineGrade", Parent = Lighting })
 	bloom = Lighting:FindFirstChild("VoidlineBloom") :: BloomEffect?
-		or Ui.Make("BloomEffect", { Name = "VoidlineBloom", Threshold = 0.9, Size = 24, Parent = Lighting })
+		or Ui.Make("BloomEffect", {
+			Name = "VoidlineBloom",
+			Threshold = LIGHT.Bloom.Threshold,
+			Size = LIGHT.Bloom.Size,
+			Parent = Lighting,
+		})
+	if LIGHT.DepthOfField.Enabled then
+		depthOfField = Lighting:FindFirstChild("VoidlineDoF") :: DepthOfFieldEffect?
+			or Ui.Make("DepthOfFieldEffect", {
+				Name = "VoidlineDoF",
+				InFocusRadius = LIGHT.DepthOfField.InFocusRadius,
+				NearIntensity = LIGHT.DepthOfField.NearIntensity,
+				FarIntensity = LIGHT.DepthOfField.FarIntensity,
+				Enabled = false,
+				Parent = Lighting,
+			})
+	end
+	Lighting.Ambient = LIGHT.Ambient
+	Lighting.OutdoorAmbient = LIGHT.OutdoorAmbient
+	Lighting.Brightness = LIGHT.Brightness
+	Lighting.ClockTime = LIGHT.ClockTime
+	Lighting.FogColor = LIGHT.FogColor
+	Lighting.FogStart = LIGHT.FogStart
+	Lighting.FogEnd = LIGHT.FogEnd
+	atmosphere.Offset = LIGHT.Atmosphere.Offset
 end
 
 local function currentBiome(): BiomeRegistry.Biome?
@@ -87,9 +116,9 @@ local function applyGrade()
 	local saturation = if calm then -0.05 elseif sky then sky.Saturation else BASE.Saturation
 	local contrast = if sky then sky.Contrast else BASE.Contrast
 	if deepSpaceBoost and not calm then
-		saturation += 0.12
+		saturation += LIGHT.DeepSpaceBoost.SaturationAdd
 		contrast += 0.1
-		tint = tint:Lerp(Color3.fromRGB(120, 90, 200), 0.08)
+		tint = tint:Lerp(VisualBibleConfig.Palette.VoidMist, 0.08)
 	end
 	Ui.Tween(grade, GRADE_SECONDS, {
 		TintColor = tint,
@@ -99,8 +128,8 @@ local function applyGrade()
 	local density = if sky then sky.Density else BASE.Density
 	local haze = if sky then sky.Haze else BASE.Haze
 	if deepSpaceBoost and not calm then
-		density += 0.06
-		haze += 0.25
+		density += LIGHT.DeepSpaceBoost.DensityAdd
+		haze += LIGHT.DeepSpaceBoost.HazeAdd
 	end
 	Ui.Tween(atmosphere, GRADE_SECONDS, {
 		Color = if sky then sky.AtmosphereColor else BASE.AtmosphereColor,
@@ -111,9 +140,15 @@ local function applyGrade()
 	})
 	local bloomIntensity = if sky then sky.Bloom else BASE.Bloom
 	if deepSpaceBoost and not calm then
-		bloomIntensity += 0.14
+		bloomIntensity += LIGHT.DeepSpaceBoost.BloomAdd
 	end
-	Ui.Tween(bloom, GRADE_SECONDS, { Intensity = if perfMode then bloomIntensity * 0.4 else bloomIntensity })
+	local bloomTarget = if perfMode
+		then bloomIntensity * (LIGHT.Bloom.IntensityPerf / LIGHT.Bloom.Intensity)
+		else bloomIntensity
+	Ui.Tween(bloom, GRADE_SECONDS, { Intensity = bloomTarget })
+	if depthOfField then
+		depthOfField.Enabled = LIGHT.DepthOfField.Enabled and not perfMode
+	end
 end
 
 -- Monolith -------------------------------------------------------------------------
@@ -163,16 +198,27 @@ local function applySplit(split: boolean)
 	end
 	local core = root:FindFirstChild("VoidCore")
 	if core and core:IsA("BasePart") then
-		Ui.Tween(core, SPLIT_SECONDS, { Transparency = if split then 0.05 else 1 })
+		Ui.Tween(core, SPLIT_SECONDS, {
+			Transparency = if split then 0.05 else 1,
+			Color = if split then SPLIT.CoreRevealColor else VisualBibleConfig.Palette.GoldCore,
+			Size = if split then Vector3.new(8.5, 8.5, 8.5) else Vector3.new(7, 7, 7),
+		})
 	end
 	if split then
-		CameraController.Shake(0.6, 1.2)
-		CameraController.Punch(6, 1.6)
+		VFXController.MonolithSplitCrack()
+		CameraController.Shake(SPLIT.CameraShake, SPLIT.ShakeSeconds)
+		CameraController.Punch(SPLIT.CameraPunchFov, SPLIT.CameraPunchSeconds)
 		local ok, audio = pcall(function()
 			return require(script.Parent.AudioController)
 		end)
 		if ok and audio and audio.Play then
 			audio.Play("MonolithSplit")
+			audio.Play("MonolithCore")
+		end
+	else
+		local seam = root:FindFirstChild("MonolithSplitSeam")
+		if seam and seam:IsA("BasePart") then
+			Ui.Tween(seam, SPLIT_SECONDS, { Transparency = 0.2 })
 		end
 	end
 end

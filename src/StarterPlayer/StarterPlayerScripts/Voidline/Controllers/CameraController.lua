@@ -10,6 +10,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
 local ClipFramingConfig = require(Voidline.Config.ClipFramingConfig)
+local VisualBibleConfig = require(Voidline.Config.VisualBibleConfig)
 
 local Client = script.Parent.Parent.Client
 local Ui = require(Client.Ui)
@@ -21,7 +22,7 @@ local CameraController = {}
 local BASE_FOV = 70
 local BEAM_LINK_FOV = 8
 local TOW_FOV = 5
-local HALO_FOV = 4
+local HALO_FOV = VisualBibleConfig.SovereignHalo.CameraFovAdd
 local FOV_RATE = 4
 local MAX_SHAKE = 1.2
 

@@ -68,6 +68,11 @@ local PITCH_BAND: { [string]: { number } } = {
 	Warn = { 0.85, 0.95 },
 	Relic = { 0.92, 1.06 },
 	Codex = { 1.05, 1.15 },
+	MonolithSplit = { 0.9, 1.02 },
+	MonolithCore = { 0.82, 0.96 },
+	HaloForm = { 0.96, 1.08 },
+	TowLatch = { 0.94, 1.05 },
+	StarfallStreak = { 0.88, 1.02 },
 }
 
 local function getOrCreate(key: string): Sound?
@@ -169,6 +174,9 @@ local function onJuice(message: any)
 			AudioController.Play("Warn")
 		end
 		return
+	end
+	if kind == "WorldEvent" and message.Phase == "start" then
+		AudioController.Play("StarfallStreak")
 	end
 	if kind == "WorldEvent" and message.Phase ~= "start" then
 		return

@@ -9,6 +9,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
 local GameConfig = require(Voidline.Config.GameConfig)
+local VisualBibleConfig = require(Voidline.Config.VisualBibleConfig)
 local ClipFramingConfig = require(Voidline.Config.ClipFramingConfig)
 local PlotLayout = require(Voidline.Modules.PlotLayout)
 local HubLayout = require(Voidline.Modules.HubLayout)
@@ -16,6 +17,8 @@ local HubLayout = require(Voidline.Modules.HubLayout)
 local MapBuilder = {}
 
 local COLORS = GameConfig.Colors
+local PALETTE = VisualBibleConfig.Palette
+local DECK = VisualBibleConfig.HubDeck
 
 type PartProps = {
 	Name: string?,
@@ -121,16 +124,80 @@ local function goldTrim(parent: Instance, base: CFrame, size: Vector3)
 	end
 end
 
-local function buildHub(root: Instance)
-	local hub = folder("Hub", root)
-	local hubCFrame = CFrame.new(0, 0, 0)
+-- Procedural obsidian-gold plated deck: inset tiles, edge lights, trim rings.
+local function buildPlatedHubDeck(hub: Instance, hubCFrame: CFrame)
+	local deck = folder("HubPlatedDeck", hub)
+	local tile = DECK.TileStuds
+	local gap = DECK.Gap
+	local halfX = HubLayout.HubSize.X / 2
+	local halfZ = HubLayout.HubSize.Z / 2
+	local baseY = hubCFrame.Position.Y
+	local tileCount = 0
+	for ix = 0, math.floor((HubLayout.HubSize.X - gap) / tile) - 1 do
+		for iz = 0, math.floor((HubLayout.HubSize.Z - gap) / tile) - 1 do
+			local cx = -halfX + gap + tile / 2 + ix * tile
+			local cz = -halfZ + gap + tile / 2 + iz * tile
+			local inset = (ix + iz) % 2 == 0
+			local thickness = if inset then DECK.PlateThickness - DECK.InsetDepth else DECK.PlateThickness
+			local y = baseY + thickness / 2 - DECK.PlateThickness / 2
+			part({
+				Name = if inset then "DeckTileInset" else "DeckTile",
+				Parent = deck,
+				Size = Vector3.new(tile - gap, thickness, tile - gap),
+				CFrame = CFrame.new(cx, y, cz),
+				Color = if inset then PALETTE.ObsidianLift else PALETTE.Obsidian,
+				Material = if inset then Enum.Material.DiamondPlate else Enum.Material.Slate,
+			})
+			if inset then
+				local edge = DECK.EdgeLightThickness
+				part({
+					Name = "DeckEdgeLight",
+					Parent = deck,
+					Size = Vector3.new(tile - gap * 2, DECK.EdgeLightHeight, edge),
+					CFrame = CFrame.new(
+						cx,
+						y + thickness / 2 + DECK.EdgeLightHeight / 2,
+						cz + (tile - gap) / 2 - edge / 2
+					),
+					Color = PALETTE.DeckInset,
+					Material = Enum.Material.Neon,
+					Transparency = 0.25,
+					CanCollide = false,
+					CanQuery = false,
+				})
+			end
+			tileCount += 1
+		end
+	end
+	deck:SetAttribute("TileCount", tileCount)
+	for ri, radius in DECK.TrimRingRadii do
+		part({
+			Name = "HubTrimRing" .. ri,
+			Parent = deck,
+			Size = Vector3.new(DECK.TrimRingHeight, radius * 2, radius * 2),
+			CFrame = hubCFrame * CFrame.new(0, 0.25 + ri * 0.02, 0) * CFrame.Angles(0, 0, math.rad(90)),
+			Shape = Enum.PartType.Cylinder,
+			Color = PALETTE.Gold,
+			Material = Enum.Material.Neon,
+			Transparency = 0.78 + ri * 0.04,
+			CanCollide = false,
+			CanQuery = false,
+		})
+	end
 	part({
 		Name = "HubPad",
 		Parent = hub,
-		Size = HubLayout.HubSize,
-		CFrame = hubCFrame,
+		Size = Vector3.new(HubLayout.HubSize.X, 0.4, HubLayout.HubSize.Z),
+		CFrame = hubCFrame * CFrame.new(0, -0.35, 0),
+		Color = PALETTE.Obsidian,
 		Material = Enum.Material.Basalt,
 	})
+end
+
+local function buildHub(root: Instance)
+	local hub = folder("Hub", root)
+	local hubCFrame = CFrame.new(0, 0, 0)
+	buildPlatedHubDeck(hub, hubCFrame)
 	goldTrim(hub, hubCFrame, HubLayout.HubSize)
 
 	-- Monolith: two halves (split along X) plus gold bands and the Void Core.
@@ -192,7 +259,7 @@ local function buildHub(root: Instance)
 		Parent = monolith,
 		Size = Vector3.new(7, 7, 7),
 		CFrame = CFrame.new(HubLayout.VoidCore),
-		Color = COLORS.VoidAccent,
+		Color = PALETTE.GoldCore,
 		Material = Enum.Material.Neon,
 		Shape = Enum.PartType.Ball,
 		CanCollide = false,

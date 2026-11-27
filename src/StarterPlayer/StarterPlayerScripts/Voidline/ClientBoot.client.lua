@@ -120,6 +120,8 @@ TowController.OnArrive(function(tow)
 		return
 	end
 	VFXController.Popup("TOW HOME", Ui.Colors.GoldBright, tow.To)
+	VFXController.TowArriveShock(tow.To)
+	AudioController.Play("TowLatch")
 	CameraController.Shake(0.28, 0.28)
 end)
 task.spawn(InteractController.Init, {

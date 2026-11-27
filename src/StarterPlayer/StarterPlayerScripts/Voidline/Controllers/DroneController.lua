@@ -11,11 +11,13 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
 local DroneConfig = require(Voidline.Config.DroneConfig)
+local VisualBibleConfig = require(Voidline.Config.VisualBibleConfig)
 local DroneRegistry = require(Voidline.Content.DroneRegistry)
 
 local Client = script.Parent.Parent.Client
 local Ui = require(Client.Ui)
 local TowController = require(script.Parent.TowController)
+local CameraController = require(script.Parent.CameraController)
 
 local DroneController = {}
 
@@ -70,7 +72,9 @@ local aimAttachments: { [BasePart]: Attachment } = {}
 local hitEmitters: { [BasePart]: ParticleEmitter } = {}
 local perfMode = false
 local haloRing: Part
+local haloRingInner: Part
 local haloSpin = 0
+local localFormation = 0
 
 -- Rocks -----------------------------------------------------------------------
 
@@ -190,12 +194,12 @@ local function newDrone(): Drone
 		FaceCamera = true,
 		LightEmission = 1,
 		LightInfluence = 0,
-		Segments = 10,
-		CurveSize0 = 1.5,
-		CurveSize1 = -1.5,
-		Width0 = 0.42,
-		Width1 = 0.5,
-		Color = ColorSequence.new(Color3.fromRGB(150, 230, 255), Color3.fromRGB(255, 230, 150)),
+		Segments = VisualBibleConfig.Tow.RibbonSegments,
+		CurveSize0 = 1.8,
+		CurveSize1 = -1.2,
+		Width0 = VisualBibleConfig.Tow.RibbonWidth0,
+		Width1 = VisualBibleConfig.Tow.RibbonWidth1,
+		Color = ColorSequence.new(VisualBibleConfig.Palette.BeamCyan, VisualBibleConfig.Palette.TetherRibbon),
 		Transparency = NumberSequence.new(0.2, 0.5),
 		Parent = body,
 	}) :: Beam
@@ -525,8 +529,15 @@ local function stepFleet(
 		drone.Trail.Enabled = not far and not perfMode and (isLocal or (drone.Position - cameraPos).Magnitude < 120)
 	end
 
-	-- Orbital Beam-Link: chain the ring of drones around the shared target.
-	local linkCount = if formation == 2 and #targets > 0 and miners >= 3 and not far then miners else 0
+	-- Orbital Beam-Link + Sovereign Halo machine ring (beams between drones).
+	local linkCount = 0
+	if not far then
+		if formation == 2 and #targets > 0 and miners >= 3 then
+			linkCount = miners
+		elseif formation == 3 and n >= 3 then
+			linkCount = n
+		end
+	end
 	while #fleet.Links > linkCount do
 		local beam = table.remove(fleet.Links)
 		if beam then
@@ -537,19 +548,21 @@ local function stepFleet(
 	while #fleet.Links < linkCount and #fleet.Links < LINK_POOL_MAX do
 		table.insert(fleet.Links, acquireLink())
 	end
+	local ringMembers = if formation == 3 then n else miners
 	for i, beam in fleet.Links do
 		local a = fleet.Drones[i]
-		local b = fleet.Drones[i % miners + 1]
+		local b = fleet.Drones[i % ringMembers + 1]
 		beam.Attachment0 = a.Attach
 		beam.Attachment1 = b.Attach
 		beam.Color = ColorSequence.new(fleet.LaserColor)
 		beam.Enabled = true
+		local haloWidth = if formation == 3 then VisualBibleConfig.SovereignHalo.LinkWidth else 0.34
 		if isLocal and not perfMode then
-			beam.Width0 = 0.34
-			beam.Width1 = 0.34
+			beam.Width0 = haloWidth
+			beam.Width1 = haloWidth
 		else
-			beam.Width0 = 0.24
-			beam.Width1 = 0.24
+			beam.Width0 = haloWidth * 0.7
+			beam.Width1 = haloWidth * 0.7
 		end
 	end
 end
@@ -588,14 +601,44 @@ local function step(dt: number)
 			end
 		end
 	end
+	local cfg = VisualBibleConfig.SovereignHalo
 	if localHalo and localHaloCenter then
-		haloSpin += dt * 1.2
-		haloRing.CFrame = CFrame.new(localHaloCenter + Vector3.new(0, 3.1, 0))
-			* CFrame.Angles(0, haloSpin, math.rad(90))
-		haloRing.Size = Vector3.new(0.32, localHaloScale, localHaloScale)
-		haloRing.Transparency = 0.42
+		haloSpin += dt * cfg.RingSpinRate
+		local cf = CFrame.new(localHaloCenter + Vector3.new(0, 3.1, 0)) * CFrame.Angles(0, haloSpin, math.rad(90))
+		haloRing.CFrame = cf
+		haloRing.Size = Vector3.new(cfg.RingThickness, localHaloScale, localHaloScale)
+		haloRing.Transparency = 0.38
+		haloRingInner.CFrame = cf * CFrame.Angles(0, -haloSpin * 0.6, 0)
+		haloRingInner.Size = Vector3.new(
+			cfg.RingThickness * 0.65,
+			localHaloScale * cfg.SecondaryRingScale,
+			localHaloScale * cfg.SecondaryRingScale
+		)
+		haloRingInner.Transparency = 0.55
 	else
 		haloRing.CFrame = HIDDEN
+		haloRingInner.CFrame = HIDDEN
+	end
+	local localPlayer = Players.LocalPlayer
+	local form = localPlayer:GetAttribute("Formation")
+	local f = if type(form) == "number" then form else 0
+	if f ~= localFormation then
+		localFormation = f
+		if f == 3 and not perfMode then
+			local okVfx, vfx = pcall(function()
+				return require(script.Parent.VFXController)
+			end)
+			if okVfx and vfx and vfx.SovereignHaloPulse then
+				vfx.SovereignHaloPulse()
+			end
+			local okAud, aud = pcall(function()
+				return require(script.Parent.AudioController)
+			end)
+			if okAud and aud and aud.Play then
+				aud.Play("HaloForm")
+			end
+			CameraController.Punch(VisualBibleConfig.SovereignHalo.CameraFovAdd, 0.9)
+		end
 	end
 	if #parts > 0 then
 		Workspace:BulkMoveTo(parts, cframes, Enum.BulkMoveMode.FireCFrameChanged)
@@ -647,6 +690,21 @@ function DroneController.Init()
 		Color = Ui.Colors.GoldBright,
 		Transparency = 1,
 		Size = Vector3.new(0.32, 6, 6),
+		CFrame = HIDDEN,
+		Parent = folder,
+	}) :: Part
+	haloRingInner = Ui.Make("Part", {
+		Name = "SovereignHaloInner",
+		Anchored = true,
+		CanCollide = false,
+		CanQuery = false,
+		CanTouch = false,
+		CastShadow = false,
+		Shape = Enum.PartType.Cylinder,
+		Material = Enum.Material.Neon,
+		Color = VisualBibleConfig.Palette.Gold,
+		Transparency = 1,
+		Size = Vector3.new(0.22, 4, 4),
 		CFrame = HIDDEN,
 		Parent = folder,
 	}) :: Part

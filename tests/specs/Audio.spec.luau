@@ -21,6 +21,10 @@ local REQUIRED = {
 	"Forge",
 	"Ambient",
 	"MonolithSplit",
+	"MonolithCore",
+	"HaloForm",
+	"TowLatch",
+	"StarfallStreak",
 }
 
 tests["AudioConfig core SFX use non-empty rbxasset paths"] = function()

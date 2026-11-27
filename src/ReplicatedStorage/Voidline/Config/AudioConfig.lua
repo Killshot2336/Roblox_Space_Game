@@ -14,6 +14,10 @@ local AudioConfig = {
 		BridgeIgnite = { AssetId = "rbxasset://sounds/flashbulb.mp3", Volume = 0.65 },
 		Starfall = { AssetId = "rbxasset://sounds/collide.mp3", Volume = 0.55 },
 		MonolithSplit = { AssetId = "rbxasset://sounds/impact_water.mp3", Volume = 0.58 },
+		MonolithCore = { AssetId = "rbxasset://sounds/bass.mp3", Volume = 0.52 },
+		HaloForm = { AssetId = "rbxasset://sounds/snap.mp3", Volume = 0.42 },
+		TowLatch = { AssetId = "rbxasset://sounds/Kerplunk.mp3", Volume = 0.48 },
+		StarfallStreak = { AssetId = "rbxasset://sounds/swordlunge.mp3", Volume = 0.4 },
 		Rebirth = { AssetId = "rbxasset://sounds/victory.mp3", Volume = 0.55 },
 		StoreSuccess = { AssetId = "rbxasset://sounds/electronicpingshort.mp3", Volume = 0.45 },
 		-- Extra juice
