@@ -36,9 +36,9 @@ local VisualBibleConfig = {
 			Offset = 0.12,
 		},
 		Grade = {
-			Saturation = 0.08,
-			Contrast = 0.12,
-			Tint = Color3.fromRGB(255, 248, 235),
+			Saturation = 0.1,
+			Contrast = 0.16,
+			Tint = Color3.fromRGB(255, 246, 228),
 		},
 		DepthOfField = {
 			Enabled = true,

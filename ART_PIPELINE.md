@@ -54,26 +54,62 @@ Export **FBX** or **GLB** → import in Studio (Avatar / Mesh Importer) or uploa
 
 For fast iteration without Meshy: block out in Studio, **File → Export Selection** (if available) or union parts → **Mesh** from parts → upload. Match approximate bounds in `HubLayout` / `PlotLayout` before replacing.
 
-## UI icons
+## UI icons (generated art pack)
 
-PNG sources for upload live under `/opt/cursor/artifacts/art/` (godly pass — obsidian/gold, no bubble ABX palette).
+PNG sources live under **`/opt/cursor/artifacts/art/`** (128×128 UI icons, 512×512 decals/textures, 1280×720 concept stills).  
+Owner click-by-click steps: **`OWNER_UPLOAD_ART.md`**.  
+Automatic Open Cloud batch: **`./scripts/upload_art_open_cloud.sh`** (needs `ROBLOX_OPEN_CLOUD_API_KEY` + `ROBLOX_USER_ID` or `ROBLOX_GROUP_ID` in the shell).
 
-1. Dashboard → **Development Items** → **Images** → upload each PNG (128×128 recommended).
-2. Paste Asset IDs into `ArtConfig.lua`:
-   - **Hotbar** → `ArtConfig.UI.Hotbar.*.AssetId`
-   - **HUD stat chips** → `ArtConfig.UI.Hud.Credits|Ore|Shards|Tokens.AssetId`
+1. Dashboard → **Development Items** → **Images** → upload each PNG (or run the upload script).
+2. Paste numeric Asset IDs into `ArtConfig.lua` — field is always `AssetId` under `ArtConfig.UI.*` (never invent IDs in code).
 3. Until IDs exist, UI uses `rbxasset://textures/ui/GuiImagePlaceholder.png` with **gold glyph** fallback (hotbar + HUD).
 
-| File | `ArtConfig` key |
-|------|-----------------|
-| `icon_hotbar_upgrade.png` | `UI.Hotbar.Upgrade` |
-| `icon_formation_orbit.png` | `UI.Hotbar.Formation1` |
-| `icon_formation_wedge.png` | `UI.Hotbar.Formation2` |
-| `icon_formation_crown.png` | `UI.Hotbar.Formation3` |
-| `icon_hotbar_store.png` | `UI.Hotbar.Store` |
-| `icon_hotbar_clip.png` | `UI.Hotbar.Clip` |
+### Hotbar (`ArtConfig.UI.Hotbar`)
 
-Optional: generate matching HUD chip icons (credits diamond, cargo hex, shard star) and set `UI.Hud.*` the same way.
+| File | Key | Lua path |
+|------|-----|----------|
+| `icon_hotbar_upgrade.png` | Upgrade | `UI.Hotbar.Upgrade.AssetId` |
+| `icon_formation_orbit.png` | Formation1 | `UI.Hotbar.Formation1.AssetId` |
+| `icon_formation_wedge.png` | Formation2 | `UI.Hotbar.Formation2.AssetId` |
+| `icon_formation_crown.png` | Formation3 | `UI.Hotbar.Formation3.AssetId` |
+| `icon_hotbar_store.png` | Store | `UI.Hotbar.Store.AssetId` |
+| `icon_hotbar_menu.png` | Menu | `UI.Hotbar.Menu.AssetId` |
+| `icon_hotbar_home.png` | Home | `UI.Hotbar.Home.AssetId` |
+| `icon_hotbar_sell.png` | Sell | `UI.Hotbar.Sell.AssetId` |
+| `icon_hotbar_clip.png` | Clip | `UI.Hotbar.Clip.AssetId` |
+
+### HUD chips (`ArtConfig.UI.Hud`)
+
+| File | Key | Lua path |
+|------|-----|----------|
+| `icon_hud_credits.png` | Credits | `UI.Hud.Credits.AssetId` |
+| `icon_hud_ore.png` | Ore | `UI.Hud.Ore.AssetId` |
+| `icon_hud_shards.png` | Shards | `UI.Hud.Shards.AssetId` |
+| `icon_hud_tokens.png` | Tokens | `UI.Hud.Tokens.AssetId` |
+
+### Store (`ArtConfig.UI.Store`)
+
+| File | Key | Lua path |
+|------|-----|----------|
+| `icon_store_gamepass.png` | GamePass | `UI.Store.GamePass.AssetId` |
+| `icon_store_devproduct.png` | DevProduct | `UI.Store.DevProduct.AssetId` |
+| `icon_store_summon.png` | Summon | `UI.Store.Summon.AssetId` |
+
+### World decals & textures
+
+| File | Key | Lua path | Upload type |
+|------|-----|----------|-------------|
+| `decal_voidline_sigil.png` | VoidlineSigil | `Decals.VoidlineSigil.DecalId` | Decal |
+| `decal_plot_sector_mark.png` | PlotSectorMark | `Decals.PlotSectorMark.DecalId` | Decal |
+| `texture_obsidian_plate.png` | ObsidianPlate | `Textures.ObsidianPlate.TextureId` | Image |
+
+### Concept stills (mesh reference — no `ArtConfig` paste)
+
+| File | Intended mesh key |
+|------|-------------------|
+| `concept_monolith_half.png` | `Meshes.MonolithHalf` |
+| `concept_bridge_spine.png` | `Meshes.EnergyBridgeSegment` |
+| `concept_grinder_core.png` | `Meshes.GrinderCore` |
 
 ## One-commit mesh swap
 

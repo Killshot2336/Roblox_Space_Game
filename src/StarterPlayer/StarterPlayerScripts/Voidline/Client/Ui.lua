@@ -166,12 +166,19 @@ function Ui.Glass(props: { [string]: any }): Frame
 	Ui.Corner(frame, props.CornerRadius or 14)
 	Ui.Stroke(frame, Ui.Colors.Gold, if premium then 1.75 else 1.5, if premium then 0.42 else 0.55)
 	Ui.Make("UIGradient", {
-		Rotation = 90,
+		Rotation = premium and 135 or 90,
 		Transparency = NumberSequence.new({
 			NumberSequenceKeypoint.new(0, if premium then 0 else 0),
-			NumberSequenceKeypoint.new(1, if premium then 0.12 else 0.2),
+			NumberSequenceKeypoint.new(0.55, if premium then 0.05 else 0.08),
+			NumberSequenceKeypoint.new(1, if premium then 0.14 else 0.2),
 		}),
-		Color = ColorSequence.new(Ui.Colors.GlassLight, Ui.Colors.Glass),
+		Color = if premium
+			then ColorSequence.new({
+				ColorSequenceKeypoint.new(0, Color3.fromRGB(42, 34, 68)),
+				ColorSequenceKeypoint.new(0.5, Ui.Colors.GlassLight),
+				ColorSequenceKeypoint.new(1, Ui.Colors.Glass),
+			})
+			else ColorSequence.new(Ui.Colors.GlassLight, Ui.Colors.Glass),
 		Parent = frame,
 	})
 	if props.Parent then

@@ -246,6 +246,44 @@ local function cableRun(parent: Instance, a: Vector3, b: Vector3, name: string)
 	beam.Parent = parent
 end
 
+local function buildMonolithFractureDressing(monolith: Instance, center: Vector3, halfSize: Vector3, size: Vector3)
+	local dress = folder("MonolithFractureDressing", monolith)
+	for i = 1, 5 do
+		local y = -size.Y / 2 + 8 + i * 11
+		local chip = part({
+			Name = "FractureChip" .. i,
+			Parent = dress,
+			Size = Vector3.new(0.85 + (i % 2) * 0.35, 2.8 + (i % 3), 1.1),
+			CFrame = CFrame.new(center + Vector3.new(0, y, halfSize.Z * 0.38))
+				* CFrame.Angles(math.rad(6 + i * 3), math.rad(12 * i), math.rad(18 - i * 2)),
+			Color = Color3.fromRGB(12, 10, 18),
+			Material = Enum.Material.Slate,
+			CanCollide = false,
+			CastShadow = true,
+		})
+		goldSeam(
+			dress,
+			chip.CFrame * CFrame.new(0, chip.Size.Y / 2 - 0.2, 0),
+			Vector3.new(chip.Size.X * 0.6, DECK.SeamThickness, 0.28),
+			"FractureSeam" .. i
+		)
+	end
+	local buttressSides: { [string]: number } = { Left = -1, Right = 1 }
+	for side, sign in buttressSides do
+		part({
+			Name = "MonolithButtress" .. side,
+			Parent = dress,
+			Size = Vector3.new(2.4, size.Y * 0.55, 3.2),
+			CFrame = CFrame.new(center + Vector3.new(sign * (halfSize.X + 1.2), -size.Y * 0.08, -halfSize.Z * 0.42))
+				* CFrame.Angles(0, sign * math.rad(14), sign * math.rad(6)),
+			Color = Color3.fromRGB(16, 14, 22),
+			Material = Enum.Material.DiamondPlate,
+			CanCollide = false,
+			CastShadow = true,
+		})
+	end
+end
+
 local function buildHubCathedralDressing(hub: Instance, hubCFrame: CFrame, walkTop: number)
 	local dress = folder("HubCathedralDressing", hub)
 	part({
@@ -691,6 +729,7 @@ local function buildHub(root: Instance)
 	heroRim.Parent = heroKey
 	label(monolith:FindFirstChild("MonolithLeft") :: Instance, "THE VOIDLINE MONOLITH", 42, 48)
 	local monolithHalfSize = Vector3.new(size.X / 2, size.Y, size.Z)
+	buildMonolithFractureDressing(monolith, HubLayout.MonolithCenter, monolithHalfSize, size)
 	for side, sign in sides do
 		local half = monolith:FindFirstChild("Monolith" .. side)
 		if half and half:IsA("BasePart") then
@@ -1342,6 +1381,22 @@ local function buildPlot(plots: Instance, index: number)
 		Material = Enum.Material.DiamondPlate,
 		CanCollide = false,
 	})
+	for ti = 1, 8 do
+		local toothAngle = (ti - 0.5) / 8 * math.pi * 2
+		part({
+			Name = "GrinderSawTooth" .. ti,
+			Parent = machine,
+			Size = Vector3.new(1.2, 2.4, 0.55),
+			CFrame = plotCFrame * CFrame.new(
+				PlotLayout.Grinder.X + math.cos(toothAngle) * 5.2,
+				PlotLayout.SurfaceY + 3.8,
+				PlotLayout.Grinder.Z + math.sin(toothAngle) * 5.2
+			) * CFrame.Angles(0, toothAngle, math.rad(22)),
+			Color = Color3.fromRGB(30, 28, 38),
+			Material = Enum.Material.Metal,
+			CanCollide = false,
+		})
+	end
 	local grinder = part({
 		Name = "GrinderCore",
 		Parent = station,
