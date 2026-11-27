@@ -19,6 +19,8 @@ local MapBuilder = {}
 local COLORS = GameConfig.Colors
 local PALETTE = VisualBibleConfig.Palette
 local DECK = VisualBibleConfig.HubDeck
+local HUB_FILL = VisualBibleConfig.Lighting.HubFill
+local MAX_GOLD_SEAM = DECK.MaxGoldSeamStuds
 
 type PartProps = {
 	Name: string?,
@@ -57,7 +59,7 @@ local function part(props: PartProps): Part
 end
 MapBuilder.Part = part
 
--- Invisible collision for neon walkways (visual parts stay CanCollide=false).
+-- Invisible collision under matte bridge decks (neon is trim-only, CanCollide=false).
 local function walkPlate(props: PartProps): Part
 	local plate = part({
 		Name = props.Name,
@@ -119,26 +121,188 @@ local function label(parent: Instance, text: string, height: number, maxDistance
 end
 MapBuilder.Label = label
 
+local function goldSeam(parent: Instance, cframe: CFrame, size: Vector3, name: string?, shape: Enum.PartType?)
+	local seam = part({
+		Name = name or "GoldSeam",
+		Parent = parent,
+		Size = size,
+		CFrame = cframe,
+		Color = PALETTE.Gold,
+		Material = Enum.Material.Neon,
+		Transparency = 0.42,
+		CanCollide = false,
+		CanQuery = false,
+		Shape = shape,
+	})
+	seam:SetAttribute("GoldSeam", true)
+	return seam
+end
+
+-- Thin gold inlay on matte lip (seam cross-section ≤ MaxGoldSeamStuds).
 local function goldTrim(parent: Instance, base: CFrame, size: Vector3)
 	local half = size / 2
+	local lip = math.min(0.35, MAX_GOLD_SEAM)
+	local seamT = DECK.SeamThickness
 	local edges = {
-		{ Vector3.new(0, half.Y, -half.Z), Vector3.new(size.X, 0.4, 0.6) },
-		{ Vector3.new(0, half.Y, half.Z), Vector3.new(size.X, 0.4, 0.6) },
-		{ Vector3.new(-half.X, half.Y, 0), Vector3.new(0.6, 0.4, size.Z) },
-		{ Vector3.new(half.X, half.Y, 0), Vector3.new(0.6, 0.4, size.Z) },
+		{ Vector3.new(0, half.Y + DECK.SeamLift, -half.Z + lip / 2), Vector3.new(size.X - lip * 2, seamT, lip) },
+		{ Vector3.new(0, half.Y + DECK.SeamLift, half.Z - lip / 2), Vector3.new(size.X - lip * 2, seamT, lip) },
+		{ Vector3.new(-half.X + lip / 2, half.Y + DECK.SeamLift, 0), Vector3.new(lip, seamT, size.Z - lip * 2) },
+		{ Vector3.new(half.X - lip / 2, half.Y + DECK.SeamLift, 0), Vector3.new(lip, seamT, size.Z - lip * 2) },
 	}
 	for i, edge in edges do
-		part({
-			Name = "GoldTrim" .. i,
-			Parent = parent,
-			Size = edge[2],
-			CFrame = base * CFrame.new(edge[1]),
-			Color = COLORS.Gold,
-			Material = Enum.Material.Neon,
+		goldSeam(parent, base * CFrame.new(edge[1]), edge[2], "GoldTrim" .. i)
+	end
+end
+
+local function attachFillLight(parent: Part, color: Color3, brightness: number, range: number)
+	local light = Instance.new("PointLight")
+	light.Brightness = brightness
+	light.Range = range
+	light.Color = color
+	light.Shadows = false
+	light.Parent = parent
+end
+
+local function buildHubFillLights(hub: Instance, hubCFrame: CFrame, walkTop: number)
+	local lights = folder("HubFillLights", hub)
+	local y = walkTop + 6
+	local offsets = {
+		Vector3.new(28, y, 14),
+		Vector3.new(-22, y, -18),
+		Vector3.new(14, y, -30),
+		Vector3.new(-32, y, 22),
+	}
+	for i, pos in offsets do
+		local anchor = part({
+			Name = "FillAnchor" .. i,
+			Parent = lights,
+			Size = Vector3.new(0.6, 0.6, 0.6),
+			CFrame = CFrame.new(pos),
+			Transparency = 1,
 			CanCollide = false,
 			CanQuery = false,
 		})
+		attachFillLight(
+			anchor,
+			if i % 2 == 0 then Color3.fromRGB(210, 188, 148) else Color3.fromRGB(168, 182, 220),
+			HUB_FILL.FillBrightness,
+			HUB_FILL.Range
+		)
 	end
+	local rim = part({
+		Name = "MonolithRimFill",
+		Parent = lights,
+		Size = Vector3.new(1, 1, 1),
+		CFrame = CFrame.new(HubLayout.MonolithCenter + Vector3.new(0, 8, -14)),
+		Transparency = 1,
+		CanCollide = false,
+		CanQuery = false,
+	})
+	attachFillLight(rim, Color3.fromRGB(255, 218, 140), HUB_FILL.RimBrightness, HUB_FILL.Range * 0.75)
+end
+
+local function cableRun(parent: Instance, a: Vector3, b: Vector3, name: string)
+	local p0 = part({
+		Name = name .. "A",
+		Parent = parent,
+		Size = Vector3.new(0.45, 0.45, 0.45),
+		CFrame = CFrame.new(a),
+		Color = PALETTE.ObsidianLift,
+		Material = Enum.Material.Metal,
+		CanCollide = false,
+		CanQuery = false,
+	})
+	local p1 = part({
+		Name = name .. "B",
+		Parent = parent,
+		Size = Vector3.new(0.45, 0.45, 0.45),
+		CFrame = CFrame.new(b),
+		Color = PALETTE.ObsidianLift,
+		Material = Enum.Material.Metal,
+		CanCollide = false,
+		CanQuery = false,
+	})
+	local a0 = Instance.new("Attachment")
+	a0.Parent = p0
+	local a1 = Instance.new("Attachment")
+	a1.Parent = p1
+	local beam = Instance.new("Beam")
+	beam.Name = name .. "Beam"
+	beam.Attachment0 = a0
+	beam.Attachment1 = a1
+	beam.Width0 = 0.12
+	beam.Width1 = 0.12
+	beam.Color = ColorSequence.new(PALETTE.Gold)
+	beam.Transparency = NumberSequence.new(0.35)
+	beam.FaceCamera = true
+	beam.LightEmission = 0.55
+	beam.Parent = parent
+end
+
+local function buildHubCathedralDressing(hub: Instance, hubCFrame: CFrame, walkTop: number)
+	local dress = folder("HubCathedralDressing", hub)
+	part({
+		Name = "OffsetSpireEast",
+		Parent = dress,
+		Size = Vector3.new(4.5, 26, 4.5),
+		CFrame = hubCFrame * CFrame.new(36, walkTop + 13, -11) * CFrame.Angles(0, math.rad(18), math.rad(4)),
+		Color = Color3.fromRGB(16, 14, 22),
+		Material = Enum.Material.Slate,
+		CastShadow = true,
+	})
+	part({
+		Name = "OffsetSpireNorthwest",
+		Parent = dress,
+		Size = Vector3.new(3.2, 19, 3.2),
+		CFrame = hubCFrame * CFrame.new(-30, walkTop + 9.5, 20) * CFrame.Angles(math.rad(-6), math.rad(-22), 0),
+		Color = Color3.fromRGB(14, 12, 20),
+		Material = Enum.Material.Metal,
+	})
+	goldSeam(dress, hubCFrame * CFrame.new(36, walkTop + 25.5, -11), Vector3.new(0.18, 4.2, 0.18), "SpireEastCrownSeam")
+	for i = 1, 5 do
+		local ribZ = -38 + i * 6.5 + (i % 2) * 1.2
+		part({
+			Name = "HubRibbing" .. i,
+			Parent = dress,
+			Size = Vector3.new(HubLayout.HubSize.X * 0.92, 1.8, 0.55),
+			CFrame = hubCFrame * CFrame.new(0, walkTop - 0.2, ribZ),
+			Color = Color3.fromRGB(20, 18, 26),
+			Material = Enum.Material.DiamondPlate,
+			CanCollide = false,
+		})
+		if i % 2 == 0 then
+			goldSeam(
+				dress,
+				hubCFrame * CFrame.new(0, walkTop + 0.12, ribZ),
+				Vector3.new(18 + i * 3, DECK.SeamThickness, 0.35),
+				"HubRibSeam" .. i
+			)
+		end
+	end
+	local under = folder("UnderHubGantry", dress)
+	for i = 1, 3 do
+		part({
+			Name = "GantryBeam" .. i,
+			Parent = under,
+			Size = Vector3.new(HubLayout.HubSize.X - 8 - i * 4, 0.9, 1.2),
+			CFrame = hubCFrame * CFrame.new(i * 3 - 5, walkTop - 3.2 - i * 0.6, -8 + i * 9),
+			Color = Color3.fromRGB(22, 20, 28),
+			Material = Enum.Material.CorrodedMetal,
+			CanCollide = false,
+		})
+	end
+	cableRun(
+		dress,
+		hubCFrame.Position + Vector3.new(30, walkTop + 22, -8),
+		hubCFrame.Position + Vector3.new(8, walkTop + 4, 28),
+		"CableA"
+	)
+	cableRun(
+		dress,
+		hubCFrame.Position + Vector3.new(-26, walkTop + 16, 14),
+		hubCFrame.Position + Vector3.new(-6, walkTop - 2.5, -32),
+		"CableB"
+	)
 end
 
 -- Procedural obsidian-gold plated deck: inset tiles, edge lights, trim rings.
@@ -168,22 +332,12 @@ local function buildPlatedHubDeck(hub: Instance, hubCFrame: CFrame)
 			})
 			deckTile:SetAttribute("Walkable", true)
 			if inset then
-				local edge = DECK.EdgeLightThickness
-				part({
-					Name = "DeckEdgeLight",
-					Parent = deck,
-					Size = Vector3.new(tile - gap * 2, DECK.EdgeLightHeight, edge),
-					CFrame = CFrame.new(
-						cx,
-						y + thickness / 2 + DECK.EdgeLightHeight / 2,
-						cz + (tile - gap) / 2 - edge / 2
-					),
-					Color = PALETTE.DeckInset,
-					Material = Enum.Material.Neon,
-					Transparency = 0.25,
-					CanCollide = false,
-					CanQuery = false,
-				})
+				goldSeam(
+					deck,
+					CFrame.new(cx, y + thickness / 2 + DECK.SeamLift, cz + (tile - gap) / 2 - 0.2),
+					Vector3.new(tile - gap * 2, DECK.SeamThickness, 0.35),
+					"DeckInsetSeam"
+				)
 			end
 			tileCount += 1
 		end
@@ -194,14 +348,21 @@ local function buildPlatedHubDeck(hub: Instance, hubCFrame: CFrame)
 			Name = "HubTrimRing" .. ri,
 			Parent = deck,
 			Size = Vector3.new(DECK.TrimRingHeight, radius * 2, radius * 2),
-			CFrame = hubCFrame * CFrame.new(0, 0.25 + ri * 0.02, 0) * CFrame.Angles(0, 0, math.rad(90)),
+			CFrame = hubCFrame * CFrame.new(0, 0.22 + ri * 0.02, 0) * CFrame.Angles(0, 0, math.rad(90)),
 			Shape = Enum.PartType.Cylinder,
-			Color = PALETTE.Gold,
-			Material = Enum.Material.Neon,
-			Transparency = 0.78 + ri * 0.04,
+			Color = Color3.fromRGB(14, 12, 18),
+			Material = Enum.Material.Metal,
+			Transparency = 0.15,
 			CanCollide = false,
 			CanQuery = false,
 		})
+		goldSeam(
+			deck,
+			hubCFrame * CFrame.new(0, 0.25 + ri * 0.02, 0) * CFrame.Angles(0, 0, math.rad(90)),
+			Vector3.new(DECK.SeamThickness, radius * 2, radius * 2),
+			"HubTrimRingSeam" .. ri,
+			Enum.PartType.Cylinder
+		)
 	end
 	local padThickness = 0.55
 	walkPlate({
@@ -225,8 +386,11 @@ end
 local function buildHub(root: Instance)
 	local hub = folder("Hub", root)
 	local hubCFrame = CFrame.new(0, 0, 0)
+	local walkTop = HubLayout.HubSize.Y / 2
 	buildPlatedHubDeck(hub, hubCFrame)
 	goldTrim(hub, hubCFrame, HubLayout.HubSize)
+	buildHubCathedralDressing(hub, hubCFrame, walkTop)
+	buildHubFillLights(hub, hubCFrame, walkTop)
 
 	-- Monolith: two halves (split along X) plus gold bands and the Void Core.
 	local monolith = folder("VoidlineMonolith", hub)
@@ -299,16 +463,38 @@ local function buildHub(root: Instance)
 	for side, sign in sides do
 		local half = monolith:FindFirstChild("Monolith" .. side)
 		if half and half:IsA("BasePart") then
+			local crownH = if side == "Right" then 9.5 else 4.5
 			part({
 				Name = "SpireCrown",
 				Parent = half,
-				Size = Vector3.new(monolithHalfSize.X * 0.35, 5, monolithHalfSize.Z * 0.35),
-				CFrame = half.CFrame * CFrame.new(0, size.Y / 2 + 2.5, 0),
-				Color = COLORS.GoldBright,
-				Material = Enum.Material.Neon,
+				Size = Vector3.new(monolithHalfSize.X * 0.32, crownH, monolithHalfSize.Z * 0.32),
+				CFrame = half.CFrame
+					* CFrame.new(0, size.Y / 2 + crownH / 2, 0)
+					* CFrame.Angles(0, 0, sign * math.rad(5)),
+				Color = Color3.fromRGB(16, 14, 22),
+				Material = Enum.Material.Slate,
 				CanCollide = false,
-				CanQuery = false,
+				CastShadow = true,
 			})
+			goldSeam(
+				half,
+				half.CFrame * CFrame.new(0, size.Y / 2 + crownH - 0.2, 0),
+				Vector3.new(monolithHalfSize.X * 0.34, DECK.SeamThickness, 0.28),
+				"SpireCrownSeam"
+			)
+			if side == "Right" then
+				part({
+					Name = "BrokenCrownShard",
+					Parent = half,
+					Size = Vector3.new(2.2, 6, 1.4),
+					CFrame = half.CFrame
+						* CFrame.new(monolithHalfSize.X * 0.22, size.Y / 2 + 11, 0.6)
+						* CFrame.Angles(math.rad(14), math.rad(20), math.rad(32)),
+					Color = Color3.fromRGB(18, 16, 24),
+					Material = Enum.Material.Metal,
+					CanCollide = false,
+				})
+			end
 			part({
 				Name = "SpireFin",
 				Parent = half,
@@ -327,35 +513,98 @@ local function buildHub(root: Instance)
 	part({
 		Name = "HubSilhouetteRing",
 		Parent = hub,
-		Size = Vector3.new(2, HubLayout.HubSize.X * 1.45, HubLayout.HubSize.Z * 1.45),
-		CFrame = hubCFrame * CFrame.Angles(0, 0, math.rad(90)),
+		Size = Vector3.new(0.55, HubLayout.HubSize.X * 1.42, HubLayout.HubSize.Z * 1.42),
+		CFrame = hubCFrame * CFrame.new(0, walkTop + 0.35, 0) * CFrame.Angles(0, 0, math.rad(90)),
 		Shape = Enum.PartType.Cylinder,
-		Color = COLORS.Gold,
-		Material = Enum.Material.Neon,
-		Transparency = 0.82,
+		Color = Color3.fromRGB(12, 10, 16),
+		Material = Enum.Material.Metal,
+		Transparency = 0.35,
 		CanCollide = false,
 		CanQuery = false,
 	})
+	goldSeam(
+		hub,
+		hubCFrame * CFrame.new(0, walkTop + 0.42, 0) * CFrame.Angles(0, 0, math.rad(90)),
+		Vector3.new(DECK.SeamThickness, HubLayout.HubSize.X * 1.38, HubLayout.HubSize.Z * 1.38),
+		"HubSilhouetteSeam",
+		Enum.PartType.Cylinder
+	)
 
-	local function pad(name: string, position: Vector3, padSize: Vector3, color: Color3, text: string)
+	local function hubPad(name: string, position: Vector3, padSize: Vector3, text: string, style: string)
 		local p = part({
 			Name = name,
 			Parent = hub,
 			Size = padSize,
 			CFrame = CFrame.new(position),
-			Color = color,
-			Material = Enum.Material.Neon,
+			Color = PALETTE.ObsidianLift,
+			Material = Enum.Material.DiamondPlate,
 		})
-		-- Near-only: readable when standing on the pad, invisible from hub center.
+		p:SetAttribute("Walkable", true)
+		goldTrim(hub, p.CFrame, padSize)
+		if style == "forge" then
+			part({
+				Name = name .. "Chimney",
+				Parent = hub,
+				Size = Vector3.new(3.5, 14, 3.5),
+				CFrame = p.CFrame * CFrame.new(4, 7.5, -3),
+				Color = Color3.fromRGB(20, 18, 26),
+				Material = Enum.Material.CorrodedMetal,
+				CanCollide = false,
+			})
+			part({
+				Name = name .. "Anvil",
+				Parent = hub,
+				Size = Vector3.new(4, 2, 3),
+				CFrame = p.CFrame * CFrame.new(-2, 1.5, 2),
+				Color = Color3.fromRGB(28, 26, 34),
+				Material = Enum.Material.Metal,
+				CanCollide = false,
+			})
+			goldSeam(
+				hub,
+				p.CFrame * CFrame.new(-2, 2.35, 2),
+				Vector3.new(2.2, DECK.SeamThickness, 0.35),
+				"ForgeAnvilSeam"
+			)
+		elseif style == "summon" then
+			part({
+				Name = name .. "ArchL",
+				Parent = hub,
+				Size = Vector3.new(1.2, 11, 1.2),
+				CFrame = p.CFrame * CFrame.new(-4.5, 6, 0),
+				Color = Color3.fromRGB(16, 14, 22),
+				Material = Enum.Material.Slate,
+				CanCollide = false,
+			})
+			part({
+				Name = name .. "ArchR",
+				Parent = hub,
+				Size = Vector3.new(1.2, 11, 1.2),
+				CFrame = p.CFrame * CFrame.new(4.5, 6, 0),
+				Color = Color3.fromRGB(16, 14, 22),
+				Material = Enum.Material.Slate,
+				CanCollide = false,
+			})
+			part({
+				Name = name .. "ArchLintel",
+				Parent = hub,
+				Size = Vector3.new(10, 1, 1.6),
+				CFrame = p.CFrame * CFrame.new(0, 11.2, 0),
+				Color = COLORS.VoidAccent,
+				Material = Enum.Material.Glass,
+				Transparency = 0.35,
+				CanCollide = false,
+			})
+		end
 		label(p, text, 3.2, 16)
 		return p
 	end
-	pad("RebirthPad", HubLayout.RebirthPad, Vector3.new(12, 1, 12), COLORS.Gold, "VOID REBIRTH")
-	pad("ForgePad", HubLayout.ForgePad, Vector3.new(12, 1, 12), COLORS.VoidAccent, "ARTIFACT FORGE")
-	pad("SummonPad", HubLayout.SummonPad, Vector3.new(12, 1, 12), COLORS.GoldBright, "SERVER SUMMONS")
-	pad("VipLounge", HubLayout.VipLounge, Vector3.new(18, 1, 18), COLORS.Gold, "VOID SOVEREIGN LOUNGE")
-	pad("OverlookGate", HubLayout.OverlookGate, Vector3.new(10, 1, 10), Color3.fromRGB(255, 236, 190), "STAR OVERLOOK")
-	pad("RiftGate", HubLayout.RiftGate, Vector3.new(10, 1, 10), Color3.fromRGB(190, 120, 255), "VOID RIFT")
+	hubPad("RebirthPad", HubLayout.RebirthPad, Vector3.new(12, 1, 12), "VOID REBIRTH", "ritual")
+	hubPad("ForgePad", HubLayout.ForgePad, Vector3.new(12, 1, 12), "ARTIFACT FORGE", "forge")
+	hubPad("SummonPad", HubLayout.SummonPad, Vector3.new(12, 1, 12), "SERVER SUMMONS", "summon")
+	hubPad("VipLounge", HubLayout.VipLounge, Vector3.new(18, 1, 18), "VOID SOVEREIGN LOUNGE", "ritual")
+	hubPad("OverlookGate", HubLayout.OverlookGate, Vector3.new(10, 1, 10), "STAR OVERLOOK", "ritual")
+	hubPad("RiftGate", HubLayout.RiftGate, Vector3.new(10, 1, 10), "VOID RIFT", "ritual")
 
 	local terminal = part({
 		Name = "CodeTerminal",
@@ -418,12 +667,12 @@ local function buildHub(root: Instance)
 	part({
 		Name = "MonumentHalo",
 		Parent = monument,
-		Size = Vector3.new(14, 0.5, 14),
+		Size = Vector3.new(14, 0.35, 14),
 		CFrame = plinth.CFrame * CFrame.new(0, 2.5, 0) * CFrame.Angles(0, 0, math.rad(90)),
 		Shape = Enum.PartType.Cylinder,
-		Color = COLORS.GoldBright,
-		Material = Enum.Material.Neon,
-		Transparency = 0.35,
+		Color = Color3.fromRGB(22, 20, 28),
+		Material = Enum.Material.Metal,
+		Transparency = 0.25,
 		CanCollide = false,
 		CanQuery = false,
 	})
@@ -435,9 +684,9 @@ local function buildHub(root: Instance)
 			Parent = clipShots,
 			Size = Vector3.new(5, 0.15, 5),
 			CFrame = CFrame.new(shot.Stand),
-			Color = COLORS.Gold,
-			Material = Enum.Material.Neon,
-			Transparency = 0.88,
+			Color = PALETTE.ObsidianLift,
+			Material = Enum.Material.SmoothPlastic,
+			Transparency = 0.94,
 			CanCollide = false,
 			CanQuery = false,
 		})
@@ -470,10 +719,10 @@ local function buildHub(root: Instance)
 	spawnLocation.Anchored = true
 	spawnLocation.Size = Vector3.new(10, 1, 10)
 	spawnLocation.CFrame = CFrame.new(HubLayout.Spawn)
-	spawnLocation.Color = COLORS.Gold
-	spawnLocation.Material = Enum.Material.Neon
+	spawnLocation.Color = PALETTE.ObsidianLift
+	spawnLocation.Material = Enum.Material.SmoothPlastic
 	spawnLocation.Duration = 0
-	spawnLocation.Transparency = 0.6
+	spawnLocation.Transparency = 0.92
 	spawnLocation.Parent = hub
 
 	-- Void Rift spiral: faint and solid only while the Rift event is open.
@@ -513,9 +762,9 @@ local function buildDeepSpace(root: Instance)
 		Size = Vector3.new(1, HubLayout.ZoneRadius * 2, HubLayout.ZoneRadius * 2),
 		CFrame = CFrame.new(0, -6, 0) * CFrame.Angles(0, 0, math.rad(90)),
 		Shape = Enum.PartType.Cylinder,
-		Color = Color3.fromRGB(30, 14, 60),
-		Material = Enum.Material.Neon,
-		Transparency = 0.9,
+		Color = Color3.fromRGB(12, 10, 18),
+		Material = Enum.Material.Metal,
+		Transparency = 0.65,
 		CanCollide = false,
 		CanQuery = false,
 	})
@@ -524,17 +773,23 @@ local function buildDeepSpace(root: Instance)
 		local angle = (i - 0.5) / 12 * math.pi * 2
 		local rim = (HubLayout.ZoneRadius + GameConfig.PlotRingRadius) * 0.52
 		local pos = Vector3.new(math.cos(angle) * rim, 6, math.sin(angle) * rim)
-		part({
+		local pylon = part({
 			Name = "DeepSpacePylon" .. i,
 			Parent = deep,
 			Size = Vector3.new(1.4, 22, 1.4),
 			CFrame = CFrame.new(pos),
-			Color = if i % 2 == 0 then COLORS.VoidAccent else COLORS.GoldBright,
-			Material = Enum.Material.Neon,
-			Transparency = 0.2,
+			Color = Color3.fromRGB(14, 12, 20),
+			Material = Enum.Material.Slate,
+			Transparency = 0,
 			CanCollide = false,
 			CanQuery = false,
 		})
+		goldSeam(
+			deep,
+			pylon.CFrame * CFrame.new(0, 10.5, 0),
+			Vector3.new(1.6, DECK.SeamThickness, 0.35),
+			"PylonSeam" .. i
+		)
 	end
 	part({
 		Name = "DeepSpaceFloor",
@@ -552,12 +807,19 @@ local function buildDeepSpace(root: Instance)
 		Size = Vector3.new(1.2, GameConfig.PlotRingRadius * 2.02, GameConfig.PlotRingRadius * 2.02),
 		CFrame = CFrame.new(0, 3, 0) * CFrame.Angles(0, 0, math.rad(90)),
 		Shape = Enum.PartType.Cylinder,
-		Color = COLORS.Gold,
-		Material = Enum.Material.Neon,
-		Transparency = 0.78,
+		Color = Color3.fromRGB(16, 14, 22),
+		Material = Enum.Material.Metal,
+		Transparency = 0.2,
 		CanCollide = false,
 		CanQuery = false,
 	})
+	goldSeam(
+		deep,
+		CFrame.new(0, 3, 0) * CFrame.Angles(0, 0, math.rad(90)),
+		Vector3.new(DECK.SeamThickness, GameConfig.PlotRingRadius * 2.02, GameConfig.PlotRingRadius * 2.02),
+		"PlotOrbitSeam",
+		Enum.PartType.Cylinder
+	)
 	folder("SharedRocks", deep)
 	folder("EventTargets", deep)
 	folder("Hazards", deep)
@@ -601,10 +863,10 @@ local function buildOverlook(root: Instance)
 		Parent = overlook,
 		Size = Vector3.new(6, 0.2, 6),
 		CFrame = platform.CFrame * CFrame.new(0, 0.85, 6),
-		Color = Color3.fromRGB(255, 236, 190),
-		Material = Enum.Material.Neon,
+		Color = Color3.fromRGB(28, 24, 36),
+		Material = Enum.Material.Marble,
 		CanCollide = false,
-		Transparency = 0.5,
+		Transparency = 0,
 	})
 	spawnPad:SetAttribute("Arrival", true)
 end
@@ -636,16 +898,22 @@ local function buildPlot(plots: Instance, index: number)
 		Vector3.new(half.X - 2, 2, half.Z - 2),
 	}
 	for i, offset in pylonOffsets do
-		part({
+		local pylon = part({
 			Name = "PlotPylon" .. i,
 			Parent = plot,
 			Size = Vector3.new(1.4, 7, 1.4),
 			CFrame = plotCFrame * CFrame.new(offset),
-			Color = COLORS.GoldBright,
-			Material = Enum.Material.Neon,
+			Color = Color3.fromRGB(16, 14, 22),
+			Material = Enum.Material.Slate,
 			CanCollide = false,
 			CanQuery = false,
 		})
+		goldSeam(
+			plot,
+			pylon.CFrame * CFrame.new(0, 3.2, 0),
+			Vector3.new(1.5, DECK.SeamThickness, 0.35),
+			"PlotPylonSeam" .. i
+		)
 	end
 
 	local spawnMarker = part({
@@ -653,10 +921,10 @@ local function buildPlot(plots: Instance, index: number)
 		Parent = plot,
 		Size = Vector3.new(6, 0.2, 6),
 		CFrame = plotCFrame * CFrame.new(PlotLayout.Spawn),
-		Color = COLORS.GoldBright,
-		Material = Enum.Material.Neon,
+		Color = PALETTE.ObsidianLift,
+		Material = Enum.Material.SmoothPlastic,
 		CanCollide = false,
-		Transparency = 0.6,
+		Transparency = 0.88,
 	})
 	spawnMarker:SetAttribute("Spawn", true)
 
@@ -666,9 +934,15 @@ local function buildPlot(plots: Instance, index: number)
 		Parent = station,
 		Size = PlotLayout.RefinerySize,
 		CFrame = plotCFrame * CFrame.new(PlotLayout.Refinery),
-		Color = COLORS.Gold,
-		Material = Enum.Material.Neon,
+		Color = Color3.fromRGB(22, 20, 28),
+		Material = Enum.Material.Metal,
 	})
+	goldSeam(
+		station,
+		plotCFrame * CFrame.new(PlotLayout.Refinery + Vector3.new(0, PlotLayout.RefinerySize.Y / 2 + 0.08, 0)),
+		Vector3.new(PlotLayout.RefinerySize.X - 1, DECK.SeamThickness, 0.35),
+		"RefineryDeckSeam"
+	)
 	label(refinery, "REFINERY", 3.5, 14)
 	part({
 		Name = "RefineryTower",
@@ -706,11 +980,18 @@ local function buildPlot(plots: Instance, index: number)
 			Parent = pads,
 			Size = PlotLayout.PadSize,
 			CFrame = plotCFrame * CFrame.new(offset),
-			Color = COLORS.Gold,
-			Material = Enum.Material.Neon,
-			Transparency = 0.1,
+			Color = PALETTE.ObsidianLift,
+			Material = Enum.Material.DiamondPlate,
+			Transparency = 0,
 		})
 		pad:SetAttribute("UpgradeId", upgradeId)
+		pad:SetAttribute("Walkable", true)
+		goldSeam(
+			pads,
+			pad.CFrame * CFrame.new(0, PlotLayout.PadSize.Y / 2 + DECK.SeamLift, 0),
+			Vector3.new(PlotLayout.PadSize.X * 0.5, DECK.SeamThickness, 0.28),
+			upgradeId .. "Seam"
+		)
 	end
 
 	local tuner = part({
@@ -718,9 +999,15 @@ local function buildPlot(plots: Instance, index: number)
 		Parent = station,
 		Size = Vector3.new(6, 1, 6),
 		CFrame = plotCFrame * CFrame.new(PlotLayout.LaserTuner),
-		Color = Color3.fromRGB(90, 220, 255),
-		Material = Enum.Material.Neon,
+		Color = Color3.fromRGB(26, 24, 34),
+		Material = Enum.Material.Metal,
 	})
+	goldSeam(
+		station,
+		plotCFrame * CFrame.new(PlotLayout.LaserTuner + Vector3.new(0, 0.65, 0)),
+		Vector3.new(3.2, DECK.SeamThickness, 0.35),
+		"TunerSeam"
+	)
 	label(tuner, "LASER TUNER", 2.8, 12)
 
 	folder("Pedestals", plot)
@@ -742,9 +1029,9 @@ local function buildPlot(plots: Instance, index: number)
 			Parent = bridge,
 			Size = Vector3.new(7, 0.8, segmentLength + 0.05),
 			CFrame = segmentCFrame,
-			Color = COLORS.Gold,
-			Material = Enum.Material.Neon,
-			Transparency = 0.72,
+			Color = Color3.fromRGB(18, 16, 24),
+			Material = Enum.Material.Slate,
+			Transparency = 0,
 			CanCollide = false,
 			CanQuery = false,
 		})
@@ -754,18 +1041,15 @@ local function buildPlot(plots: Instance, index: number)
 			Parent = bridge,
 			Size = Vector3.new(7.2, 1.1, segmentLength + 0.12),
 			CFrame = segmentCFrame,
+			Material = Enum.Material.DiamondPlate,
+			Color = PALETTE.ObsidianLift,
 		})
-		part({
-			Name = "Spine" .. i,
-			Parent = bridge,
-			Size = Vector3.new(0.75, 0.45, segmentLength * 0.96),
-			CFrame = segment.CFrame * CFrame.new(0, 0.55, 0),
-			Color = COLORS.GoldBright,
-			Material = Enum.Material.Neon,
-			Transparency = 0.35,
-			CanCollide = false,
-			CanQuery = false,
-		})
+		goldSeam(
+			bridge,
+			segment.CFrame * CFrame.new(0, 0.52, 0),
+			Vector3.new(0.35, DECK.SeamThickness, segmentLength * 0.94),
+			"Spine" .. i
+		)
 		part({
 			Name = "Rail" .. i,
 			Parent = bridge,

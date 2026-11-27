@@ -53,6 +53,38 @@ tests["hub ships procedural plated deck tiles"] = function()
 	expect(findDescendant(root, "DeckTileInset") ~= nil).toBe(true)
 end
 
+tests["walk surfaces use matte decks not neon slabs"] = function()
+	local world = Harness.new()
+	world:runScript("ServerScriptService/Voidline/Services/MapBuilder")
+	local MapBuilder = world:require("ServerScriptService/Voidline/Services/MapBuilder")
+	local root = MapBuilder.Build()
+	local neonWalk = 0
+	local function walk(node: any)
+		if node.ClassName == "BasePart" and node:GetAttribute("Walkable") == true then
+			if node.Material == Enum.Material.Neon then
+				neonWalk += 1
+			end
+		end
+		for _, child in node:GetChildren() do
+			walk(child)
+		end
+	end
+	walk(root)
+	expect(neonWalk).toBe(0)
+	local plot = findDescendant(root, "Plot_1")
+	local bridge = plot and plot:FindFirstChild("EnergyBridge")
+	if bridge then
+		for _, child in bridge:GetChildren() do
+			if child.ClassName == "BasePart" and string.sub(child.Name, 1, 7) == "Segment" then
+				expect(child.Material ~= Enum.Material.Neon).toBe(true)
+			end
+		end
+	end
+	expect(findDescendant(root, "HubCathedralDressing") ~= nil).toBe(true)
+	expect(findDescendant(root, "HubFillLights") ~= nil).toBe(true)
+	expect(findDescendant(root, "BrokenCrownShard") ~= nil).toBe(true)
+end
+
 tests["walkable map surfaces have solid collision under neon visuals"] = function()
 	local world = Harness.new()
 	world:runScript("ServerScriptService/Voidline/Services/MapBuilder")
@@ -81,8 +113,9 @@ tests["walkable map surfaces have solid collision under neon visuals"] = functio
 			walkPlates += 1
 			expect(child.CanCollide).toBe(true)
 			expect(child:GetAttribute("Walkable")).toBe(true)
-		elseif string.sub(child.Name, 1, 7) == "Segment" then
+		elseif child.ClassName == "BasePart" and string.sub(child.Name, 1, 7) == "Segment" then
 			expect(child.CanCollide).toBe(false)
+			expect(child.Material ~= Enum.Material.Neon).toBe(true)
 		end
 	end
 	expect(walkPlates).toBe(PlotLayout.BridgeSegments)
