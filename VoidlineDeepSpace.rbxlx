@@ -7622,6 +7622,23 @@ local function part(props: PartProps): Part
 end
 MapBuilder.Part = part
 
+-- Invisible collision for neon walkways (visual parts stay CanCollide=false).
+local function walkPlate(props: PartProps): Part
+	local plate = part({
+		Name = props.Name,
+		Parent = props.Parent,
+		Size = props.Size,
+		CFrame = props.CFrame,
+		Color = props.Color or COLORS.Obsidian,
+		Material = props.Material or Enum.Material.Slate,
+		Transparency = if props.Transparency ~= nil then props.Transparency else 1,
+		CanCollide = true,
+		CanQuery = false,
+	})
+	plate:SetAttribute("Walkable", true)
+	return plate
+end
+
 local function folder(name: string, parent: Instance): Folder
 	local f = Instance.new("Folder")
 	f.Name = name
@@ -7697,6 +7714,7 @@ local function buildPlatedHubDeck(hub: Instance, hubCFrame: CFrame)
 	local halfX = HubLayout.HubSize.X / 2
 	local halfZ = HubLayout.HubSize.Z / 2
 	local baseY = hubCFrame.Position.Y
+	local walkTop = baseY + HubLayout.HubSize.Y / 2
 	local tileCount = 0
 	for ix = 0, math.floor((HubLayout.HubSize.X - gap) / tile) - 1 do
 		for iz = 0, math.floor((HubLayout.HubSize.Z - gap) / tile) - 1 do
@@ -7704,8 +7722,8 @@ local function buildPlatedHubDeck(hub: Instance, hubCFrame: CFrame)
 			local cz = -halfZ + gap + tile / 2 + iz * tile
 			local inset = (ix + iz) % 2 == 0
 			local thickness = if inset then DECK.PlateThickness - DECK.InsetDepth else DECK.PlateThickness
-			local y = baseY + thickness / 2 - DECK.PlateThickness / 2
-			part({
+			local y = walkTop - thickness / 2
+			local deckTile = part({
 				Name = if inset then "DeckTileInset" else "DeckTile",
 				Parent = deck,
 				Size = Vector3.new(tile - gap, thickness, tile - gap),
@@ -7713,6 +7731,7 @@ local function buildPlatedHubDeck(hub: Instance, hubCFrame: CFrame)
 				Color = if inset then PALETTE.ObsidianLift else PALETTE.Obsidian,
 				Material = if inset then Enum.Material.DiamondPlate else Enum.Material.Slate,
 			})
+			deckTile:SetAttribute("Walkable", true)
 			if inset then
 				local edge = DECK.EdgeLightThickness
 				part({
@@ -7749,11 +7768,20 @@ local function buildPlatedHubDeck(hub: Instance, hubCFrame: CFrame)
 			CanQuery = false,
 		})
 	end
+	local padThickness = 0.55
+	walkPlate({
+		Name = "HubWalkCollision",
+		Parent = deck,
+		Size = Vector3.new(HubLayout.HubSize.X, padThickness, HubLayout.HubSize.Z),
+		CFrame = CFrame.new(0, walkTop - padThickness / 2, 0),
+		Material = Enum.Material.Basalt,
+		Color = PALETTE.Obsidian,
+	})
 	part({
 		Name = "HubPad",
 		Parent = hub,
 		Size = Vector3.new(HubLayout.HubSize.X, 0.4, HubLayout.HubSize.Z),
-		CFrame = hubCFrame * CFrame.new(0, -0.35, 0),
+		CFrame = hubCFrame * CFrame.new(0, walkTop - 0.2, 0),
 		Color = PALETTE.Obsidian,
 		Material = Enum.Material.Basalt,
 	})
@@ -8155,7 +8183,7 @@ local function buildPlot(plots: Instance, index: number)
 	plot:SetAttribute("BridgeIgnited", false)
 
 	local baseCFrame = plotCFrame * CFrame.new(0, PlotLayout.SurfaceY - 1, 0)
-	part({
+	local stationBase = part({
 		Name = "StationBase",
 		Parent = plot,
 		Size = PlotLayout.BaseSize,
@@ -8163,6 +8191,7 @@ local function buildPlot(plots: Instance, index: number)
 		Material = Enum.Material.Basalt,
 		Color = COLORS.Obsidian,
 	})
+	stationBase:SetAttribute("Walkable", true)
 	goldTrim(plot, baseCFrame, PlotLayout.BaseSize)
 	local half = PlotLayout.BaseSize / 2
 	local pylonOffsets = {
@@ -8272,17 +8301,25 @@ local function buildPlot(plots: Instance, index: number)
 	local segmentLength = span.Magnitude / count
 	for i = 1, count do
 		local center = startPos + span * ((i - 0.5) / count)
+		local segmentCFrame = CFrame.lookAt(center, center + span)
 		local segment = part({
 			Name = "Segment" .. i,
 			Parent = bridge,
 			Size = Vector3.new(7, 0.8, segmentLength + 0.05),
-			CFrame = CFrame.lookAt(center, center + span),
+			CFrame = segmentCFrame,
 			Color = COLORS.Gold,
 			Material = Enum.Material.Neon,
 			Transparency = 0.72,
 			CanCollide = false,
+			CanQuery = false,
 		})
 		segment:SetAttribute("SegmentIndex", i)
+		walkPlate({
+			Name = "WalkPlate" .. i,
+			Parent = bridge,
+			Size = Vector3.new(7.2, 1.1, segmentLength + 0.12),
+			CFrame = segmentCFrame,
+		})
 		part({
 			Name = "Spine" .. i,
 			Parent = bridge,
@@ -9295,10 +9332,9 @@ local function setBridge(index: number, lit: boolean)
 	if not bridge then
 		return
 	end
-	for _, segment in bridge:GetChildren() do
-		if segment:IsA("BasePart") then
-			segment.CanCollide = lit
-			segment.Transparency = if lit then 0.15 else 0.85
+	for _, child in bridge:GetChildren() do
+		if child:IsA("BasePart") and string.sub(child.Name, 1, 7) == "Segment" then
+			child.Transparency = if lit then 0.15 else 0.85
 		end
 	end
 end

@@ -53,6 +53,45 @@ tests["hub ships procedural plated deck tiles"] = function()
 	expect(findDescendant(root, "DeckTileInset") ~= nil).toBe(true)
 end
 
+tests["walkable map surfaces have solid collision under neon visuals"] = function()
+	local world = Harness.new()
+	world:runScript("ServerScriptService/Voidline/Services/MapBuilder")
+	local MapBuilder = world:require("ServerScriptService/Voidline/Services/MapBuilder")
+	local HubLayout = world:require("ReplicatedStorage/Voidline/Modules/HubLayout")
+	local PlotLayout = world:require("ReplicatedStorage/Voidline/Modules/PlotLayout")
+	local root = MapBuilder.Build()
+	local hubCollision = findDescendant(root, "HubWalkCollision")
+	expect(hubCollision ~= nil).toBe(true)
+	expect(hubCollision.CanCollide).toBe(true)
+	expect(hubCollision:GetAttribute("Walkable")).toBe(true)
+	local hubTop = hubCollision.Position.Y + hubCollision.Size.Y / 2
+	expect(math.abs(hubTop - HubLayout.HubSize.Y / 2) < 0.05).toBe(true)
+
+	local plot = findDescendant(root, "Plot_1")
+	local base = plot and plot:FindFirstChild("StationBase")
+	expect(base ~= nil).toBe(true)
+	expect(base.CanCollide).toBe(true)
+	expect(base:GetAttribute("Walkable")).toBe(true)
+
+	local bridge = plot and plot:FindFirstChild("EnergyBridge")
+	expect(bridge ~= nil).toBe(true)
+	local walkPlates = 0
+	for _, child in bridge:GetChildren() do
+		if string.sub(child.Name, 1, 9) == "WalkPlate" then
+			walkPlates += 1
+			expect(child.CanCollide).toBe(true)
+			expect(child:GetAttribute("Walkable")).toBe(true)
+		elseif string.sub(child.Name, 1, 7) == "Segment" then
+			expect(child.CanCollide).toBe(false)
+		end
+	end
+	expect(walkPlates).toBe(PlotLayout.BridgeSegments)
+
+	local silhouette = findDescendant(root, "HubSilhouetteRing")
+	expect(silhouette ~= nil).toBe(true)
+	expect(silhouette.CanCollide).toBe(false)
+end
+
 tests["hub world labels are near-only (no billboard sludge)"] = function()
 	local world = Harness.new()
 	world:runScript("ServerScriptService/Voidline/Services/MapBuilder")

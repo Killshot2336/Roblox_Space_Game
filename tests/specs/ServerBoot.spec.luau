@@ -179,8 +179,13 @@ tests["onboarding: 10 ore -> 30 Cr, 20/35/50 upgrades, bridge ignites with +100 
 	expect(elapsed > 15 and elapsed < 45).toBe(true)
 	local plot = world:find("Workspace/VoidlineMap/Plots/Plot_1")
 	expect(plot:GetAttribute("BridgeIgnited")).toBe(true)
-	for _, segment in plot.EnergyBridge:GetChildren() do
-		expect(segment.CanCollide).toBe(true)
+	for _, child in plot.EnergyBridge:GetChildren() do
+		if string.sub(child.Name, 1, 9) == "WalkPlate" then
+			expect(child.CanCollide).toBe(true)
+			expect(child:GetAttribute("Walkable")).toBe(true)
+		elseif string.sub(child.Name, 1, 7) == "Segment" then
+			expect(child.CanCollide).toBe(false)
+		end
 	end
 	local kinds = juiceKinds(world, player)
 	expect(kinds.BridgeIgnite).toBe(1)

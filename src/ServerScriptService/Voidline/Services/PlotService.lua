@@ -101,10 +101,9 @@ local function setBridge(index: number, lit: boolean)
 	if not bridge then
 		return
 	end
-	for _, segment in bridge:GetChildren() do
-		if segment:IsA("BasePart") then
-			segment.CanCollide = lit
-			segment.Transparency = if lit then 0.15 else 0.85
+	for _, child in bridge:GetChildren() do
+		if child:IsA("BasePart") and string.sub(child.Name, 1, 7) == "Segment" then
+			child.Transparency = if lit then 0.15 else 0.85
 		end
 	end
 end
