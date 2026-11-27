@@ -1000,32 +1000,34 @@ local VisualBibleConfig = {
 		GapStuds = 7.5,
 		TiltRadians = math.rad(7),
 		Duration = 2.6,
-		SeamPulseTransparency = { 0.08, 0.35 },
+		SeamPulseTransparency = { 0.04, 0.28 },
 		CoreRevealColor = Color3.fromRGB(255, 198, 88),
-		CameraPunchFov = 8,
-		CameraPunchSeconds = 1.8,
-		CameraShake = 0.75,
-		ShakeSeconds = 1.35,
+		CameraPunchFov = 10,
+		CameraPunchSeconds = 2,
+		CameraShake = 0.92,
+		ShakeSeconds = 1.5,
+		SplitSparkCount = 12,
 	},
 	SovereignHalo = {
-		LinkWidth = 0.38,
-		RingThickness = 0.36,
-		RingSpinRate = 1.45,
-		SecondaryRingScale = 0.72,
-		CameraFovAdd = 6,
+		LinkWidth = 0.42,
+		RingThickness = 0.4,
+		RingSpinRate = 1.55,
+		SecondaryRingScale = 0.76,
+		CameraFovAdd = 7,
+		PulseFlashSeconds = 0.42,
 	},
 	Starfall = {
-		StreakCount = 6,
-		StreakSpeed = 140,
-		ShockRingMax = 42,
-		ShockRingSeconds = 1.4,
+		StreakCount = 9,
+		StreakSpeed = 155,
+		ShockRingMax = 48,
+		ShockRingSeconds = 1.55,
 	},
 	Tow = {
-		RibbonSegments = 14,
-		RibbonWidth0 = 0.72,
-		RibbonWidth1 = 0.38,
-		ShockRadius = 14,
-		ShockSeconds = 0.9,
+		RibbonSegments = 16,
+		RibbonWidth0 = 0.78,
+		RibbonWidth1 = 0.42,
+		ShockRadius = 16,
+		ShockSeconds = 1,
 	},
 }
 
@@ -3750,6 +3752,21 @@ function ArtResolve.UiImage(group: string, key: string): string
 	return ArtConfig.UI.FallbackImage
 end
 
+function ArtResolve.UiHasUpload(group: string, key: string): boolean
+	local bucket = (ArtConfig.UI :: any)[group]
+	local entry = if type(bucket) == "table" then bucket[key] else nil
+	return type(entry) == "table" and type(entry.AssetId) == "number" and entry.AssetId > 0
+end
+
+function ArtResolve.UiLabel(group: string, key: string, fallback: string?): string
+	local bucket = (ArtConfig.UI :: any)[group]
+	local entry = if type(bucket) == "table" then bucket[key] else nil
+	if type(entry) == "table" and type(entry.Label) == "string" and entry.Label ~= "" then
+		return entry.Label
+	end
+	return fallback or key
+end
+
 function ArtResolve.HasUploadedMesh(meshKey: string): boolean
 	local entry = (ArtConfig.Meshes :: any)[meshKey]
 	return type(entry) == "table" and type(entry.MeshId) == "number" and entry.MeshId > 0
@@ -4858,6 +4875,86 @@ return EconomyRules
         </Item>
         <Item class="ModuleScript" referent="47">
           <Properties>
+            <string name="Name">HudCueRules</string>
+            <string name="Source"><![CDATA[--!strict
+-- Pure HUD copy for sim clarity: next upgrade goal and soft "come back" cues.
+local Config = script.Parent.Parent.Config
+local EconomyConfig = require(Config.EconomyConfig)
+local EconomyRules = require(script.Parent.EconomyRules)
+local ProgressionRules = require(script.Parent.ProgressionRules)
+
+local HudCueRules = {}
+
+local function nextUpgrade(profile: any, ctx: any): (string?, number?)
+	if not profile.TutorialComplete then
+		for _, entry in { { "Drill", "Drill" }, { "Cargo", "Cargo" }, { "Drone", "DroneSlot" } } do
+			if not profile.TutorialFlags[entry[1]] then
+				return entry[2], EconomyRules.UpgradeCost(profile, entry[2], ctx)
+			end
+		end
+	end
+	local best: string?, bestCost = nil, math.huge
+	for _, id in EconomyConfig.UpgradeOrder do
+		local ok, reason = EconomyRules.CanUpgrade(profile, id, ctx)
+		if ok or reason == "funds" then
+			local cost = EconomyRules.UpgradeCost(profile, id, ctx) :: number
+			if cost < bestCost then
+				best, bestCost = id, cost
+			end
+		end
+	end
+	if best then
+		return best, bestCost
+	end
+	return nil, nil
+end
+
+function HudCueRules.NextGoalLine(profile: any, ctx: any): string
+	local id, cost = nextUpgrade(profile, ctx)
+	if id and cost then
+		local def = EconomyConfig.Upgrades[id]
+		local label = if def then def.Label else id
+		local afford = profile.Credits >= cost
+		if afford then
+			return ("NEXT GOAL · %s · tap UPGRADE (U)"):format(label)
+		end
+		return ("NEXT GOAL · %s · need %d credits"):format(label, math.ceil(cost))
+	end
+	if not profile.TutorialComplete then
+		return "NEXT GOAL · finish tutorial boosts"
+	end
+	return "NEXT GOAL · all station upgrades maxed"
+end
+
+function HudCueRules.ComebackCue(profile: any, unixTime: number): string?
+	if ProgressionRules.CanClaimDaily(profile, unixTime) then
+		return "◈ DAILY READY — open menu (C)"
+	end
+	for _, list in { profile.Quests.Daily, profile.Quests.Weekly } do
+		for _, entry in list do
+			if not entry.Done and type(entry.Target) == "number" and entry.Target > 0 then
+				local progress = if type(entry.Progress) == "number" then entry.Progress else 0
+				local ratio = progress / entry.Target
+				if ratio >= 0.85 and ratio < 1 then
+					local pct = math.floor(ratio * 100 + 0.5)
+					return ("◈ QUEST · %s · %d%%"):format(tostring(entry.Name), pct)
+				end
+			end
+		end
+	end
+	ProgressionRules.RefreshForgeDay(profile, unixTime)
+	if profile.ForgeJobEndsAt <= unixTime and not ProgressionRules.ForgeCooling(profile) then
+		return "◈ FORGE OPEN — visit your Sovereign station"
+	end
+	return nil
+end
+
+return HudCueRules
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="48">
+          <Properties>
             <string name="Name">MiningRules</string>
             <string name="Source"><![CDATA[--!strict
 -- Drone swarm math (spec §6). Server-authoritative: the server simulates
@@ -4959,7 +5056,7 @@ return MiningRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="48">
+        <Item class="ModuleScript" referent="49">
           <Properties>
             <string name="Name">ProgressionRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -5152,7 +5249,7 @@ return ProgressionRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="49">
+        <Item class="ModuleScript" referent="50">
           <Properties>
             <string name="Name">QuestRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -5264,7 +5361,7 @@ return QuestRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="50">
+        <Item class="ModuleScript" referent="51">
           <Properties>
             <string name="Name">StoreRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -5346,7 +5443,7 @@ return StoreRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="51">
+        <Item class="ModuleScript" referent="52">
           <Properties>
             <string name="Name">TutorialRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -5461,15 +5558,15 @@ return TutorialRules
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="52">
+  <Item class="ServerScriptService" referent="53">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="53">
+    <Item class="Folder" referent="54">
       <Properties>
         <string name="Name">Voidline</string>
       </Properties>
-      <Item class="Script" referent="54">
+      <Item class="Script" referent="55">
         <Properties>
           <string name="Name">Boot</string>
           <token name="RunContext">0</token>
@@ -5542,11 +5639,11 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Folder" referent="55">
+      <Item class="Folder" referent="56">
         <Properties>
           <string name="Name">Security</string>
         </Properties>
-        <Item class="ModuleScript" referent="56">
+        <Item class="ModuleScript" referent="57">
           <Properties>
             <string name="Name">ValidateRemote</string>
             <string name="Source"><![CDATA[--!strict
@@ -5702,11 +5799,11 @@ return ValidateRemote
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="57">
+      <Item class="Folder" referent="58">
         <Properties>
           <string name="Name">Services</string>
         </Properties>
-        <Item class="ModuleScript" referent="58">
+        <Item class="ModuleScript" referent="59">
           <Properties>
             <string name="Name">AfkService</string>
             <string name="Source"><![CDATA[--!strict
@@ -5787,7 +5884,7 @@ return AfkService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="59">
+        <Item class="ModuleScript" referent="60">
           <Properties>
             <string name="Name">BeltService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6004,7 +6101,7 @@ return BeltService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="60">
+        <Item class="ModuleScript" referent="61">
           <Properties>
             <string name="Name">CitadelService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6258,7 +6355,7 @@ return CitadelService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="61">
+        <Item class="ModuleScript" referent="62">
           <Properties>
             <string name="Name">CodeService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6314,7 +6411,7 @@ return CodeService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="62">
+        <Item class="ModuleScript" referent="63">
           <Properties>
             <string name="Name">CodexService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6406,7 +6503,7 @@ return CodexService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="63">
+        <Item class="ModuleScript" referent="64">
           <Properties>
             <string name="Name">CosmeticService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6561,7 +6658,7 @@ return CosmeticService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="64">
+        <Item class="ModuleScript" referent="65">
           <Properties>
             <string name="Name">DailyStreakService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6618,7 +6715,7 @@ return DailyStreakService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="65">
+        <Item class="ModuleScript" referent="66">
           <Properties>
             <string name="Name">DroneService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6874,7 +6971,7 @@ return DroneService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="66">
+        <Item class="ModuleScript" referent="67">
           <Properties>
             <string name="Name">EconomyService</string>
             <string name="Source"><![CDATA[--!strict
@@ -7278,7 +7375,7 @@ return EconomyService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="67">
+        <Item class="ModuleScript" referent="68">
           <Properties>
             <string name="Name">ForgeService</string>
             <string name="Source"><![CDATA[--!strict
@@ -7405,7 +7502,7 @@ return ForgeService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="68">
+        <Item class="ModuleScript" referent="69">
           <Properties>
             <string name="Name">InspectService</string>
             <string name="Source"><![CDATA[--!strict
@@ -7484,7 +7581,7 @@ return InspectService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="69">
+        <Item class="ModuleScript" referent="70">
           <Properties>
             <string name="Name">JuiceService</string>
             <string name="Source"><![CDATA[--!strict
@@ -7524,7 +7621,7 @@ return JuiceService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="70">
+        <Item class="ModuleScript" referent="71">
           <Properties>
             <string name="Name">LeaderboardService</string>
             <string name="Source"><![CDATA[--!strict
@@ -7764,7 +7861,7 @@ return LeaderboardService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="71">
+        <Item class="ModuleScript" referent="72">
           <Properties>
             <string name="Name">MapBuilder</string>
             <string name="Source"><![CDATA[--!strict
@@ -8053,7 +8150,7 @@ local function buildHubCathedralDressing(hub: Instance, hubCFrame: CFrame, walkT
 		CanCollide = false,
 	})
 	goldSeam(dress, hubCFrame * CFrame.new(36, walkTop + 25.5, -11), Vector3.new(0.18, 4.2, 0.18), "SpireEastCrownSeam")
-	for i = 1, 5 do
+	for i = 1, 7 do
 		local ribZ = -38 + i * 6.5 + (i % 2) * 1.2
 		part({
 			Name = "HubRibbing" .. i,
@@ -8203,6 +8300,52 @@ local function buildHubUpperDecks(hub: Instance, hubCFrame: CFrame, walkTop: num
 	})
 end
 
+local function buildHubCathedralArches(hub: Instance, hubCFrame: CFrame, walkTop: number)
+	local arches = folder("HubCathedralArches", hub)
+	for i = 1, 6 do
+		local angle = (i - 0.5) / 6 * math.pi * 2 + math.rad(8)
+		local radius = 34 + (i % 2) * 3
+		local base = Vector3.new(math.cos(angle) * radius, walkTop, math.sin(angle) * radius)
+		local pillarL = part({
+			Name = "ArchPillarL" .. i,
+			Parent = arches,
+			Size = Vector3.new(1.6, 16 + (i % 3) * 2, 1.6),
+			CFrame = hubCFrame * CFrame.new(base + Vector3.new(-2.2, 8, 0)) * CFrame.Angles(0, angle, 0),
+			Color = Color3.fromRGB(14, 12, 20),
+			Material = Enum.Material.Slate,
+			CanCollide = false,
+		})
+		part({
+			Name = "ArchPillarR" .. i,
+			Parent = arches,
+			Size = pillarL.Size,
+			CFrame = hubCFrame * CFrame.new(base + Vector3.new(2.2, 8, 0)) * CFrame.Angles(0, angle, 0),
+			Color = Color3.fromRGB(14, 12, 20),
+			Material = Enum.Material.Slate,
+			CanCollide = false,
+		})
+		part({
+			Name = "ArchLinte" .. i,
+			Parent = arches,
+			Size = Vector3.new(6.8, 1.2, 2.4),
+			CFrame = hubCFrame
+				* CFrame.new(base + Vector3.new(0, pillarL.Size.Y / 2 + 7.8, 0))
+				* CFrame.Angles(0, angle + math.rad(90), math.rad(3 * (i % 2))),
+			Color = PALETTE.ObsidianLift,
+			Material = Enum.Material.DiamondPlate,
+			CanCollide = false,
+		})
+		if i % 2 == 0 then
+			goldSeam(
+				arches,
+				hubCFrame * CFrame.new(base + Vector3.new(0, 12, 0)),
+				Vector3.new(4.8, DECK.SeamThickness, 0.3),
+				"ArchKeystone" .. i
+			)
+		end
+	end
+end
+
 local function buildHubLightWells(hub: Instance, hubCFrame: CFrame, walkTop: number)
 	local wells = folder("HubLightWells", hub)
 	local spots = {
@@ -8318,6 +8461,7 @@ local function buildHub(root: Instance)
 	buildHubColonnades(hub, hubCFrame, walkTop)
 	buildHubUpperDecks(hub, hubCFrame, walkTop)
 	buildHubLightWells(hub, hubCFrame, walkTop)
+	buildHubCathedralArches(hub, hubCFrame, walkTop)
 	buildHubFillLights(hub, hubCFrame, walkTop)
 
 	-- Monolith: two halves (split along X) plus gold bands and the Void Core.
@@ -8758,7 +8902,7 @@ local function buildAsteroidField(parent: Instance)
 	local field = folder("DeepSpaceAsteroidField", parent)
 	local rng = Random.new(8819)
 	local count = 0
-	for i = 1, 86 do
+	for i = 1, 92 do
 		local angle = rng:NextNumber(0, math.pi * 2)
 		local band = if i % 4 == 0 then 1.35 elseif i % 7 == 0 then 0.55 else 0.85
 		local radius = rng:NextNumber(HubLayout.ZoneRadius * 0.25, HubLayout.ZoneRadius * 1.25) * band
@@ -9237,7 +9381,7 @@ return MapBuilder
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="72">
+        <Item class="ModuleScript" referent="73">
           <Properties>
             <string name="Name">MonetizationService</string>
             <string name="Source"><![CDATA[--!strict
@@ -9451,7 +9595,7 @@ return MonetizationService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="73">
+        <Item class="ModuleScript" referent="74">
           <Properties>
             <string name="Name">PlayerDataService</string>
             <string name="Source"><![CDATA[--!strict
@@ -10083,7 +10227,7 @@ return PlayerDataService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="74">
+        <Item class="ModuleScript" referent="75">
           <Properties>
             <string name="Name">PlotService</string>
             <string name="Source"><![CDATA[--!strict
@@ -10277,7 +10421,7 @@ return PlotService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="75">
+        <Item class="ModuleScript" referent="76">
           <Properties>
             <string name="Name">RebirthService</string>
             <string name="Source"><![CDATA[--!strict
@@ -10356,7 +10500,7 @@ return RebirthService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="76">
+        <Item class="ModuleScript" referent="77">
           <Properties>
             <string name="Name">RelicService</string>
             <string name="Source"><![CDATA[--!strict
@@ -10540,7 +10684,7 @@ return RelicService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="77">
+        <Item class="ModuleScript" referent="78">
           <Properties>
             <string name="Name">RiftService</string>
             <string name="Source"><![CDATA[--!strict
@@ -10645,7 +10789,7 @@ return RiftService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="78">
+        <Item class="ModuleScript" referent="79">
           <Properties>
             <string name="Name">RockService</string>
             <string name="Source"><![CDATA[--!strict
@@ -10938,7 +11082,7 @@ return RockService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="79">
+        <Item class="ModuleScript" referent="80">
           <Properties>
             <string name="Name">SoftContestService</string>
             <string name="Source"><![CDATA[--!strict
@@ -11170,7 +11314,7 @@ return SoftContestService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="80">
+        <Item class="ModuleScript" referent="81">
           <Properties>
             <string name="Name">SquadService</string>
             <string name="Source"><![CDATA[--!strict
@@ -11513,7 +11657,7 @@ return SquadService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="81">
+        <Item class="ModuleScript" referent="82">
           <Properties>
             <string name="Name">StatService</string>
             <string name="Source"><![CDATA[--!strict
@@ -11641,7 +11785,7 @@ return StatService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="82">
+        <Item class="ModuleScript" referent="83">
           <Properties>
             <string name="Name">SummonService</string>
             <string name="Source"><![CDATA[--!strict
@@ -11787,7 +11931,7 @@ return SummonService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="83">
+        <Item class="ModuleScript" referent="84">
           <Properties>
             <string name="Name">TowService</string>
             <string name="Source"><![CDATA[--!strict
@@ -11892,7 +12036,7 @@ return TowService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="84">
+        <Item class="ModuleScript" referent="85">
           <Properties>
             <string name="Name">TutorialService</string>
             <string name="Source"><![CDATA[--!strict
@@ -11994,7 +12138,7 @@ return TutorialService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="85">
+        <Item class="ModuleScript" referent="86">
           <Properties>
             <string name="Name">WarpService</string>
             <string name="Source"><![CDATA[--!strict
@@ -12171,7 +12315,7 @@ return WarpService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="86">
+        <Item class="ModuleScript" referent="87">
           <Properties>
             <string name="Name">WorldEventService</string>
             <string name="Source"><![CDATA[--!strict
@@ -12496,7 +12640,7 @@ return WorldEventService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="87">
+        <Item class="ModuleScript" referent="88">
           <Properties>
             <string name="Name">WorldState</string>
             <string name="Source"><![CDATA[--!strict
@@ -12587,15 +12731,15 @@ return WorldState
       </Item>
     </Item>
   </Item>
-  <Item class="ServerStorage" referent="88">
+  <Item class="ServerStorage" referent="89">
     <Properties>
       <string name="Name">ServerStorage</string>
     </Properties>
-    <Item class="Folder" referent="89">
+    <Item class="Folder" referent="90">
       <Properties>
         <string name="Name">Voidline</string>
       </Properties>
-      <Item class="ModuleScript" referent="90">
+      <Item class="ModuleScript" referent="91">
         <Properties>
           <string name="Name">README</string>
           <string name="Source"><![CDATA[-- ServerStorage.Voidline holds runtime templates if needed.
@@ -12606,23 +12750,23 @@ return {}
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="91">
+  <Item class="StarterPlayer" referent="92">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="92">
+    <Item class="StarterPlayerScripts" referent="93">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="93">
+      <Item class="Folder" referent="94">
         <Properties>
           <string name="Name">Voidline</string>
         </Properties>
-        <Item class="Folder" referent="94">
+        <Item class="Folder" referent="95">
           <Properties>
             <string name="Name">Client</string>
           </Properties>
-          <Item class="ModuleScript" referent="95">
+          <Item class="ModuleScript" referent="96">
             <Properties>
               <string name="Name">ClientState</string>
               <string name="Source"><![CDATA[--!strict
@@ -12785,7 +12929,7 @@ return ClientState
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="96">
+          <Item class="ModuleScript" referent="97">
             <Properties>
               <string name="Name">Ui</string>
               <string name="Source"><![CDATA[--!strict
@@ -12940,11 +13084,12 @@ function Ui.Screen(name: string, order: number): ScreenGui
 	})
 end
 
--- Frosted obsidian panel with a thin gold edge.
+-- Frosted obsidian panel with a thin gold edge (`Premium` = sharper sim HUD bar).
 function Ui.Glass(props: { [string]: any }): Frame
+	local premium = props.Premium == true
 	local frame = Ui.Make("Frame", {
 		BackgroundColor3 = Ui.Colors.Glass,
-		BackgroundTransparency = 0.18,
+		BackgroundTransparency = if premium then 0.12 else 0.18,
 		BorderSizePixel = 0,
 	}) :: Frame
 	for key, value in props do
@@ -12953,12 +13098,12 @@ function Ui.Glass(props: { [string]: any }): Frame
 		end
 	end
 	Ui.Corner(frame, props.CornerRadius or 14)
-	Ui.Stroke(frame)
+	Ui.Stroke(frame, Ui.Colors.Gold, if premium then 1.75 else 1.5, if premium then 0.42 else 0.55)
 	Ui.Make("UIGradient", {
 		Rotation = 90,
 		Transparency = NumberSequence.new({
-			NumberSequenceKeypoint.new(0, 0),
-			NumberSequenceKeypoint.new(1, 0.2),
+			NumberSequenceKeypoint.new(0, if premium then 0 else 0),
+			NumberSequenceKeypoint.new(1, if premium then 0.12 else 0.2),
 		}),
 		Color = ColorSequence.new(Ui.Colors.GlassLight, Ui.Colors.Glass),
 		Parent = frame,
@@ -13098,19 +13243,27 @@ function Ui.ArtIcon(parent: Instance, artGroup: string, artKey: string, glyph: s
 		ScaleType = Enum.ScaleType.Fit,
 		Parent = parent,
 	}) :: ImageLabel
-	Ui.Label({
-		Name = "Glyph",
-		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = UDim2.new(0.5, 0, 0, 4 + dim / 2),
-		Size = UDim2.fromOffset(dim, dim),
-		Text = glyph,
-		Font = Ui.Font.Title,
-		TextSize = math.floor(dim * 0.78),
-		TextColor3 = Ui.Colors.GoldBright,
-		TextTransparency = 0.15,
-		BackgroundTransparency = 1,
-		Parent = parent,
-	})
+	local hideGlyph = (function()
+		local ok, ArtResolve = pcall(function()
+			return require(ReplicatedStorage:WaitForChild("Voidline").Modules.ArtResolve)
+		end)
+		return ok and ArtResolve and ArtResolve.UiHasUpload(artGroup, artKey)
+	end)()
+	if not hideGlyph then
+		Ui.Label({
+			Name = "Glyph",
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.new(0.5, 0, 0, 4 + dim / 2),
+			Size = UDim2.fromOffset(dim, dim),
+			Text = glyph,
+			Font = Ui.Font.Title,
+			TextSize = math.floor(dim * 0.72),
+			TextColor3 = Ui.Colors.GoldBright,
+			TextTransparency = 0.08,
+			BackgroundTransparency = 1,
+			Parent = parent,
+		})
+	end
 	return image
 end
 
@@ -13119,7 +13272,7 @@ return Ui
             </Properties>
           </Item>
         </Item>
-        <Item class="LocalScript" referent="97">
+        <Item class="LocalScript" referent="98">
           <Properties>
             <string name="Name">ClientBoot</string>
             <string name="Source"><![CDATA[--!strict
@@ -13296,11 +13449,11 @@ print(("[Voidline] Client online for %s"):format(Players.LocalPlayer.Name))
 ]]></string>
           </Properties>
         </Item>
-        <Item class="Folder" referent="98">
+        <Item class="Folder" referent="99">
           <Properties>
             <string name="Name">Controllers</string>
           </Properties>
-          <Item class="ModuleScript" referent="99">
+          <Item class="ModuleScript" referent="100">
             <Properties>
               <string name="Name">AudioController</string>
               <string name="Source"><![CDATA[--!strict
@@ -13534,7 +13687,7 @@ return AudioController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="100">
+          <Item class="ModuleScript" referent="101">
             <Properties>
               <string name="Name">CameraController</string>
               <string name="Source"><![CDATA[--!strict
@@ -13662,7 +13815,7 @@ return CameraController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="101">
+          <Item class="ModuleScript" referent="102">
             <Properties>
               <string name="Name">DroneController</string>
               <string name="Source"><![CDATA[--!strict
@@ -14387,7 +14540,7 @@ return DroneController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="102">
+          <Item class="ModuleScript" referent="103">
             <Properties>
               <string name="Name">HUDController</string>
               <string name="Source"><![CDATA[--!strict
@@ -14403,6 +14556,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
 local JuiceConfig = require(Voidline.Config.JuiceConfig)
 local EconomyRules = require(Voidline.Rules.EconomyRules)
+local HudCueRules = require(Voidline.Rules.HudCueRules)
+local ArtResolve = require(Voidline.Modules.ArtResolve)
 local BiomeRegistry = require(Voidline.Content.BiomeRegistry)
 local WorldEventRegistry = require(Voidline.Content.WorldEventRegistry)
 local Remotes = require(Voidline.Remotes)
@@ -14419,13 +14574,23 @@ local TOAST_MAX = 3
 local CONTEST_RANGE = 220
 local CONTEST_TIMEOUT = 4
 
-type Chip = { Frame: Frame, Value: TextLabel, Shown: number, Target: number, Format: (number) -> string }
+type Chip = {
+	Frame: Frame,
+	Value: TextLabel,
+	Title: TextLabel,
+	Shown: number,
+	Target: number,
+	Format: (number) -> string,
+}
 
 local gui: ScreenGui
 local pill: Frame
 local chips: { [string]: Chip } = {}
 local worldLine: TextLabel
 local eventLine: TextLabel
+local goalLine: TextLabel
+local comebackLine: TextLabel
+local comebackFrame: Frame
 local bannerFrame: Frame
 local bannerText: TextLabel
 local toastHolder: Frame
@@ -14440,39 +14605,60 @@ local bannerBusy = false
 local contest: { Id: number, Seen: number, Done: boolean }? = nil
 local visible = true
 
-local function makeChip(order: number, icon: string, color: Color3, format: (number) -> string): Chip
+local STAT_TITLES = { Credits = "CREDITS", Ore = "CARGO", Shards = "SHARDS", Tokens = "TOKENS" }
+
+local function makeChip(order: number, icon: string, statKey: string, color: Color3, format: (number) -> string): Chip
 	local frame = Ui.Make("Frame", {
 		Name = "Chip" .. order,
 		BackgroundTransparency = 1,
 		AutomaticSize = Enum.AutomaticSize.X,
-		Size = UDim2.fromOffset(0, 36),
+		Size = UDim2.fromOffset(0, 46),
 		LayoutOrder = order,
 		Parent = pill,
 	}) :: Frame
-	Ui.List(frame, Enum.FillDirection.Horizontal, 4)
-	Ui.Label({
-		Name = "Icon",
-		Text = icon,
-		TextColor3 = color,
-		Font = Ui.Font.Title,
-		TextSize = 18,
-		AutomaticSize = Enum.AutomaticSize.X,
-		Size = UDim2.fromOffset(0, 36),
-		LayoutOrder = 1,
+	Ui.List(frame, Enum.FillDirection.Horizontal, 6)
+	Ui.ArtIcon(frame, "Hud", statKey, icon, 22)
+	local textStack = Ui.Make("Frame", {
+		Name = "TextStack",
+		BackgroundTransparency = 1,
+		AutomaticSize = Enum.AutomaticSize.XY,
+		Size = UDim2.fromOffset(0, 46),
+		LayoutOrder = 2,
 		Parent = frame,
+	}) :: Frame
+	Ui.List(textStack, Enum.FillDirection.Vertical, 0, Enum.HorizontalAlignment.Left)
+	local title = Ui.Label({
+		Name = "Title",
+		Text = STAT_TITLES[statKey] or statKey,
+		Font = Ui.Font.Bold,
+		TextSize = 9,
+		TextColor3 = Ui.Colors.Muted,
+		AutomaticSize = Enum.AutomaticSize.X,
+		Size = UDim2.fromOffset(0, 12),
+		LayoutOrder = 1,
+		Parent = textStack,
+		Visible = not ArtResolve.UiHasUpload("Hud", statKey),
 	})
 	local value = Ui.Label({
 		Name = "Value",
 		Text = "0",
-		Font = Ui.Font.Bold,
-		TextSize = 18,
+		Font = Ui.Font.Title,
+		TextSize = 22,
 		TextWrapped = false,
 		AutomaticSize = Enum.AutomaticSize.X,
-		Size = UDim2.fromOffset(0, 36),
+		Size = UDim2.fromOffset(0, 28),
 		LayoutOrder = 2,
-		Parent = frame,
+		Parent = textStack,
 	})
-	return { Frame = frame, Value = value, Shown = 0, Target = 0, Format = format }
+	value.TextColor3 = color
+	return {
+		Frame = frame,
+		Value = value,
+		Title = title,
+		Shown = 0,
+		Target = 0,
+		Format = format,
+	}
 end
 
 local function build()
@@ -14482,19 +14668,20 @@ local function build()
 		Name = "TopPill",
 		AnchorPoint = Vector2.new(0.5, 0),
 		Position = UDim2.new(0.5, 0, 0, 6),
-		Size = UDim2.fromOffset(0, 44),
+		Size = UDim2.fromOffset(0, 52),
 		AutomaticSize = Enum.AutomaticSize.X,
-		CornerRadius = 22,
+		CornerRadius = 24,
+		Premium = true,
 		Parent = gui,
 	})
-	Ui.Padding(pill, 16, 4)
-	Ui.List(pill, Enum.FillDirection.Horizontal, 18)
-	chips.Credits = makeChip(1, "◆", Ui.Colors.GoldBright, Ui.Compact)
-	chips.Ore = makeChip(2, "⬢", Color3.fromRGB(255, 170, 90), function(n)
+	Ui.Padding(pill, 18, 6)
+	Ui.List(pill, Enum.FillDirection.Horizontal, 22)
+	chips.Credits = makeChip(1, "◆", "Credits", Ui.Colors.GoldBright, Ui.Compact)
+	chips.Ore = makeChip(2, "⬢", "Ore", Color3.fromRGB(255, 170, 90), function(n)
 		return ("%d/%d"):format(n, EconomyRules.CargoCap(ClientState.Profile))
 	end)
-	chips.Shards = makeChip(3, "✦", Ui.Colors.Void, Ui.Compact)
-	chips.Tokens = makeChip(4, "⬡", Ui.Colors.Cyan, Ui.Compact)
+	chips.Shards = makeChip(3, "✦", "Shards", Ui.Colors.Void, Ui.Compact)
+	chips.Tokens = makeChip(4, "⬡", "Tokens", Ui.Colors.Cyan, Ui.Compact)
 	cargoTag = Ui.Label({
 		Name = "CargoFull",
 		Text = "FULL · REFINE",
@@ -14513,7 +14700,7 @@ local function build()
 	worldLine = Ui.Label({
 		Name = "WorldClock",
 		AnchorPoint = Vector2.new(0.5, 0),
-		Position = UDim2.new(0.5, 0, 0, 52),
+		Position = UDim2.new(0.5, 0, 0, 60),
 		Size = UDim2.new(0.9, 0, 0, 18),
 		Font = Ui.Font.Bold,
 		TextSize = 13,
@@ -14525,7 +14712,7 @@ local function build()
 	eventLine = Ui.Label({
 		Name = "EventClock",
 		AnchorPoint = Vector2.new(0.5, 0),
-		Position = UDim2.new(0.5, 0, 0, 70),
+		Position = UDim2.new(0.5, 0, 0, 78),
 		Size = UDim2.new(0.9, 0, 0, 18),
 		Font = Ui.Font.Bold,
 		TextSize = 13,
@@ -14534,11 +14721,45 @@ local function build()
 		Text = "",
 		Parent = gui,
 	})
+	goalLine = Ui.Label({
+		Name = "NextGoal",
+		AnchorPoint = Vector2.new(0.5, 0),
+		Position = UDim2.new(0.5, 0, 0, 96),
+		Size = UDim2.new(0.92, 0, 0, 18),
+		Font = Ui.Font.Bold,
+		TextSize = 14,
+		TextColor3 = Ui.Colors.GoldBright,
+		TextStrokeTransparency = 0.65,
+		TextTruncate = Enum.TextTruncate.AtEnd,
+		Text = "",
+		Parent = gui,
+	})
+	comebackFrame = Ui.Glass({
+		Name = "ComebackCue",
+		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.new(0, 12, 1, -72),
+		Size = UDim2.fromOffset(0, 30),
+		AutomaticSize = Enum.AutomaticSize.X,
+		CornerRadius = 12,
+		Visible = false,
+		Parent = gui,
+	})
+	Ui.Padding(comebackFrame, 12, 6)
+	comebackLine = Ui.Label({
+		Name = "Text",
+		Font = Ui.Font.Bold,
+		TextSize = 13,
+		TextColor3 = Ui.Colors.GoldBright,
+		AutomaticSize = Enum.AutomaticSize.X,
+		Size = UDim2.fromOffset(0, 18),
+		Text = "",
+		Parent = comebackFrame,
+	})
 
 	bannerFrame = Ui.Glass({
 		Name = "Banner",
 		AnchorPoint = Vector2.new(0.5, 0),
-		Position = UDim2.new(0.5, 0, 0, 96),
+		Position = UDim2.new(0.5, 0, 0, 118),
 		Size = UDim2.new(0.8, 0, 0, 46),
 		Visible = false,
 		Parent = gui,
@@ -14566,7 +14787,7 @@ local function build()
 	contestFrame = Ui.Glass({
 		Name = "Contest",
 		AnchorPoint = Vector2.new(0.5, 0),
-		Position = UDim2.new(0.5, 0, 0, 148),
+		Position = UDim2.new(0.5, 0, 0, 170),
 		Size = UDim2.fromOffset(340, 64),
 		Visible = false,
 		Parent = gui,
@@ -14746,6 +14967,22 @@ function HUDController.Pulse(statName: string)
 	end
 end
 
+local function updateGoalAndCue()
+	local profile = ClientState.Profile
+	goalLine.Text = HudCueRules.NextGoalLine(profile, ClientState.Ctx())
+	local cue = HudCueRules.ComebackCue(profile, os.time())
+	local showCue = cue ~= nil and visible
+	if showCue ~= comebackFrame.Visible then
+		comebackFrame.Visible = showCue
+		if showCue then
+			Ui.Pop(comebackFrame, 0.9)
+		end
+	end
+	if cue then
+		comebackLine.Text = cue
+	end
+end
+
 -- World clock -----------------------------------------------------------------
 
 local function updateClock()
@@ -14862,6 +15099,7 @@ function HUDController.Init()
 	gui.Enabled = true
 	visible = true
 	setTargets()
+	updateGoalAndCue()
 	ClientState.OnChanged(function(changed)
 		if
 			changed.Credits
@@ -14869,9 +15107,15 @@ function HUDController.Init()
 			or changed.VoidShards
 			or changed.VoidlineTokens
 			or changed.CargoLevel
+			or changed.TutorialFlags
+			or changed.TutorialComplete
+			or changed.Quests
+			or changed.ForgeJobEndsAt
+			or changed.LastDailyClaimDay
 			or changed.Loaded
 		then
 			setTargets()
+			updateGoalAndCue()
 		end
 		if changed.Settings or changed.Loaded then
 			HUDController.SetVisible(ClientState.Profile.Settings.ClipMode ~= true)
@@ -14882,6 +15126,7 @@ function HUDController.Init()
 	task.spawn(function()
 		while gui.Parent do
 			updateClock()
+			updateGoalAndCue()
 			stepContest()
 			task.wait(0.5)
 		end
@@ -14892,7 +15137,7 @@ return HUDController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="103">
+          <Item class="ModuleScript" referent="104">
             <Properties>
               <string name="Name">HotbarController</string>
               <string name="Source"><![CDATA[--!strict
@@ -14903,6 +15148,7 @@ local ContextActionService = game:GetService("ContextActionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local ArtResolve = require(Voidline.Modules.ArtResolve)
 local EconomyConfig = require(Voidline.Config.EconomyConfig)
 local DroneConfig = require(Voidline.Config.DroneConfig)
 local EconomyRules = require(Voidline.Rules.EconomyRules)
@@ -15126,33 +15372,25 @@ function HotbarController.Init(hotbarActions: Actions)
 	keyHint(upgradeButton, "U")
 
 	for n = 1, 3 do
-		local caption = string.split(DroneConfig.FormationLabels[n], " ")
-		formationButtons[n] = slotButton(
-			"Formation" .. n,
-			FORMATION_GLYPHS[n],
-			caption[#caption],
-			tostring(n),
-			1 + n,
-			function()
-				setFormation(n)
-			end,
-			"Formation" .. n
-		)
+		local caption = ArtResolve.UiLabel("Hotbar", "Formation" .. n, FORMATION_GLYPHS[n])
+		formationButtons[n] = slotButton("Formation" .. n, FORMATION_GLYPHS[n], caption, tostring(n), 1 + n, function()
+			setFormation(n)
+		end, "Formation" .. n)
 	end
-	slotButton("Store", "⬡", "STORE", "B", 10, function()
+	slotButton("Store", "⬡", ArtResolve.UiLabel("Hotbar", "Store", "STORE"), "B", 10, function()
 		actions.OpenStore()
 	end, "Store")
-	slotButton("Menu", "☰", "CODEX", "C", 11, function()
+	slotButton("Menu", "☰", ArtResolve.UiLabel("Hotbar", "Menu", "CODEX"), "C", 11, function()
 		actions.OpenMenu(nil)
 	end, "Menu")
-	slotButton("Home", "⌂", "HOME", "H", 12, function()
+	slotButton("Home", "⌂", ArtResolve.UiLabel("Hotbar", "Home", "HOME"), "H", 12, function()
 		ClientState.Fire("WarpRequest", "Home")
 	end, "Home")
-	sellButton = slotButton("Sell", "⇪", "SELL", "R", 13, function()
+	sellButton = slotButton("Sell", "⇪", ArtResolve.UiLabel("Hotbar", "Sell", "SELL"), "R", 13, function()
 		ClientState.Fire("SellOre")
 	end, "Sell")
 	if Ui.IsTouch() then
-		slotButton("Clip", "▣", "CLIP", "K", 14, function()
+		slotButton("Clip", "▣", ArtResolve.UiLabel("Hotbar", "Clip", "CLIP"), "K", 14, function()
 			actions.ToggleClip()
 		end, "Clip")
 	end
@@ -15213,7 +15451,7 @@ return HotbarController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="104">
+          <Item class="ModuleScript" referent="105">
             <Properties>
               <string name="Name">InteractController</string>
               <string name="Source"><![CDATA[--!strict
@@ -15333,7 +15571,7 @@ return InteractController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="105">
+          <Item class="ModuleScript" referent="106">
             <Properties>
               <string name="Name">JuiceController</string>
               <string name="Source"><![CDATA[--!strict
@@ -15781,7 +16019,7 @@ return JuiceController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="106">
+          <Item class="ModuleScript" referent="107">
             <Properties>
               <string name="Name">MenuController</string>
               <string name="Source"><![CDATA[--!strict
@@ -16666,7 +16904,7 @@ return MenuController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="107">
+          <Item class="ModuleScript" referent="108">
             <Properties>
               <string name="Name">MovementController</string>
               <string name="Source"><![CDATA[--!strict
@@ -16878,7 +17116,7 @@ return MovementController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="108">
+          <Item class="ModuleScript" referent="109">
             <Properties>
               <string name="Name">OnboardingController</string>
               <string name="Source"><![CDATA[--!strict
@@ -17226,7 +17464,7 @@ return OnboardingController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="109">
+          <Item class="ModuleScript" referent="110">
             <Properties>
               <string name="Name">SettingsController</string>
               <string name="Source"><![CDATA[local Players = game:GetService("Players")
@@ -17337,7 +17575,7 @@ return SettingsController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="110">
+          <Item class="ModuleScript" referent="111">
             <Properties>
               <string name="Name">StationInteractController</string>
               <string name="Source"><![CDATA[local Players = game:GetService("Players")
@@ -17470,7 +17708,7 @@ return StationInteractController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="111">
+          <Item class="ModuleScript" referent="112">
             <Properties>
               <string name="Name">StoreController</string>
               <string name="Source"><![CDATA[--!strict
@@ -17866,7 +18104,7 @@ return StoreController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="112">
+          <Item class="ModuleScript" referent="113">
             <Properties>
               <string name="Name">ThrusterCosmeticController</string>
               <string name="Source"><![CDATA[local Players = game:GetService("Players")
@@ -17942,7 +18180,7 @@ return ThrusterCosmeticController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="113">
+          <Item class="ModuleScript" referent="114">
             <Properties>
               <string name="Name">TowController</string>
               <string name="Source"><![CDATA[--!strict
@@ -18084,7 +18322,7 @@ return TowController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="114">
+          <Item class="ModuleScript" referent="115">
             <Properties>
               <string name="Name">VFXController</string>
               <string name="Source"><![CDATA[--!strict
@@ -18328,14 +18566,15 @@ function VFXController.MonolithSplitCrack()
 	task.delay(cfg.Duration * 0.4, function()
 		Ui.Tween(seam, cfg.Duration * 0.5, { Transparency = cfg.SeamPulseTransparency[2] })
 	end)
-	for i = 1, 8 do
+	local sparkCount = cfg.SplitSparkCount or 8
+	for i = 1, sparkCount do
 		local spark = Ui.Make("Part", {
 			Name = "SplitSpark",
 			Anchored = true,
 			CanCollide = false,
 			CanQuery = false,
 			Size = Vector3.new(0.35, 0.35, 2.4),
-			CFrame = seam.CFrame * CFrame.new(0, -seam.Size.Y / 2 + i * (seam.Size.Y / 9), 0),
+			CFrame = seam.CFrame * CFrame.new(0, -seam.Size.Y / 2 + i * (seam.Size.Y / (sparkCount + 1)), 0),
 			Color = VisualBibleConfig.Palette.GoldBright,
 			Material = Enum.Material.Neon,
 			Parent = folder,
@@ -18413,7 +18652,11 @@ function VFXController.SovereignHaloPulse()
 	if clipHidden or perfMode then
 		return
 	end
-	VFXController.ScreenFlash(VisualBibleConfig.Palette.GoldBright, 0.28)
+	local haloCfg = VisualBibleConfig.SovereignHalo
+	VFXController.ScreenFlash(VisualBibleConfig.Palette.GoldBright, haloCfg.PulseFlashSeconds or 0.35)
+	if not Ui.ReducedMotion then
+		shockRing(folder, HubLayout.MonolithCenter + Vector3.new(0, 18, 0), 18, VisualBibleConfig.Palette.Gold, 0.75)
+	end
 end
 
 function VFXController.GrinderPulse()
@@ -18454,7 +18697,7 @@ return VFXController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="115">
+          <Item class="ModuleScript" referent="116">
             <Properties>
               <string name="Name">WorldController</string>
               <string name="Source"><![CDATA[--!strict
@@ -18816,7 +19059,7 @@ return WorldController
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="116">
+  <Item class="Workspace" referent="117">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">60</float>

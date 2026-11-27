@@ -56,20 +56,24 @@ For fast iteration without Meshy: block out in Studio, **File → Export Selecti
 
 ## UI icons
 
-PNG sources for upload live under `/opt/cursor/artifacts/art/` (generated in this pass).
+PNG sources for upload live under `/opt/cursor/artifacts/art/` (godly pass — obsidian/gold, no bubble ABX palette).
 
-1. Dashboard → **Development Items** → **Images** → upload each PNG.
-2. Paste Asset IDs into `ArtConfig.UI.Hotbar` / `Hud` / `Store`.
-3. Until IDs exist, UI uses `rbxasset://textures/ui/GuiImagePlaceholder.png` with **glyph text** on top (readable in Studio).
+1. Dashboard → **Development Items** → **Images** → upload each PNG (128×128 recommended).
+2. Paste Asset IDs into `ArtConfig.lua`:
+   - **Hotbar** → `ArtConfig.UI.Hotbar.*.AssetId`
+   - **HUD stat chips** → `ArtConfig.UI.Hud.Credits|Ore|Shards|Tokens.AssetId`
+3. Until IDs exist, UI uses `rbxasset://textures/ui/GuiImagePlaceholder.png` with **gold glyph** fallback (hotbar + HUD).
 
-Suggested filenames:
+| File | `ArtConfig` key |
+|------|-----------------|
+| `icon_hotbar_upgrade.png` | `UI.Hotbar.Upgrade` |
+| `icon_formation_orbit.png` | `UI.Hotbar.Formation1` |
+| `icon_formation_wedge.png` | `UI.Hotbar.Formation2` |
+| `icon_formation_crown.png` | `UI.Hotbar.Formation3` |
+| `icon_hotbar_store.png` | `UI.Hotbar.Store` |
+| `icon_hotbar_clip.png` | `UI.Hotbar.Clip` |
 
-- `icon_hotbar_upgrade.png`
-- `icon_formation_orbit.png`
-- `icon_formation_wedge.png`
-- `icon_formation_crown.png`
-- `icon_hotbar_store.png`
-- `icon_hotbar_clip.png`
+Optional: generate matching HUD chip icons (credits diamond, cargo hex, shard star) and set `UI.Hud.*` the same way.
 
 ## One-commit mesh swap
 

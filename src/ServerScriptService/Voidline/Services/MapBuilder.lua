@@ -284,7 +284,7 @@ local function buildHubCathedralDressing(hub: Instance, hubCFrame: CFrame, walkT
 		CanCollide = false,
 	})
 	goldSeam(dress, hubCFrame * CFrame.new(36, walkTop + 25.5, -11), Vector3.new(0.18, 4.2, 0.18), "SpireEastCrownSeam")
-	for i = 1, 5 do
+	for i = 1, 7 do
 		local ribZ = -38 + i * 6.5 + (i % 2) * 1.2
 		part({
 			Name = "HubRibbing" .. i,
@@ -434,6 +434,52 @@ local function buildHubUpperDecks(hub: Instance, hubCFrame: CFrame, walkTop: num
 	})
 end
 
+local function buildHubCathedralArches(hub: Instance, hubCFrame: CFrame, walkTop: number)
+	local arches = folder("HubCathedralArches", hub)
+	for i = 1, 6 do
+		local angle = (i - 0.5) / 6 * math.pi * 2 + math.rad(8)
+		local radius = 34 + (i % 2) * 3
+		local base = Vector3.new(math.cos(angle) * radius, walkTop, math.sin(angle) * radius)
+		local pillarL = part({
+			Name = "ArchPillarL" .. i,
+			Parent = arches,
+			Size = Vector3.new(1.6, 16 + (i % 3) * 2, 1.6),
+			CFrame = hubCFrame * CFrame.new(base + Vector3.new(-2.2, 8, 0)) * CFrame.Angles(0, angle, 0),
+			Color = Color3.fromRGB(14, 12, 20),
+			Material = Enum.Material.Slate,
+			CanCollide = false,
+		})
+		part({
+			Name = "ArchPillarR" .. i,
+			Parent = arches,
+			Size = pillarL.Size,
+			CFrame = hubCFrame * CFrame.new(base + Vector3.new(2.2, 8, 0)) * CFrame.Angles(0, angle, 0),
+			Color = Color3.fromRGB(14, 12, 20),
+			Material = Enum.Material.Slate,
+			CanCollide = false,
+		})
+		part({
+			Name = "ArchLinte" .. i,
+			Parent = arches,
+			Size = Vector3.new(6.8, 1.2, 2.4),
+			CFrame = hubCFrame
+				* CFrame.new(base + Vector3.new(0, pillarL.Size.Y / 2 + 7.8, 0))
+				* CFrame.Angles(0, angle + math.rad(90), math.rad(3 * (i % 2))),
+			Color = PALETTE.ObsidianLift,
+			Material = Enum.Material.DiamondPlate,
+			CanCollide = false,
+		})
+		if i % 2 == 0 then
+			goldSeam(
+				arches,
+				hubCFrame * CFrame.new(base + Vector3.new(0, 12, 0)),
+				Vector3.new(4.8, DECK.SeamThickness, 0.3),
+				"ArchKeystone" .. i
+			)
+		end
+	end
+end
+
 local function buildHubLightWells(hub: Instance, hubCFrame: CFrame, walkTop: number)
 	local wells = folder("HubLightWells", hub)
 	local spots = {
@@ -549,6 +595,7 @@ local function buildHub(root: Instance)
 	buildHubColonnades(hub, hubCFrame, walkTop)
 	buildHubUpperDecks(hub, hubCFrame, walkTop)
 	buildHubLightWells(hub, hubCFrame, walkTop)
+	buildHubCathedralArches(hub, hubCFrame, walkTop)
 	buildHubFillLights(hub, hubCFrame, walkTop)
 
 	-- Monolith: two halves (split along X) plus gold bands and the Void Core.
@@ -989,7 +1036,7 @@ local function buildAsteroidField(parent: Instance)
 	local field = folder("DeepSpaceAsteroidField", parent)
 	local rng = Random.new(8819)
 	local count = 0
-	for i = 1, 86 do
+	for i = 1, 92 do
 		local angle = rng:NextNumber(0, math.pi * 2)
 		local band = if i % 4 == 0 then 1.35 elseif i % 7 == 0 then 0.55 else 0.85
 		local radius = rng:NextNumber(HubLayout.ZoneRadius * 0.25, HubLayout.ZoneRadius * 1.25) * band

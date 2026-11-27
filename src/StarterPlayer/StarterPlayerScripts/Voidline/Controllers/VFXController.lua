@@ -239,14 +239,15 @@ function VFXController.MonolithSplitCrack()
 	task.delay(cfg.Duration * 0.4, function()
 		Ui.Tween(seam, cfg.Duration * 0.5, { Transparency = cfg.SeamPulseTransparency[2] })
 	end)
-	for i = 1, 8 do
+	local sparkCount = cfg.SplitSparkCount or 8
+	for i = 1, sparkCount do
 		local spark = Ui.Make("Part", {
 			Name = "SplitSpark",
 			Anchored = true,
 			CanCollide = false,
 			CanQuery = false,
 			Size = Vector3.new(0.35, 0.35, 2.4),
-			CFrame = seam.CFrame * CFrame.new(0, -seam.Size.Y / 2 + i * (seam.Size.Y / 9), 0),
+			CFrame = seam.CFrame * CFrame.new(0, -seam.Size.Y / 2 + i * (seam.Size.Y / (sparkCount + 1)), 0),
 			Color = VisualBibleConfig.Palette.GoldBright,
 			Material = Enum.Material.Neon,
 			Parent = folder,
@@ -324,7 +325,11 @@ function VFXController.SovereignHaloPulse()
 	if clipHidden or perfMode then
 		return
 	end
-	VFXController.ScreenFlash(VisualBibleConfig.Palette.GoldBright, 0.28)
+	local haloCfg = VisualBibleConfig.SovereignHalo
+	VFXController.ScreenFlash(VisualBibleConfig.Palette.GoldBright, haloCfg.PulseFlashSeconds or 0.35)
+	if not Ui.ReducedMotion then
+		shockRing(folder, HubLayout.MonolithCenter + Vector3.new(0, 18, 0), 18, VisualBibleConfig.Palette.Gold, 0.75)
+	end
 end
 
 function VFXController.GrinderPulse()

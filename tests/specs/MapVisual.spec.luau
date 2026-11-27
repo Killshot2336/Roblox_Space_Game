@@ -84,6 +84,8 @@ tests["walk surfaces use matte decks not neon slabs"] = function()
 	expect(findDescendant(root, "HubColonnadeRing") ~= nil).toBe(true)
 	expect(findDescendant(root, "HubUpperDecks") ~= nil).toBe(true)
 	expect(findDescendant(root, "HubLightWell1") ~= nil).toBe(true)
+	expect(findDescendant(root, "HubCathedralArches") ~= nil).toBe(true)
+	expect(findDescendant(root, "ArchLinte1") ~= nil).toBe(true)
 	expect(findDescendant(root, "HubFillLights") ~= nil).toBe(true)
 	expect(findDescendant(root, "BrokenCrownShard") ~= nil).toBe(true)
 	local asteroids = findDescendant(root, "DeepSpaceAsteroidField")
@@ -105,6 +107,7 @@ tests["walkable map surfaces have solid collision under neon visuals"] = functio
 	expect(hubCollision ~= nil).toBe(true)
 	expect(hubCollision.CanCollide).toBe(true)
 	expect(hubCollision:GetAttribute("Walkable")).toBe(true)
+	expect(string.find(tostring(hubCollision.Material), "Neon") == nil).toBe(true)
 	local hubTop = hubCollision.Position.Y + hubCollision.Size.Y / 2
 	expect(math.abs(hubTop - HubLayout.HubSize.Y / 2) < 0.05).toBe(true)
 
