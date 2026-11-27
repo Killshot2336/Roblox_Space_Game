@@ -180,6 +180,7 @@ end
 function HotbarController.Init(hotbarActions: Actions)
 	actions = hotbarActions
 	gui = Ui.Screen("VoidlineHotbar", 6)
+	gui.Enabled = true
 	bar = Ui.Glass({
 		Name = "Hotbar",
 		AnchorPoint = Vector2.new(0.5, 1),

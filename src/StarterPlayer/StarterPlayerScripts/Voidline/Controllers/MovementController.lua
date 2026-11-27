@@ -6,6 +6,10 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Voidline = ReplicatedStorage:WaitForChild("Voidline")
+local VisualBibleConfig = require(Voidline.Config.VisualBibleConfig)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Voidline = ReplicatedStorage:WaitForChild("Voidline")
 local GameConfig = require(Voidline.Config.GameConfig)
 
 local Client = script.Parent.Parent.Client
@@ -64,6 +68,26 @@ local function setSprint(on: boolean)
 	end
 	sprinting = on
 	applySpeed()
+end
+
+local AVATAR_FILL = VisualBibleConfig.Lighting.HubFill
+
+local function attachAvatarFill(character: Model)
+	local root = character:FindFirstChild("HumanoidRootPart")
+	if not root or not root:IsA("BasePart") then
+		return
+	end
+	local existing = root:FindFirstChild("VoidlineAvatarFill")
+	if existing then
+		return
+	end
+	local light = Instance.new("PointLight")
+	light.Name = "VoidlineAvatarFill"
+	light.Brightness = AVATAR_FILL.AvatarFillBrightness
+	light.Range = AVATAR_FILL.AvatarFillRange
+	light.Color = Color3.fromRGB(215, 205, 245)
+	light.Shadows = false
+	light.Parent = root
 end
 
 local function attachFootFx(character: Model)
@@ -161,6 +185,7 @@ function MovementController.Init()
 			if humInst and humInst:IsA("Humanoid") then
 				humInst.WalkSpeed = BASE_WALK
 			end
+			attachAvatarFill(character)
 			attachFootFx(character)
 		end)
 	end

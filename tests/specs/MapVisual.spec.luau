@@ -120,9 +120,33 @@ tests["walkable map surfaces have solid collision under neon visuals"] = functio
 	end
 	expect(walkPlates).toBe(PlotLayout.BridgeSegments)
 
-	local silhouette = findDescendant(root, "HubSilhouetteRing")
-	expect(silhouette ~= nil).toBe(true)
-	expect(silhouette.CanCollide).toBe(false)
+	expect(findDescendant(root, "HubSilhouetteRing")).toBeNil()
+	expect(findDescendant(root, "HubDeckLipNorth") ~= nil).toBe(true)
+	expect(findDescendant(root, "VoidStarDressing") ~= nil).toBe(true)
+	expect(findDescendant(root, "MonolithHeroKey") ~= nil).toBe(true)
+end
+
+tests["hub has no oversized neon gold seams"] = function()
+	local world = Harness.new()
+	world:runScript("ServerScriptService/Voidline/Services/MapBuilder")
+	local MapBuilder = world:require("ServerScriptService/Voidline/Services/MapBuilder")
+	local root = MapBuilder.Build()
+	local offenders = 0
+	local function walk(node: any)
+		if node.ClassName == "BasePart" and node:GetAttribute("GoldSeam") == true then
+			if node.Material == Enum.Material.Neon then
+				local maxDim = math.max(node.Size.X, node.Size.Y, node.Size.Z)
+				if maxDim > 2.5 then
+					offenders += 1
+				end
+			end
+		end
+		for _, child in node:GetChildren() do
+			walk(child)
+		end
+	end
+	walk(root)
+	expect(offenders).toBe(0)
 end
 
 tests["hub world labels are near-only (no billboard sludge)"] = function()

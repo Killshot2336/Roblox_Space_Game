@@ -86,7 +86,27 @@ local function ensureEffects()
 	Lighting.FogColor = LIGHT.FogColor
 	Lighting.FogStart = LIGHT.FogStart
 	Lighting.FogEnd = LIGHT.FogEnd
+	Lighting.EnvironmentDiffuseScale = 0.55
+	Lighting.EnvironmentSpecularScale = 0.35
+	Lighting.GlobalShadows = true
 	atmosphere.Offset = LIGHT.Atmosphere.Offset
+	atmosphere.Color = LIGHT.Atmosphere.Color
+	atmosphere.Decay = LIGHT.Atmosphere.Decay
+	atmosphere.Density = LIGHT.Atmosphere.Density
+	atmosphere.Haze = LIGHT.Atmosphere.Haze
+	atmosphere.Glare = LIGHT.Atmosphere.Glare
+	local skyChild = Lighting:FindFirstChild("VoidlineSky")
+	local sky: Sky
+	if skyChild and skyChild:IsA("Sky") then
+		sky = skyChild
+	else
+		sky = Instance.new("Sky")
+		sky.Name = "VoidlineSky"
+		sky.Parent = Lighting
+	end
+	sky.StarCount = 4200
+	sky.SunAngularSize = 8
+	sky.MoonAngularSize = 6
 end
 
 local function currentBiome(): BiomeRegistry.Biome?

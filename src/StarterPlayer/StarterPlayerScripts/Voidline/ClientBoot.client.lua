@@ -132,14 +132,27 @@ task.spawn(InteractController.Init, {
 	end,
 })
 
+-- Normal play always shows HUD/hotbar unless Clip Mode is explicitly on (default false).
+local function ensurePlayHud()
+	local clip = ClientState.Profile.Settings.ClipMode == true
+	if clip then
+		return
+	end
+	HUDController.SetVisible(true)
+	HotbarController.SetVisible(true)
+	MovementController.SetVisible(true)
+end
+
 ClientState.OnChanged(function(changed)
 	if changed.Settings or changed.Loaded then
 		applySettings()
 		applyClipMode()
+		ensurePlayHud()
 	end
 end)
 applySettings()
 applyClipMode()
+ensurePlayHud()
 
 local lastPing = -math.huge
 UserInputService.InputBegan:Connect(function()
@@ -151,4 +164,8 @@ UserInputService.InputBegan:Connect(function()
 end)
 
 ClientState.Init()
+task.defer(ensurePlayHud)
+Players.LocalPlayer.CharacterAdded:Connect(function()
+	task.defer(ensurePlayHud)
+end)
 print(("[Voidline] Client online for %s"):format(Players.LocalPlayer.Name))

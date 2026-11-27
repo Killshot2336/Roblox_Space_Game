@@ -3,9 +3,9 @@
 local HubLayout = {}
 
 HubLayout.HubSize = Vector3.new(96, 2, 96)
-HubLayout.MonolithSize = Vector3.new(18, 72, 18)
-HubLayout.MonolithCenter = Vector3.new(0, 37, 0)
-HubLayout.VoidCore = Vector3.new(0, 40, 0)
+HubLayout.MonolithSize = Vector3.new(22, 86, 22)
+HubLayout.MonolithCenter = Vector3.new(0, 44, 0)
+HubLayout.VoidCore = Vector3.new(0, 48, 0)
 HubLayout.RebirthPad = Vector3.new(21, 1.5, 0)
 HubLayout.ForgePad = Vector3.new(-21, 1.5, 0)
 HubLayout.CodeTerminal = Vector3.new(0, 6, 25)

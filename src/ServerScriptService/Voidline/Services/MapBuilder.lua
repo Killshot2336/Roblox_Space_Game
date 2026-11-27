@@ -122,14 +122,17 @@ end
 MapBuilder.Label = label
 
 local function goldSeam(parent: Instance, cframe: CFrame, size: Vector3, name: string?, shape: Enum.PartType?)
+	-- Neon only on thin ≤2-stud inlays; wide cylinder trims were bloom pancakes.
+	local maxDim = math.max(size.X, size.Y, size.Z)
+	local thinLip = maxDim <= MAX_GOLD_SEAM + 0.08 and shape ~= Enum.PartType.Cylinder
 	local seam = part({
 		Name = name or "GoldSeam",
 		Parent = parent,
 		Size = size,
 		CFrame = cframe,
 		Color = PALETTE.Gold,
-		Material = Enum.Material.Neon,
-		Transparency = 0.42,
+		Material = if thinLip then Enum.Material.Neon else Enum.Material.Foil,
+		Transparency = if thinLip then 0.48 else 0.1,
 		CanCollide = false,
 		CanQuery = false,
 		Shape = shape,
@@ -171,6 +174,9 @@ local function buildHubFillLights(hub: Instance, hubCFrame: CFrame, walkTop: num
 		Vector3.new(-22, y, -18),
 		Vector3.new(14, y, -30),
 		Vector3.new(-32, y, 22),
+		Vector3.new(8, y + 4, 32),
+		Vector3.new(-10, y + 3, -28),
+		Vector3.new(36, y - 2, -8),
 	}
 	for i, pos in offsets do
 		local anchor = part({
@@ -257,6 +263,24 @@ local function buildHubCathedralDressing(hub: Instance, hubCFrame: CFrame, walkT
 		CFrame = hubCFrame * CFrame.new(-30, walkTop + 9.5, 20) * CFrame.Angles(math.rad(-6), math.rad(-22), 0),
 		Color = Color3.fromRGB(14, 12, 20),
 		Material = Enum.Material.Metal,
+	})
+	part({
+		Name = "AsymmetricCatwalk",
+		Parent = dress,
+		Size = Vector3.new(18, 0.35, 3.2),
+		CFrame = hubCFrame * CFrame.new(22, walkTop + 3.2, -26) * CFrame.Angles(0, math.rad(31), math.rad(2)),
+		Color = Color3.fromRGB(20, 18, 26),
+		Material = Enum.Material.DiamondPlate,
+		CanCollide = false,
+	})
+	part({
+		Name = "AsymmetricBannerArm",
+		Parent = dress,
+		Size = Vector3.new(0.45, 12, 0.45),
+		CFrame = hubCFrame * CFrame.new(-18, walkTop + 8, -32) * CFrame.Angles(math.rad(8), math.rad(-14), 0),
+		Color = Color3.fromRGB(18, 16, 24),
+		Material = Enum.Material.Slate,
+		CanCollide = false,
 	})
 	goldSeam(dress, hubCFrame * CFrame.new(36, walkTop + 25.5, -11), Vector3.new(0.18, 4.2, 0.18), "SpireEastCrownSeam")
 	for i = 1, 5 do
@@ -356,13 +380,6 @@ local function buildPlatedHubDeck(hub: Instance, hubCFrame: CFrame)
 			CanCollide = false,
 			CanQuery = false,
 		})
-		goldSeam(
-			deck,
-			hubCFrame * CFrame.new(0, 0.25 + ri * 0.02, 0) * CFrame.Angles(0, 0, math.rad(90)),
-			Vector3.new(DECK.SeamThickness, radius * 2, radius * 2),
-			"HubTrimRingSeam" .. ri,
-			Enum.PartType.Cylinder
-		)
 	end
 	local padThickness = 0.55
 	walkPlate({
@@ -416,7 +433,7 @@ local function buildHub(root: Instance)
 				Size = Vector3.new(halfSize.X + 0.8, 1.35, halfSize.Z + 0.8),
 				CFrame = half.CFrame * CFrame.new(0, -size.Y / 2 + 10 + i * 13, 0),
 				Color = COLORS.Gold,
-				Material = Enum.Material.Neon,
+				Material = Enum.Material.Foil,
 				CanCollide = false,
 				CanQuery = false,
 			})
@@ -428,7 +445,7 @@ local function buildHub(root: Instance)
 			Size = Vector3.new(0.5, size.Y * 0.92, halfSize.Z * 0.85),
 			CFrame = half.CFrame * CFrame.new(-sign * (halfSize.X / 2 - 0.2), 0, 0),
 			Color = COLORS.GoldBright,
-			Material = Enum.Material.Neon,
+			Material = Enum.Material.Foil,
 			Transparency = 0.15,
 			CanCollide = false,
 			CanQuery = false,
@@ -441,7 +458,7 @@ local function buildHub(root: Instance)
 		Size = Vector3.new(0.4, size.Y, size.Z * 0.9),
 		CFrame = CFrame.new(HubLayout.MonolithCenter),
 		Color = COLORS.GoldBright,
-		Material = Enum.Material.Neon,
+		Material = Enum.Material.Foil,
 		Transparency = 0.2,
 		CanCollide = false,
 		CanQuery = false,
@@ -458,6 +475,30 @@ local function buildHub(root: Instance)
 		Transparency = 1,
 	})
 	core:SetAttribute("Exposed", false)
+	local heroKey = part({
+		Name = "MonolithHeroKey",
+		Parent = monolith,
+		Size = Vector3.new(1, 1, 1),
+		CFrame = CFrame.new(HubLayout.MonolithCenter + Vector3.new(0, size.Y * 0.38, 18)),
+		Transparency = 1,
+		CanCollide = false,
+		CanQuery = false,
+	})
+	local heroSpot = Instance.new("SpotLight")
+	heroSpot.Name = "MonolithHeroSpot"
+	heroSpot.Brightness = 1.35
+	heroSpot.Range = 130
+	heroSpot.Angle = 48
+	heroSpot.Color = Color3.fromRGB(255, 228, 168)
+	heroSpot.Face = Enum.NormalId.Back
+	heroSpot.Shadows = false
+	heroSpot.Parent = heroKey
+	local heroRim = Instance.new("PointLight")
+	heroRim.Name = "MonolithRim"
+	heroRim.Brightness = 0.55
+	heroRim.Range = 72
+	heroRim.Color = Color3.fromRGB(200, 170, 255)
+	heroRim.Parent = heroKey
 	label(monolith:FindFirstChild("MonolithLeft") :: Instance, "THE VOIDLINE MONOLITH", 42, 48)
 	local monolithHalfSize = Vector3.new(size.X / 2, size.Y, size.Z)
 	for side, sign in sides do
@@ -510,25 +551,24 @@ local function buildHub(root: Instance)
 			})
 		end
 	end
-	part({
-		Name = "HubSilhouetteRing",
-		Parent = hub,
-		Size = Vector3.new(0.55, HubLayout.HubSize.X * 1.42, HubLayout.HubSize.Z * 1.42),
-		CFrame = hubCFrame * CFrame.new(0, walkTop + 0.35, 0) * CFrame.Angles(0, 0, math.rad(90)),
-		Shape = Enum.PartType.Cylinder,
-		Color = Color3.fromRGB(12, 10, 16),
-		Material = Enum.Material.Metal,
-		Transparency = 0.35,
-		CanCollide = false,
-		CanQuery = false,
-	})
-	goldSeam(
-		hub,
-		hubCFrame * CFrame.new(0, walkTop + 0.42, 0) * CFrame.Angles(0, 0, math.rad(90)),
-		Vector3.new(DECK.SeamThickness, HubLayout.HubSize.X * 1.38, HubLayout.HubSize.Z * 1.38),
-		"HubSilhouetteSeam",
-		Enum.PartType.Cylinder
-	)
+	for _, lip in { { Label = "North", Sign = -1 }, { Label = "South", Sign = 1 } } do
+		local sign = lip.Sign
+		part({
+			Name = "HubDeckLip" .. lip.Label,
+			Parent = hub,
+			Size = Vector3.new(HubLayout.HubSize.X * 0.96, 0.22, 0.55),
+			CFrame = hubCFrame * CFrame.new(0, walkTop + 0.08, sign * (HubLayout.HubSize.Z / 2 - 0.35)),
+			Color = Color3.fromRGB(12, 10, 16),
+			Material = Enum.Material.Metal,
+			CanCollide = false,
+		})
+		goldSeam(
+			hub,
+			hubCFrame * CFrame.new(0, walkTop + 0.14, sign * (HubLayout.HubSize.Z / 2 - 0.35)),
+			Vector3.new(24, DECK.SeamThickness, 0.35),
+			"HubDeckLipSeam" .. lip.Label
+		)
+	end
 
 	local function hubPad(name: string, position: Vector3, padSize: Vector3, text: string, style: string)
 		local p = part({
@@ -638,7 +678,7 @@ local function buildHub(root: Instance)
 		Parent = monument,
 		Size = Vector3.new(4, 4, 4),
 		CFrame = plinth.CFrame * CFrame.new(0, 21, 0) * CFrame.Angles(math.rad(45), 0, math.rad(45)),
-		Material = Enum.Material.Neon,
+		Material = Enum.Material.Foil,
 		Color = COLORS.GoldBright,
 		CanCollide = false,
 	})
@@ -754,8 +794,60 @@ local function buildHub(root: Instance)
 	return hub
 end
 
+local function buildVoidStarDressing(parent: Instance)
+	local stars = folder("VoidStarDressing", parent)
+	local rng = Random.new(4217)
+	for i = 1, 48 do
+		local angle = rng:NextNumber(0, math.pi * 2)
+		local radius = rng:NextNumber(HubLayout.ZoneRadius * 0.35, HubLayout.ZoneRadius * 1.15)
+		local y = rng:NextNumber(-12, 42)
+		local pos = Vector3.new(math.cos(angle) * radius, y, math.sin(angle) * radius)
+		local shard = part({
+			Name = "StarShard" .. i,
+			Parent = stars,
+			Size = Vector3.new(
+				rng:NextNumber(0.35, 1.2),
+				rng:NextNumber(0.15, 0.55),
+				rng:NextNumber(0.35, 1.2)
+			),
+			CFrame = CFrame.new(pos) * CFrame.Angles(rng:NextNumber(), rng:NextNumber(), rng:NextNumber()),
+			Color = Color3.fromRGB(198, 204, 228),
+			Material = Enum.Material.Slate,
+			CanCollide = false,
+			CanQuery = false,
+			Transparency = rng:NextNumber(0.15, 0.55),
+		})
+		if i % 9 == 0 then
+			local glint = Instance.new("PointLight")
+			glint.Brightness = 0.12
+			glint.Range = 12
+			glint.Color = Color3.fromRGB(220, 230, 255)
+			glint.Shadows = false
+			glint.Parent = shard
+		end
+	end
+	for i = 1, 14 do
+		local chunk = part({
+			Name = "DebrisChunk" .. i,
+			Parent = stars,
+			Size = Vector3.new(rng:NextNumber(1.2, 3.5), rng:NextNumber(0.4, 1.1), rng:NextNumber(1.2, 3.8)),
+			CFrame = CFrame.new(
+				rng:NextNumber(-HubLayout.ZoneRadius, HubLayout.ZoneRadius),
+				rng:NextNumber(-8, 22),
+				rng:NextNumber(-HubLayout.ZoneRadius, HubLayout.ZoneRadius)
+			) * CFrame.Angles(rng:NextNumber(), rng:NextNumber(), rng:NextNumber()),
+			Color = Color3.fromRGB(16, 14, 22),
+			Material = if i % 3 == 0 then Enum.Material.CorrodedMetal else Enum.Material.Metal,
+			CanCollide = false,
+			CanQuery = false,
+		})
+		chunk:SetAttribute("VoidDressing", true)
+	end
+end
+
 local function buildDeepSpace(root: Instance)
 	local deep = folder("DeepSpace", root)
+	buildVoidStarDressing(deep)
 	part({
 		Name = "ZoneRing",
 		Parent = deep,
@@ -813,13 +905,6 @@ local function buildDeepSpace(root: Instance)
 		CanCollide = false,
 		CanQuery = false,
 	})
-	goldSeam(
-		deep,
-		CFrame.new(0, 3, 0) * CFrame.Angles(0, 0, math.rad(90)),
-		Vector3.new(DECK.SeamThickness, GameConfig.PlotRingRadius * 2.02, GameConfig.PlotRingRadius * 2.02),
-		"PlotOrbitSeam",
-		Enum.PartType.Cylinder
-	)
 	folder("SharedRocks", deep)
 	folder("EventTargets", deep)
 	folder("Hazards", deep)
@@ -963,11 +1048,10 @@ local function buildPlot(plots: Instance, index: number)
 	part({
 		Name = "GrinderGlow",
 		Parent = grinder,
-		Size = Vector3.new(4, 4, 4),
+		Size = Vector3.new(2.8, 2.8, 2.8),
 		CFrame = grinder.CFrame,
 		Color = COLORS.GoldBright,
-		Material = Enum.Material.Neon,
-		Shape = Enum.PartType.Ball,
+		Material = Enum.Material.Foil,
 		CanCollide = false,
 		CanQuery = false,
 	})

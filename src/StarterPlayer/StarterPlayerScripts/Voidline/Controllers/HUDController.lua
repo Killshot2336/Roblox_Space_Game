@@ -467,6 +467,8 @@ end
 
 function HUDController.Init()
 	build()
+	gui.Enabled = true
+	visible = true
 	setTargets()
 	ClientState.OnChanged(function(changed)
 		if

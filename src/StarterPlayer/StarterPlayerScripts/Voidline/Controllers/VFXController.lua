@@ -176,8 +176,7 @@ function VFXController.BridgeSweep()
 	for i, segment in segments do
 		segment.Transparency = 0.85
 		task.delay(Ui.Motion(i * SWEEP_STEP), function()
-			segment.Color = Color3.new(1, 1, 1)
-			Ui.Tween(segment, 0.35, { Transparency = 0.15, Color = Ui.Colors.Gold })
+			Ui.Tween(segment, 0.35, { Transparency = 0.08, Color = Color3.fromRGB(28, 26, 36) })
 		end)
 	end
 	CameraController.Punch(7, 1.4)
