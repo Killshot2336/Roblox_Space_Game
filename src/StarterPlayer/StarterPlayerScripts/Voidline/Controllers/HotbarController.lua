@@ -84,7 +84,8 @@ local function slotButton(
 	caption: string,
 	key: string,
 	order: number,
-	onActivate: () -> ()
+	onActivate: () -> (),
+	artKey: string?
 ): TextButton
 	local button = Ui.Button({
 		Name = name,
@@ -93,16 +94,20 @@ local function slotButton(
 		LayoutOrder = order,
 		Parent = bar,
 	}, onActivate)
-	Ui.Label({
-		Name = "Glyph",
-		Size = UDim2.new(1, 0, 0, 34),
-		Position = UDim2.fromOffset(0, 4),
-		Text = glyph,
-		Font = Ui.Font.Title,
-		TextSize = 24,
-		TextColor3 = Ui.Colors.GoldBright,
-		Parent = button,
-	})
+	if artKey then
+		Ui.ArtIcon(button, "Hotbar", artKey, glyph, 30)
+	else
+		Ui.Label({
+			Name = "Glyph",
+			Size = UDim2.new(1, 0, 0, 34),
+			Position = UDim2.fromOffset(0, 4),
+			Text = glyph,
+			Font = Ui.Font.Title,
+			TextSize = 24,
+			TextColor3 = Ui.Colors.GoldBright,
+			Parent = button,
+		})
+	end
 	Ui.Label({
 		Name = "Caption",
 		AnchorPoint = Vector2.new(0, 1),
@@ -155,7 +160,7 @@ local function refresh()
 	for n, button in formationButtons do
 		local selected = profile.Formation == n
 		button.BackgroundColor3 = if selected then Ui.Colors.Gold else Ui.Colors.GlassLight
-		local glyph = button:FindFirstChild("Glyph") :: TextLabel?
+		local glyph = button:FindFirstChild("Glyph", true) :: TextLabel?
 		if glyph then
 			glyph.TextColor3 = if selected then Ui.Colors.Shadow else Ui.Colors.GoldBright
 		end
@@ -200,6 +205,7 @@ function HotbarController.Init(hotbarActions: Actions)
 		LayoutOrder = 1,
 		Parent = bar,
 	}, quickUpgrade)
+	Ui.ArtIcon(upgradeButton, "Hotbar", "Upgrade", "⬆", 26)
 	Ui.Label({
 		Name = "Title",
 		Position = UDim2.fromOffset(0, 6),
@@ -232,25 +238,26 @@ function HotbarController.Init(hotbarActions: Actions)
 			1 + n,
 			function()
 				setFormation(n)
-			end
+			end,
+			"Formation" .. n
 		)
 	end
 	slotButton("Store", "⬡", "STORE", "B", 10, function()
 		actions.OpenStore()
-	end)
+	end, "Store")
 	slotButton("Menu", "☰", "CODEX", "C", 11, function()
 		actions.OpenMenu(nil)
-	end)
+	end, "Menu")
 	slotButton("Home", "⌂", "HOME", "H", 12, function()
 		ClientState.Fire("WarpRequest", "Home")
-	end)
+	end, "Home")
 	sellButton = slotButton("Sell", "⇪", "SELL", "R", 13, function()
 		ClientState.Fire("SellOre")
-	end)
+	end, "Sell")
 	if Ui.IsTouch() then
 		slotButton("Clip", "▣", "CLIP", "K", 14, function()
 			actions.ToggleClip()
-		end)
+		end, "Clip")
 	end
 
 	bindKey("VoidlineUpgrade", quickUpgrade, Enum.KeyCode.U)

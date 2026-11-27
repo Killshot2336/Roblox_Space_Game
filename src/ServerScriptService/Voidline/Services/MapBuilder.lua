@@ -13,6 +13,7 @@ local VisualBibleConfig = require(Voidline.Config.VisualBibleConfig)
 local ClipFramingConfig = require(Voidline.Config.ClipFramingConfig)
 local PlotLayout = require(Voidline.Modules.PlotLayout)
 local HubLayout = require(Voidline.Modules.HubLayout)
+local ArtResolve = require(Voidline.Modules.ArtResolve)
 
 local MapBuilder = {}
 
@@ -327,6 +328,144 @@ local function buildHubCathedralDressing(hub: Instance, hubCFrame: CFrame, walkT
 		hubCFrame.Position + Vector3.new(-6, walkTop - 2.5, -32),
 		"CableB"
 	)
+	for ci = 1, 9 do
+		local spread = (ci - 5) * 5.2 + (ci % 3) * 2.1
+		cableRun(
+			dress,
+			hubCFrame.Position + Vector3.new(34, walkTop + 6 + ci * 1.2, spread),
+			hubCFrame.Position + Vector3.new(-20 + ci, walkTop - 1.5, -spread * 0.6),
+			"CableForest" .. ci
+		)
+	end
+end
+
+local function buildHubColonnades(hub: Instance, hubCFrame: CFrame, walkTop: number)
+	local ring = folder("HubColonnadeRing", hub)
+	local count = 18
+	for i = 1, count do
+		local bias = if i % 5 == 0 then 1.35 elseif i % 3 == 0 then 0.82 else 1
+		local angle = (i - 0.5) / count * math.pi * 2 + math.rad(11 * (i % 4))
+		local radius = 40 + (i % 4) * 2.5
+		local pos = Vector3.new(math.cos(angle) * radius, walkTop, math.sin(angle) * radius)
+		local height = 14 * bias + (i % 3) * 2.5
+		local col = part({
+			Name = "HubColonnade" .. i,
+			Parent = ring,
+			Size = Vector3.new(1.8 * bias, height, 1.8 * bias),
+			CFrame = hubCFrame * CFrame.new(pos + Vector3.new(0, height / 2, 0)),
+			Color = Color3.fromRGB(14, 12, 20),
+			Material = Enum.Material.Slate,
+			CanCollide = false,
+			CastShadow = true,
+		})
+		goldSeam(
+			ring,
+			col.CFrame * CFrame.new(0, height / 2 - 0.8, 0),
+			Vector3.new(1.4, DECK.SeamThickness, 0.32),
+			"ColonnadeCap" .. i
+		)
+		if i % 7 == 0 then
+			part({
+				Name = "ColonnadeLintel" .. i,
+				Parent = ring,
+				Size = Vector3.new(10, 0.55, 2.2),
+				CFrame = hubCFrame
+					* CFrame.new(pos + Vector3.new(0, height + 0.4, 0))
+					* CFrame.Angles(0, angle + math.rad(90), 0),
+				Color = Color3.fromRGB(18, 16, 24),
+				Material = Enum.Material.Metal,
+				CanCollide = false,
+			})
+		end
+	end
+end
+
+local function buildHubUpperDecks(hub: Instance, hubCFrame: CFrame, walkTop: number)
+	local decks = folder("HubUpperDecks", hub)
+	local layouts = {
+		{
+			Name = "EastGallery",
+			Size = Vector3.new(28, 0.45, 8),
+			Offset = Vector3.new(30, 4.2, -6),
+			Rot = math.rad(14),
+		},
+		{
+			Name = "NorthwestBalcony",
+			Size = Vector3.new(16, 0.4, 12),
+			Offset = Vector3.new(-26, 3.1, 22),
+			Rot = math.rad(-18),
+		},
+		{
+			Name = "SouthUnderlook",
+			Size = Vector3.new(22, 0.38, 6),
+			Offset = Vector3.new(4, 2.4, -34),
+			Rot = math.rad(6),
+		},
+	}
+	for _, lay in layouts do
+		local deckPlate = part({
+			Name = lay.Name,
+			Parent = decks,
+			Size = lay.Size,
+			CFrame = hubCFrame * CFrame.new(lay.Offset + Vector3.new(0, walkTop, 0)) * CFrame.Angles(0, lay.Rot, 0),
+			Color = PALETTE.ObsidianLift,
+			Material = Enum.Material.DiamondPlate,
+			CanCollide = false,
+		})
+		goldTrim(decks, deckPlate.CFrame, lay.Size)
+		part({
+			Name = lay.Name .. "Rail",
+			Parent = decks,
+			Size = Vector3.new(lay.Size.X, 1.2, 0.35),
+			CFrame = deckPlate.CFrame * CFrame.new(0, lay.Size.Y / 2 + 0.55, -lay.Size.Z / 2 + 0.2),
+			Color = Color3.fromRGB(20, 18, 26),
+			Material = Enum.Material.Metal,
+			CanCollide = false,
+		})
+	end
+	part({
+		Name = "HubUpperDeck",
+		Parent = decks,
+		Size = Vector3.new(12, 0.42, 12),
+		CFrame = hubCFrame * CFrame.new(-8, walkTop + 6.5, -10) * CFrame.Angles(0, math.rad(-22), math.rad(2)),
+		Color = PALETTE.Obsidian,
+		Material = Enum.Material.Slate,
+		CanCollide = false,
+	})
+end
+
+local function buildHubLightWells(hub: Instance, hubCFrame: CFrame, walkTop: number)
+	local wells = folder("HubLightWells", hub)
+	local spots = {
+		Vector3.new(18, 0, 12),
+		Vector3.new(-16, 0, -14),
+		Vector3.new(6, 0, -28),
+	}
+	for wi, offset in spots do
+		local shaft = part({
+			Name = "HubLightWell" .. wi,
+			Parent = wells,
+			Size = Vector3.new(3.2, 18, 3.2),
+			CFrame = hubCFrame * CFrame.new(offset + Vector3.new(0, walkTop - 7, 0)),
+			Color = Color3.fromRGB(8, 6, 14),
+			Material = Enum.Material.Slate,
+			Transparency = 0.08,
+			CanCollide = false,
+			CanQuery = false,
+		})
+		local wellLight = Instance.new("PointLight")
+		wellLight.Brightness = 0.38
+		wellLight.Range = 22
+		wellLight.Color = Color3.fromRGB(200, 188, 255)
+		wellLight.Shadows = false
+		wellLight.Parent = shaft
+		goldSeam(
+			wells,
+			shaft.CFrame * CFrame.new(0, 8.2, 0),
+			Vector3.new(2.8, DECK.SeamThickness, 0.32),
+			"WellLip" .. wi
+		)
+	end
 end
 
 -- Procedural obsidian-gold plated deck: inset tiles, edge lights, trim rings.
@@ -407,6 +546,9 @@ local function buildHub(root: Instance)
 	buildPlatedHubDeck(hub, hubCFrame)
 	goldTrim(hub, hubCFrame, HubLayout.HubSize)
 	buildHubCathedralDressing(hub, hubCFrame, walkTop)
+	buildHubColonnades(hub, hubCFrame, walkTop)
+	buildHubUpperDecks(hub, hubCFrame, walkTop)
+	buildHubLightWells(hub, hubCFrame, walkTop)
 	buildHubFillLights(hub, hubCFrame, walkTop)
 
 	-- Monolith: two halves (split along X) plus gold bands and the Void Core.
@@ -451,6 +593,7 @@ local function buildHub(root: Instance)
 			CanQuery = false,
 		})
 		edge:SetAttribute("Offset", half.CFrame:ToObjectSpace(edge.CFrame))
+		ArtResolve.ApplyMeshPart(half, "MonolithHalf", monolith)
 	end
 	part({
 		Name = "MonolithSplitSeam",
@@ -524,7 +667,7 @@ local function buildHub(root: Instance)
 				"SpireCrownSeam"
 			)
 			if side == "Right" then
-				part({
+				local shard = part({
 					Name = "BrokenCrownShard",
 					Parent = half,
 					Size = Vector3.new(2.2, 6, 1.4),
@@ -535,6 +678,7 @@ local function buildHub(root: Instance)
 					Material = Enum.Material.Metal,
 					CanCollide = false,
 				})
+				ArtResolve.ApplyMeshPart(shard, "MonolithCrownShard", half)
 			end
 			part({
 				Name = "SpireFin",
@@ -805,11 +949,7 @@ local function buildVoidStarDressing(parent: Instance)
 		local shard = part({
 			Name = "StarShard" .. i,
 			Parent = stars,
-			Size = Vector3.new(
-				rng:NextNumber(0.35, 1.2),
-				rng:NextNumber(0.15, 0.55),
-				rng:NextNumber(0.35, 1.2)
-			),
+			Size = Vector3.new(rng:NextNumber(0.35, 1.2), rng:NextNumber(0.15, 0.55), rng:NextNumber(0.35, 1.2)),
 			CFrame = CFrame.new(pos) * CFrame.Angles(rng:NextNumber(), rng:NextNumber(), rng:NextNumber()),
 			Color = Color3.fromRGB(198, 204, 228),
 			Material = Enum.Material.Slate,
@@ -845,9 +985,103 @@ local function buildVoidStarDressing(parent: Instance)
 	end
 end
 
+local function buildAsteroidField(parent: Instance)
+	local field = folder("DeepSpaceAsteroidField", parent)
+	local rng = Random.new(8819)
+	local count = 0
+	for i = 1, 86 do
+		local angle = rng:NextNumber(0, math.pi * 2)
+		local band = if i % 4 == 0 then 1.35 elseif i % 7 == 0 then 0.55 else 0.85
+		local radius = rng:NextNumber(HubLayout.ZoneRadius * 0.25, HubLayout.ZoneRadius * 1.25) * band
+		local y = rng:NextNumber(-28, 95)
+		local sizeMul = rng:NextNumber(0.7, 2.8)
+		local asteroid = part({
+			Name = "Asteroid" .. i,
+			Parent = field,
+			Size = Vector3.new(
+				rng:NextNumber(2.2, 5.5) * sizeMul,
+				rng:NextNumber(1.4, 4.2) * sizeMul,
+				rng:NextNumber(2.0, 5.8) * sizeMul
+			),
+			CFrame = CFrame.new(math.cos(angle) * radius, y, math.sin(angle) * radius)
+				* CFrame.Angles(rng:NextNumber(), rng:NextNumber(), rng:NextNumber()),
+			Color = Color3.fromRGB(22 + rng:NextInteger(0, 12), 20, 28 + rng:NextInteger(0, 10)),
+			Material = if rng:NextNumber() > 0.65 then Enum.Material.Basalt else Enum.Material.Slate,
+			CanCollide = false,
+			CanQuery = false,
+		})
+		asteroid:SetAttribute("ParallaxLayer", if radius > HubLayout.ZoneRadius then 2 else 1)
+		count += 1
+		if ArtResolve.HasUploadedMesh("DeepSpaceAsteroid") and i % 3 == 0 then
+			ArtResolve.ApplyMeshPart(asteroid, "DeepSpaceAsteroid", field)
+		end
+	end
+	field:SetAttribute("AsteroidCount", count)
+end
+
+local function buildParallaxBodies(parent: Instance)
+	local parallax = folder("DeepSpaceParallax", parent)
+	local bodies = {
+		{ Name = "ParallaxBodyDwarf", Pos = Vector3.new(420, 40, -260), Size = 48, Color = Color3.fromRGB(28, 26, 34) },
+		{ Name = "ParallaxBodyGas", Pos = Vector3.new(-380, 120, 310), Size = 72, Color = Color3.fromRGB(42, 36, 58) },
+		{ Name = "ParallaxBodyIce", Pos = Vector3.new(180, -20, 520), Size = 36, Color = Color3.fromRGB(32, 38, 48) },
+	}
+	for _, body in bodies do
+		part({
+			Name = body.Name,
+			Parent = parallax,
+			Size = Vector3.new(body.Size, body.Size, body.Size),
+			CFrame = CFrame.new(body.Pos),
+			Shape = Enum.PartType.Ball,
+			Color = body.Color,
+			Material = Enum.Material.Slate,
+			Transparency = 0.12,
+			CanCollide = false,
+			CanQuery = false,
+		})
+	end
+	for i = 1, 4 do
+		part({
+			Name = "ParallaxBody" .. i,
+			Parent = parallax,
+			Size = Vector3.new(22 + i * 6, 22 + i * 6, 22 + i * 6),
+			CFrame = CFrame.new(math.cos(i * 1.7) * (520 + i * 40), 30 + i * 18, math.sin(i * 1.7) * (520 + i * 40)),
+			Shape = Enum.PartType.Ball,
+			Color = Color3.fromRGB(20, 18, 26),
+			Material = Enum.Material.Basalt,
+			Transparency = 0.22,
+			CanCollide = false,
+			CanQuery = false,
+		})
+	end
+end
+
+local function buildDeepSpaceFogVolumes(parent: Instance)
+	local fog = folder("DeepSpaceFogVolumes", parent)
+	local rng = Random.new(3301)
+	for i = 1, 8 do
+		local angle = i / 8 * math.pi * 2
+		local radius = HubLayout.ZoneRadius * rng:NextNumber(0.45, 1.05)
+		part({
+			Name = "FogVolume" .. i,
+			Parent = fog,
+			Size = Vector3.new(rng:NextNumber(40, 90), rng:NextNumber(12, 32), rng:NextNumber(40, 90)),
+			CFrame = CFrame.new(math.cos(angle) * radius, rng:NextNumber(-6, 24), math.sin(angle) * radius),
+			Color = Color3.fromRGB(24, 18, 38),
+			Material = Enum.Material.Glass,
+			Transparency = 0.93,
+			CanCollide = false,
+			CanQuery = false,
+		})
+	end
+end
+
 local function buildDeepSpace(root: Instance)
 	local deep = folder("DeepSpace", root)
 	buildVoidStarDressing(deep)
+	buildAsteroidField(deep)
+	buildParallaxBodies(deep)
+	buildDeepSpaceFogVolumes(deep)
 	part({
 		Name = "ZoneRing",
 		Parent = deep,
@@ -1029,13 +1263,37 @@ local function buildPlot(plots: Instance, index: number)
 		"RefineryDeckSeam"
 	)
 	label(refinery, "REFINERY", 3.5, 14)
+	local machine = folder("PlotMachineShell", plot)
 	part({
-		Name = "RefineryTower",
-		Parent = station,
-		Size = Vector3.new(8, 12, 6),
-		CFrame = plotCFrame * CFrame.new(PlotLayout.RefineryTower),
-		Material = Enum.Material.Metal,
-		Color = Color3.fromRGB(26, 24, 34),
+		Name = "MachineHousing",
+		Parent = machine,
+		Size = Vector3.new(PlotLayout.BaseSize.X * 0.82, 5.5, PlotLayout.BaseSize.Z * 0.62),
+		CFrame = plotCFrame * CFrame.new(0, PlotLayout.SurfaceY + 1.8, 4),
+		Color = Color3.fromRGB(18, 16, 24),
+		Material = Enum.Material.CorrodedMetal,
+		CanCollide = false,
+	})
+	for pi = 1, 4 do
+		part({
+			Name = "MachinePipe" .. pi,
+			Parent = machine,
+			Size = Vector3.new(1.1, 6 + pi * 1.4, 1.1),
+			CFrame = plotCFrame
+				* CFrame.new(-10 + pi * 5.5, PlotLayout.SurfaceY + 5, -8)
+				* CFrame.Angles(math.rad(12 + pi * 4), 0, 0),
+			Color = Color3.fromRGB(24, 22, 30),
+			Material = Enum.Material.Metal,
+			CanCollide = false,
+		})
+	end
+	part({
+		Name = "MachineFunnel",
+		Parent = machine,
+		Size = Vector3.new(7, 4, 7),
+		CFrame = plotCFrame * CFrame.new(PlotLayout.Grinder.X, PlotLayout.SurfaceY + 6, PlotLayout.Grinder.Z),
+		Color = Color3.fromRGB(22, 20, 28),
+		Material = Enum.Material.DiamondPlate,
+		CanCollide = false,
 	})
 	local grinder = part({
 		Name = "GrinderCore",
@@ -1045,6 +1303,16 @@ local function buildPlot(plots: Instance, index: number)
 		Color = Color3.fromRGB(30, 28, 44),
 		Material = Enum.Material.DiamondPlate,
 	})
+	ArtResolve.ApplyMeshPart(grinder, "GrinderCore", station)
+	local refineryTower = part({
+		Name = "RefineryTower",
+		Parent = station,
+		Size = Vector3.new(8, 12, 6),
+		CFrame = plotCFrame * CFrame.new(PlotLayout.RefineryTower),
+		Material = Enum.Material.Metal,
+		Color = Color3.fromRGB(26, 24, 34),
+	})
+	ArtResolve.ApplyMeshPart(refineryTower, "RefineryStack", station)
 	part({
 		Name = "GrinderGlow",
 		Parent = grinder,
@@ -1156,6 +1424,23 @@ local function buildPlot(plots: Instance, index: number)
 			CanCollide = false,
 			CanQuery = false,
 		})
+		if i % 2 == 1 then
+			for rib = 1, 3 do
+				part({
+					Name = "BridgeRib" .. i .. "_" .. rib,
+					Parent = bridge,
+					Size = Vector3.new(6.8, 0.28, 0.55),
+					CFrame = segment.CFrame * CFrame.new(0, -0.35 - rib * 0.22, (rib - 2) * (segmentLength * 0.28)),
+					Color = Color3.fromRGB(16, 14, 22),
+					Material = Enum.Material.Metal,
+					CanCollide = false,
+					CanQuery = false,
+				})
+			end
+		end
+		if i == 1 then
+			ArtResolve.ApplyMeshPart(segment, "EnergyBridgeSegment", bridge)
+		end
 	end
 	return plot
 end

@@ -81,8 +81,17 @@ tests["walk surfaces use matte decks not neon slabs"] = function()
 		end
 	end
 	expect(findDescendant(root, "HubCathedralDressing") ~= nil).toBe(true)
+	expect(findDescendant(root, "HubColonnadeRing") ~= nil).toBe(true)
+	expect(findDescendant(root, "HubUpperDecks") ~= nil).toBe(true)
+	expect(findDescendant(root, "HubLightWell1") ~= nil).toBe(true)
 	expect(findDescendant(root, "HubFillLights") ~= nil).toBe(true)
 	expect(findDescendant(root, "BrokenCrownShard") ~= nil).toBe(true)
+	local asteroids = findDescendant(root, "DeepSpaceAsteroidField")
+	expect(asteroids ~= nil).toBe(true)
+	expect((asteroids :: any):GetAttribute("AsteroidCount")).toBeGreaterThan(60)
+	expect(findDescendant(root, "DeepSpaceParallax") ~= nil).toBe(true)
+	expect(findDescendant(root, "PlotMachineShell") ~= nil).toBe(true)
+	expect(findDescendant(root, "BridgeRib1_1") ~= nil).toBe(true)
 end
 
 tests["walkable map surfaces have solid collision under neon visuals"] = function()

@@ -37,6 +37,100 @@
         </Properties>
         <Item class="ModuleScript" referent="4">
           <Properties>
+            <string name="Name">ArtConfig</string>
+            <string name="Source"><![CDATA[--!strict
+-- Single source of truth for uploaded mesh/texture/decal IDs and UI icon assets.
+-- Leave AssetId / MeshId / TextureId as 0 until Studio upload; code keeps procedural fallbacks.
+-- Paste rbxassetid://… from Creator Dashboard after each upload (see ART_PIPELINE.md).
+local ArtConfig = {
+	Version = 1,
+	Meshes = {
+		MonolithHalf = {
+			MeshId = 0,
+			TextureId = 0,
+			Scale = Vector3.new(1, 1, 1),
+			Notes = "Hero split monolith slab; one mesh mirrored for Left/Right.",
+		},
+		MonolithCrownShard = {
+			MeshId = 0,
+			TextureId = 0,
+			Scale = Vector3.new(1, 1, 1),
+			Notes = "Broken crown detrité on MonolithRight.",
+		},
+		HubColonnade = {
+			MeshId = 0,
+			TextureId = 0,
+			Scale = Vector3.new(1, 1, 1),
+			Notes = "Obsidian column segment (instanced around rim).",
+		},
+		GrinderCore = {
+			MeshId = 0,
+			TextureId = 0,
+			Scale = Vector3.new(1, 1, 1),
+			Notes = "Plot grinder hero volume.",
+		},
+		RefineryStack = {
+			MeshId = 0,
+			TextureId = 0,
+			Scale = Vector3.new(1, 1, 1),
+			Notes = "Refinery tower + pipe bundle.",
+		},
+		EnergyBridgeSegment = {
+			MeshId = 0,
+			TextureId = 0,
+			Scale = Vector3.new(1, 1, 1),
+			Notes = "Bridge deck rib (visual only; WalkPlate keeps collision).",
+		},
+		DeepSpaceAsteroid = {
+			MeshId = 0,
+			TextureId = 0,
+			Scale = Vector3.new(1, 1, 1),
+			Notes = "Low-poly asteroid chunk (3 variants).",
+		},
+	},
+	Textures = {
+		ObsidianPlate = { TextureId = 0, Notes = "Hub deck tile albedo." },
+		GoldSeam = { TextureId = 0, Notes = "Trim/seam mask; use with Foil/Metal." },
+		BridgeSpine = { TextureId = 0, Notes = "Energy bridge matte deck." },
+	},
+	Decals = {
+		VoidlineSigil = { DecalId = 0, Notes = "Floor sigil under Monolith (subtle)." },
+		PlotSectorMark = { DecalId = 0, Notes = "Plot station floor sector glyph." },
+	},
+	UI = {
+		-- rbxasset:// placeholders until Creator upload; Hotbar/HUD resolve via ArtResolve.
+		FallbackImage = "rbxasset://textures/ui/GuiImagePlaceholder.png",
+		Hotbar = {
+			Upgrade = { AssetId = 0, Label = "UPGRADE" },
+			Formation1 = { AssetId = 0, Label = "ORBIT" },
+			Formation2 = { AssetId = 0, Label = "WEDGE" },
+			Formation3 = { AssetId = 0, Label = "CROWN" },
+			Store = { AssetId = 0, Label = "STORE" },
+			Menu = { AssetId = 0, Label = "CODEX" },
+			Home = { AssetId = 0, Label = "HOME" },
+			Sell = { AssetId = 0, Label = "SELL" },
+			Clip = { AssetId = 0, Label = "CLIP" },
+		},
+		Hud = {
+			Credits = { AssetId = 0 },
+			Ore = { AssetId = 0 },
+			Shards = { AssetId = 0 },
+			Tokens = { AssetId = 0 },
+		},
+		Store = {
+			GamePass = { AssetId = 0 },
+			DevProduct = { AssetId = 0 },
+			Summon = { AssetId = 0 },
+		},
+	},
+}
+
+return ArtConfig
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="5">
+          <Properties>
             <string name="Name">AudioConfig</string>
             <string name="Source"><![CDATA[--!strict
 -- Engine-bundled Roblox sounds (rbxasset://). These play in Studio/live without
@@ -78,7 +172,7 @@ return AudioConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="5">
+        <Item class="ModuleScript" referent="6">
           <Properties>
             <string name="Name">ClipFramingConfig</string>
             <string name="Source"><![CDATA[--!strict
@@ -148,7 +242,7 @@ return ClipFramingConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="6">
+        <Item class="ModuleScript" referent="7">
           <Properties>
             <string name="Name">CodesConfig</string>
             <string name="Source"><![CDATA[--!strict
@@ -193,7 +287,7 @@ return CodesConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="7">
+        <Item class="ModuleScript" referent="8">
           <Properties>
             <string name="Name">DailyConfig</string>
             <string name="Source"><![CDATA[--!strict
@@ -224,7 +318,7 @@ return DailyConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="8">
+        <Item class="ModuleScript" referent="9">
           <Properties>
             <string name="Name">DroneConfig</string>
             <string name="Source"><![CDATA[--!strict
@@ -287,7 +381,7 @@ return DroneConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="9">
+        <Item class="ModuleScript" referent="10">
           <Properties>
             <string name="Name">EconomyConfig</string>
             <string name="Source"><![CDATA[--!strict
@@ -396,7 +490,7 @@ return EconomyConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="10">
+        <Item class="ModuleScript" referent="11">
           <Properties>
             <string name="Name">ForgeConfig</string>
             <string name="Source"><![CDATA[local ForgeConfig = {
@@ -411,7 +505,7 @@ return ForgeConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="11">
+        <Item class="ModuleScript" referent="12">
           <Properties>
             <string name="Name">GalaxyConfig</string>
             <string name="Source"><![CDATA[--!strict
@@ -485,7 +579,7 @@ return GalaxyConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="12">
+        <Item class="ModuleScript" referent="13">
           <Properties>
             <string name="Name">GameConfig</string>
             <string name="Source"><![CDATA[-- Voidline: Deep Space — global game constants
@@ -524,7 +618,7 @@ return GameConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="13">
+        <Item class="ModuleScript" referent="14">
           <Properties>
             <string name="Name">JuiceConfig</string>
             <string name="Source"><![CDATA[local JuiceConfig = {
@@ -539,7 +633,7 @@ return JuiceConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="14">
+        <Item class="ModuleScript" referent="15">
           <Properties>
             <string name="Name">MonetizationConfig</string>
             <string name="Source"><![CDATA[--!strict
@@ -760,7 +854,7 @@ return MonetizationConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="15">
+        <Item class="ModuleScript" referent="16">
           <Properties>
             <string name="Name">PerformanceConfig</string>
             <string name="Source"><![CDATA[local PerformanceConfig = {
@@ -776,7 +870,7 @@ return PerformanceConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="16">
+        <Item class="ModuleScript" referent="17">
           <Properties>
             <string name="Name">RebirthConfig</string>
             <string name="Source"><![CDATA[local RebirthConfig = {
@@ -798,7 +892,7 @@ return RebirthConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="17">
+        <Item class="ModuleScript" referent="18">
           <Properties>
             <string name="Name">SoftContestConfig</string>
             <string name="Source"><![CDATA[local SoftContestConfig = {
@@ -813,7 +907,7 @@ return SoftContestConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="18">
+        <Item class="ModuleScript" referent="19">
           <Properties>
             <string name="Name">SquadConfig</string>
             <string name="Source"><![CDATA[local SquadConfig = {
@@ -826,7 +920,7 @@ return SquadConfig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="19">
+        <Item class="ModuleScript" referent="20">
           <Properties>
             <string name="Name">VisualBibleConfig</string>
             <string name="Source"><![CDATA[--!strict
@@ -940,11 +1034,11 @@ return VisualBibleConfig
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="20">
+      <Item class="Folder" referent="21">
         <Properties>
           <string name="Name">Content</string>
         </Properties>
-        <Item class="ModuleScript" referent="21">
+        <Item class="ModuleScript" referent="22">
           <Properties>
             <string name="Name">AchievementRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -1410,7 +1504,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="22">
+        <Item class="ModuleScript" referent="23">
           <Properties>
             <string name="Name">BiomeRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -1836,7 +1930,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="23">
+        <Item class="ModuleScript" referent="24">
           <Properties>
             <string name="Name">CitadelRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -1949,7 +2043,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="24">
+        <Item class="ModuleScript" referent="25">
           <Properties>
             <string name="Name">ContentIndex</string>
             <string name="Source"><![CDATA[--!strict
@@ -2046,7 +2140,7 @@ return ContentIndex
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="25">
+        <Item class="ModuleScript" referent="26">
           <Properties>
             <string name="Name">ContentUtil</string>
             <string name="Source"><![CDATA[--!strict
@@ -2160,7 +2254,7 @@ return ContentUtil
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="26">
+        <Item class="ModuleScript" referent="27">
           <Properties>
             <string name="Name">DroneRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -2434,7 +2528,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="27">
+        <Item class="ModuleScript" referent="28">
           <Properties>
             <string name="Name">OreRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -2766,7 +2860,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="28">
+        <Item class="ModuleScript" referent="29">
           <Properties>
             <string name="Name">Prng</string>
             <string name="Source"><![CDATA[--!strict
@@ -2857,7 +2951,7 @@ return Prng
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="29">
+        <Item class="ModuleScript" referent="30">
           <Properties>
             <string name="Name">QuestRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -2991,7 +3085,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="30">
+        <Item class="ModuleScript" referent="31">
           <Properties>
             <string name="Name">RelicRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -3302,7 +3396,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="31">
+        <Item class="ModuleScript" referent="32">
           <Properties>
             <string name="Name">TitleRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -3432,7 +3526,7 @@ return registry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="32">
+        <Item class="ModuleScript" referent="33">
           <Properties>
             <string name="Name">WorldEventRegistry</string>
             <string name="Source"><![CDATA[--!strict
@@ -3597,11 +3691,113 @@ return registry
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="33">
+      <Item class="Folder" referent="34">
         <Properties>
           <string name="Name">Modules</string>
         </Properties>
-        <Item class="ModuleScript" referent="34">
+        <Item class="ModuleScript" referent="35">
+          <Properties>
+            <string name="Name">ArtResolve</string>
+            <string name="Source"><![CDATA[--!strict
+-- Resolves ArtConfig IDs to rbxasset URLs and optionally swaps Parts for MeshParts.
+local ArtConfig = require(script.Parent.Parent.Config.ArtConfig)
+
+local ArtResolve = {}
+
+export type MeshEntry = {
+	MeshId: number,
+	TextureId: number,
+	Scale: Vector3?,
+}
+
+local function idToContent(prefix: string, id: number): string?
+	if type(id) ~= "number" or id <= 0 then
+		return nil
+	end
+	return prefix .. "://" .. tostring(id)
+end
+
+function ArtResolve.MeshContent(meshKey: string): string?
+	local entry = (ArtConfig.Meshes :: any)[meshKey]
+	if type(entry) ~= "table" then
+		return nil
+	end
+	return idToContent("rbxassetid", entry.MeshId)
+end
+
+function ArtResolve.TextureContent(textureKey: string): string?
+	local entry = (ArtConfig.Textures :: any)[textureKey]
+	if type(entry) ~= "table" then
+		return nil
+	end
+	return idToContent("rbxassetid", entry.TextureId)
+end
+
+function ArtResolve.DecalContent(decalKey: string): string?
+	local entry = (ArtConfig.Decals :: any)[decalKey]
+	if type(entry) ~= "table" then
+		return nil
+	end
+	return idToContent("rbxassetid", entry.DecalId)
+end
+
+function ArtResolve.UiImage(group: string, key: string): string
+	local bucket = (ArtConfig.UI :: any)[group]
+	local entry = if type(bucket) == "table" then bucket[key] else nil
+	if type(entry) == "table" and type(entry.AssetId) == "number" and entry.AssetId > 0 then
+		return "rbxassetid://" .. tostring(entry.AssetId)
+	end
+	return ArtConfig.UI.FallbackImage
+end
+
+function ArtResolve.HasUploadedMesh(meshKey: string): boolean
+	local entry = (ArtConfig.Meshes :: any)[meshKey]
+	return type(entry) == "table" and type(entry.MeshId) == "number" and entry.MeshId > 0
+end
+
+-- Replaces a Part with a MeshPart when MeshId is set; otherwise leaves procedural Part.
+function ArtResolve.ApplyMeshPart(part: Part, meshKey: string, parent: Instance?): MeshPart?
+	if not ArtResolve.HasUploadedMesh(meshKey) then
+		return nil
+	end
+	local entry = (ArtConfig.Meshes :: any)[meshKey] :: MeshEntry
+	local meshUrl = ArtResolve.MeshContent(meshKey)
+	if not meshUrl then
+		return nil
+	end
+	local meshPart = Instance.new("MeshPart")
+	meshPart.Name = part.Name
+	meshPart.Size = part.Size
+	meshPart.CFrame = part.CFrame
+	meshPart.Anchored = part.Anchored
+	meshPart.CanCollide = part.CanCollide
+	meshPart.CanQuery = part.CanQuery
+	meshPart.CanTouch = part.CanTouch
+	meshPart.CastShadow = part.CastShadow
+	meshPart.Color = part.Color
+	meshPart.Material = part.Material
+	meshPart.Transparency = part.Transparency
+	meshPart.MeshId = meshUrl
+	if type(entry.TextureId) == "number" and entry.TextureId > 0 then
+		meshPart.TextureID = "rbxassetid://" .. tostring(entry.TextureId)
+	end
+	local scale = entry.Scale
+	if scale then
+		meshPart.Size = Vector3.new(part.Size.X * scale.X, part.Size.Y * scale.Y, part.Size.Z * scale.Z)
+	end
+	for name, value in part:GetAttributes() do
+		meshPart:SetAttribute(name, value)
+	end
+	meshPart.Parent = parent or part.Parent
+	part:Destroy()
+	return meshPart
+end
+
+return ArtResolve
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="36">
           <Properties>
             <string name="Name">ContributionSplit</string>
             <string name="Source"><![CDATA[--!strict
@@ -3719,7 +3915,7 @@ return ContributionSplit
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="35">
+        <Item class="ModuleScript" referent="37">
           <Properties>
             <string name="Name">FormatNumber</string>
             <string name="Source"><![CDATA[local FormatNumber = {}
@@ -3740,7 +3936,7 @@ return FormatNumber
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="36">
+        <Item class="ModuleScript" referent="38">
           <Properties>
             <string name="Name">HubLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -3823,7 +4019,7 @@ return HubLayout
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="37">
+        <Item class="ModuleScript" referent="39">
           <Properties>
             <string name="Name">OreMath</string>
             <string name="Source"><![CDATA[local EconomyConfig = require(script.Parent.Parent.Config.EconomyConfig)
@@ -3847,7 +4043,7 @@ return OreMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="38">
+        <Item class="ModuleScript" referent="40">
           <Properties>
             <string name="Name">PlotLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -3937,7 +4133,7 @@ return PlotLayout
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="39">
+        <Item class="ModuleScript" referent="41">
           <Properties>
             <string name="Name">ProfileSchema</string>
             <string name="Source"><![CDATA[--!strict
@@ -4149,7 +4345,7 @@ return ProfileSchema
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="40">
+        <Item class="ModuleScript" referent="42">
           <Properties>
             <string name="Name">RateLimiter</string>
             <string name="Source"><![CDATA[--!strict
@@ -4206,7 +4402,7 @@ return RateLimiter
           </Properties>
         </Item>
       </Item>
-      <Item class="ModuleScript" referent="41">
+      <Item class="ModuleScript" referent="43">
         <Properties>
           <string name="Name">Remotes</string>
           <string name="Source"><![CDATA[--!strict
@@ -4324,11 +4520,11 @@ return Remotes
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Folder" referent="42">
+      <Item class="Folder" referent="44">
         <Properties>
           <string name="Name">Rules</string>
         </Properties>
-        <Item class="ModuleScript" referent="43">
+        <Item class="ModuleScript" referent="45">
           <Properties>
             <string name="Name">AchievementRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -4459,7 +4655,7 @@ return AchievementRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="44">
+        <Item class="ModuleScript" referent="46">
           <Properties>
             <string name="Name">EconomyRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -4660,7 +4856,7 @@ return EconomyRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="45">
+        <Item class="ModuleScript" referent="47">
           <Properties>
             <string name="Name">MiningRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -4763,7 +4959,7 @@ return MiningRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="46">
+        <Item class="ModuleScript" referent="48">
           <Properties>
             <string name="Name">ProgressionRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -4956,7 +5152,7 @@ return ProgressionRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="47">
+        <Item class="ModuleScript" referent="49">
           <Properties>
             <string name="Name">QuestRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -5068,7 +5264,7 @@ return QuestRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="48">
+        <Item class="ModuleScript" referent="50">
           <Properties>
             <string name="Name">StoreRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -5150,7 +5346,7 @@ return StoreRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="49">
+        <Item class="ModuleScript" referent="51">
           <Properties>
             <string name="Name">TutorialRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -5265,15 +5461,15 @@ return TutorialRules
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="50">
+  <Item class="ServerScriptService" referent="52">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="51">
+    <Item class="Folder" referent="53">
       <Properties>
         <string name="Name">Voidline</string>
       </Properties>
-      <Item class="Script" referent="52">
+      <Item class="Script" referent="54">
         <Properties>
           <string name="Name">Boot</string>
           <token name="RunContext">0</token>
@@ -5346,11 +5542,11 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Folder" referent="53">
+      <Item class="Folder" referent="55">
         <Properties>
           <string name="Name">Security</string>
         </Properties>
-        <Item class="ModuleScript" referent="54">
+        <Item class="ModuleScript" referent="56">
           <Properties>
             <string name="Name">ValidateRemote</string>
             <string name="Source"><![CDATA[--!strict
@@ -5506,11 +5702,11 @@ return ValidateRemote
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="55">
+      <Item class="Folder" referent="57">
         <Properties>
           <string name="Name">Services</string>
         </Properties>
-        <Item class="ModuleScript" referent="56">
+        <Item class="ModuleScript" referent="58">
           <Properties>
             <string name="Name">AfkService</string>
             <string name="Source"><![CDATA[--!strict
@@ -5591,7 +5787,7 @@ return AfkService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="57">
+        <Item class="ModuleScript" referent="59">
           <Properties>
             <string name="Name">BeltService</string>
             <string name="Source"><![CDATA[--!strict
@@ -5808,7 +6004,7 @@ return BeltService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="58">
+        <Item class="ModuleScript" referent="60">
           <Properties>
             <string name="Name">CitadelService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6062,7 +6258,7 @@ return CitadelService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="59">
+        <Item class="ModuleScript" referent="61">
           <Properties>
             <string name="Name">CodeService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6118,7 +6314,7 @@ return CodeService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="60">
+        <Item class="ModuleScript" referent="62">
           <Properties>
             <string name="Name">CodexService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6210,7 +6406,7 @@ return CodexService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="61">
+        <Item class="ModuleScript" referent="63">
           <Properties>
             <string name="Name">CosmeticService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6365,7 +6561,7 @@ return CosmeticService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="62">
+        <Item class="ModuleScript" referent="64">
           <Properties>
             <string name="Name">DailyStreakService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6422,7 +6618,7 @@ return DailyStreakService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="63">
+        <Item class="ModuleScript" referent="65">
           <Properties>
             <string name="Name">DroneService</string>
             <string name="Source"><![CDATA[--!strict
@@ -6678,7 +6874,7 @@ return DroneService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="64">
+        <Item class="ModuleScript" referent="66">
           <Properties>
             <string name="Name">EconomyService</string>
             <string name="Source"><![CDATA[--!strict
@@ -7082,7 +7278,7 @@ return EconomyService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="65">
+        <Item class="ModuleScript" referent="67">
           <Properties>
             <string name="Name">ForgeService</string>
             <string name="Source"><![CDATA[--!strict
@@ -7209,7 +7405,7 @@ return ForgeService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="66">
+        <Item class="ModuleScript" referent="68">
           <Properties>
             <string name="Name">InspectService</string>
             <string name="Source"><![CDATA[--!strict
@@ -7288,7 +7484,7 @@ return InspectService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="67">
+        <Item class="ModuleScript" referent="69">
           <Properties>
             <string name="Name">JuiceService</string>
             <string name="Source"><![CDATA[--!strict
@@ -7328,7 +7524,7 @@ return JuiceService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="68">
+        <Item class="ModuleScript" referent="70">
           <Properties>
             <string name="Name">LeaderboardService</string>
             <string name="Source"><![CDATA[--!strict
@@ -7568,7 +7764,7 @@ return LeaderboardService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="69">
+        <Item class="ModuleScript" referent="71">
           <Properties>
             <string name="Name">MapBuilder</string>
             <string name="Source"><![CDATA[--!strict
@@ -7586,6 +7782,7 @@ local VisualBibleConfig = require(Voidline.Config.VisualBibleConfig)
 local ClipFramingConfig = require(Voidline.Config.ClipFramingConfig)
 local PlotLayout = require(Voidline.Modules.PlotLayout)
 local HubLayout = require(Voidline.Modules.HubLayout)
+local ArtResolve = require(Voidline.Modules.ArtResolve)
 
 local MapBuilder = {}
 
@@ -7900,6 +8097,144 @@ local function buildHubCathedralDressing(hub: Instance, hubCFrame: CFrame, walkT
 		hubCFrame.Position + Vector3.new(-6, walkTop - 2.5, -32),
 		"CableB"
 	)
+	for ci = 1, 9 do
+		local spread = (ci - 5) * 5.2 + (ci % 3) * 2.1
+		cableRun(
+			dress,
+			hubCFrame.Position + Vector3.new(34, walkTop + 6 + ci * 1.2, spread),
+			hubCFrame.Position + Vector3.new(-20 + ci, walkTop - 1.5, -spread * 0.6),
+			"CableForest" .. ci
+		)
+	end
+end
+
+local function buildHubColonnades(hub: Instance, hubCFrame: CFrame, walkTop: number)
+	local ring = folder("HubColonnadeRing", hub)
+	local count = 18
+	for i = 1, count do
+		local bias = if i % 5 == 0 then 1.35 elseif i % 3 == 0 then 0.82 else 1
+		local angle = (i - 0.5) / count * math.pi * 2 + math.rad(11 * (i % 4))
+		local radius = 40 + (i % 4) * 2.5
+		local pos = Vector3.new(math.cos(angle) * radius, walkTop, math.sin(angle) * radius)
+		local height = 14 * bias + (i % 3) * 2.5
+		local col = part({
+			Name = "HubColonnade" .. i,
+			Parent = ring,
+			Size = Vector3.new(1.8 * bias, height, 1.8 * bias),
+			CFrame = hubCFrame * CFrame.new(pos + Vector3.new(0, height / 2, 0)),
+			Color = Color3.fromRGB(14, 12, 20),
+			Material = Enum.Material.Slate,
+			CanCollide = false,
+			CastShadow = true,
+		})
+		goldSeam(
+			ring,
+			col.CFrame * CFrame.new(0, height / 2 - 0.8, 0),
+			Vector3.new(1.4, DECK.SeamThickness, 0.32),
+			"ColonnadeCap" .. i
+		)
+		if i % 7 == 0 then
+			part({
+				Name = "ColonnadeLintel" .. i,
+				Parent = ring,
+				Size = Vector3.new(10, 0.55, 2.2),
+				CFrame = hubCFrame
+					* CFrame.new(pos + Vector3.new(0, height + 0.4, 0))
+					* CFrame.Angles(0, angle + math.rad(90), 0),
+				Color = Color3.fromRGB(18, 16, 24),
+				Material = Enum.Material.Metal,
+				CanCollide = false,
+			})
+		end
+	end
+end
+
+local function buildHubUpperDecks(hub: Instance, hubCFrame: CFrame, walkTop: number)
+	local decks = folder("HubUpperDecks", hub)
+	local layouts = {
+		{
+			Name = "EastGallery",
+			Size = Vector3.new(28, 0.45, 8),
+			Offset = Vector3.new(30, 4.2, -6),
+			Rot = math.rad(14),
+		},
+		{
+			Name = "NorthwestBalcony",
+			Size = Vector3.new(16, 0.4, 12),
+			Offset = Vector3.new(-26, 3.1, 22),
+			Rot = math.rad(-18),
+		},
+		{
+			Name = "SouthUnderlook",
+			Size = Vector3.new(22, 0.38, 6),
+			Offset = Vector3.new(4, 2.4, -34),
+			Rot = math.rad(6),
+		},
+	}
+	for _, lay in layouts do
+		local deckPlate = part({
+			Name = lay.Name,
+			Parent = decks,
+			Size = lay.Size,
+			CFrame = hubCFrame * CFrame.new(lay.Offset + Vector3.new(0, walkTop, 0)) * CFrame.Angles(0, lay.Rot, 0),
+			Color = PALETTE.ObsidianLift,
+			Material = Enum.Material.DiamondPlate,
+			CanCollide = false,
+		})
+		goldTrim(decks, deckPlate.CFrame, lay.Size)
+		part({
+			Name = lay.Name .. "Rail",
+			Parent = decks,
+			Size = Vector3.new(lay.Size.X, 1.2, 0.35),
+			CFrame = deckPlate.CFrame * CFrame.new(0, lay.Size.Y / 2 + 0.55, -lay.Size.Z / 2 + 0.2),
+			Color = Color3.fromRGB(20, 18, 26),
+			Material = Enum.Material.Metal,
+			CanCollide = false,
+		})
+	end
+	part({
+		Name = "HubUpperDeck",
+		Parent = decks,
+		Size = Vector3.new(12, 0.42, 12),
+		CFrame = hubCFrame * CFrame.new(-8, walkTop + 6.5, -10) * CFrame.Angles(0, math.rad(-22), math.rad(2)),
+		Color = PALETTE.Obsidian,
+		Material = Enum.Material.Slate,
+		CanCollide = false,
+	})
+end
+
+local function buildHubLightWells(hub: Instance, hubCFrame: CFrame, walkTop: number)
+	local wells = folder("HubLightWells", hub)
+	local spots = {
+		Vector3.new(18, 0, 12),
+		Vector3.new(-16, 0, -14),
+		Vector3.new(6, 0, -28),
+	}
+	for wi, offset in spots do
+		local shaft = part({
+			Name = "HubLightWell" .. wi,
+			Parent = wells,
+			Size = Vector3.new(3.2, 18, 3.2),
+			CFrame = hubCFrame * CFrame.new(offset + Vector3.new(0, walkTop - 7, 0)),
+			Color = Color3.fromRGB(8, 6, 14),
+			Material = Enum.Material.Slate,
+			Transparency = 0.08,
+			CanCollide = false,
+			CanQuery = false,
+		})
+		local wellLight = Instance.new("PointLight")
+		wellLight.Brightness = 0.38
+		wellLight.Range = 22
+		wellLight.Color = Color3.fromRGB(200, 188, 255)
+		wellLight.Shadows = false
+		wellLight.Parent = shaft
+		goldSeam(
+			wells,
+			shaft.CFrame * CFrame.new(0, 8.2, 0),
+			Vector3.new(2.8, DECK.SeamThickness, 0.32),
+			"WellLip" .. wi
+		)
+	end
 end
 
 -- Procedural obsidian-gold plated deck: inset tiles, edge lights, trim rings.
@@ -7980,6 +8315,9 @@ local function buildHub(root: Instance)
 	buildPlatedHubDeck(hub, hubCFrame)
 	goldTrim(hub, hubCFrame, HubLayout.HubSize)
 	buildHubCathedralDressing(hub, hubCFrame, walkTop)
+	buildHubColonnades(hub, hubCFrame, walkTop)
+	buildHubUpperDecks(hub, hubCFrame, walkTop)
+	buildHubLightWells(hub, hubCFrame, walkTop)
 	buildHubFillLights(hub, hubCFrame, walkTop)
 
 	-- Monolith: two halves (split along X) plus gold bands and the Void Core.
@@ -8024,6 +8362,7 @@ local function buildHub(root: Instance)
 			CanQuery = false,
 		})
 		edge:SetAttribute("Offset", half.CFrame:ToObjectSpace(edge.CFrame))
+		ArtResolve.ApplyMeshPart(half, "MonolithHalf", monolith)
 	end
 	part({
 		Name = "MonolithSplitSeam",
@@ -8097,7 +8436,7 @@ local function buildHub(root: Instance)
 				"SpireCrownSeam"
 			)
 			if side == "Right" then
-				part({
+				local shard = part({
 					Name = "BrokenCrownShard",
 					Parent = half,
 					Size = Vector3.new(2.2, 6, 1.4),
@@ -8108,6 +8447,7 @@ local function buildHub(root: Instance)
 					Material = Enum.Material.Metal,
 					CanCollide = false,
 				})
+				ArtResolve.ApplyMeshPart(shard, "MonolithCrownShard", half)
 			end
 			part({
 				Name = "SpireFin",
@@ -8378,11 +8718,7 @@ local function buildVoidStarDressing(parent: Instance)
 		local shard = part({
 			Name = "StarShard" .. i,
 			Parent = stars,
-			Size = Vector3.new(
-				rng:NextNumber(0.35, 1.2),
-				rng:NextNumber(0.15, 0.55),
-				rng:NextNumber(0.35, 1.2)
-			),
+			Size = Vector3.new(rng:NextNumber(0.35, 1.2), rng:NextNumber(0.15, 0.55), rng:NextNumber(0.35, 1.2)),
 			CFrame = CFrame.new(pos) * CFrame.Angles(rng:NextNumber(), rng:NextNumber(), rng:NextNumber()),
 			Color = Color3.fromRGB(198, 204, 228),
 			Material = Enum.Material.Slate,
@@ -8418,9 +8754,103 @@ local function buildVoidStarDressing(parent: Instance)
 	end
 end
 
+local function buildAsteroidField(parent: Instance)
+	local field = folder("DeepSpaceAsteroidField", parent)
+	local rng = Random.new(8819)
+	local count = 0
+	for i = 1, 86 do
+		local angle = rng:NextNumber(0, math.pi * 2)
+		local band = if i % 4 == 0 then 1.35 elseif i % 7 == 0 then 0.55 else 0.85
+		local radius = rng:NextNumber(HubLayout.ZoneRadius * 0.25, HubLayout.ZoneRadius * 1.25) * band
+		local y = rng:NextNumber(-28, 95)
+		local sizeMul = rng:NextNumber(0.7, 2.8)
+		local asteroid = part({
+			Name = "Asteroid" .. i,
+			Parent = field,
+			Size = Vector3.new(
+				rng:NextNumber(2.2, 5.5) * sizeMul,
+				rng:NextNumber(1.4, 4.2) * sizeMul,
+				rng:NextNumber(2.0, 5.8) * sizeMul
+			),
+			CFrame = CFrame.new(math.cos(angle) * radius, y, math.sin(angle) * radius)
+				* CFrame.Angles(rng:NextNumber(), rng:NextNumber(), rng:NextNumber()),
+			Color = Color3.fromRGB(22 + rng:NextInteger(0, 12), 20, 28 + rng:NextInteger(0, 10)),
+			Material = if rng:NextNumber() > 0.65 then Enum.Material.Basalt else Enum.Material.Slate,
+			CanCollide = false,
+			CanQuery = false,
+		})
+		asteroid:SetAttribute("ParallaxLayer", if radius > HubLayout.ZoneRadius then 2 else 1)
+		count += 1
+		if ArtResolve.HasUploadedMesh("DeepSpaceAsteroid") and i % 3 == 0 then
+			ArtResolve.ApplyMeshPart(asteroid, "DeepSpaceAsteroid", field)
+		end
+	end
+	field:SetAttribute("AsteroidCount", count)
+end
+
+local function buildParallaxBodies(parent: Instance)
+	local parallax = folder("DeepSpaceParallax", parent)
+	local bodies = {
+		{ Name = "ParallaxBodyDwarf", Pos = Vector3.new(420, 40, -260), Size = 48, Color = Color3.fromRGB(28, 26, 34) },
+		{ Name = "ParallaxBodyGas", Pos = Vector3.new(-380, 120, 310), Size = 72, Color = Color3.fromRGB(42, 36, 58) },
+		{ Name = "ParallaxBodyIce", Pos = Vector3.new(180, -20, 520), Size = 36, Color = Color3.fromRGB(32, 38, 48) },
+	}
+	for _, body in bodies do
+		part({
+			Name = body.Name,
+			Parent = parallax,
+			Size = Vector3.new(body.Size, body.Size, body.Size),
+			CFrame = CFrame.new(body.Pos),
+			Shape = Enum.PartType.Ball,
+			Color = body.Color,
+			Material = Enum.Material.Slate,
+			Transparency = 0.12,
+			CanCollide = false,
+			CanQuery = false,
+		})
+	end
+	for i = 1, 4 do
+		part({
+			Name = "ParallaxBody" .. i,
+			Parent = parallax,
+			Size = Vector3.new(22 + i * 6, 22 + i * 6, 22 + i * 6),
+			CFrame = CFrame.new(math.cos(i * 1.7) * (520 + i * 40), 30 + i * 18, math.sin(i * 1.7) * (520 + i * 40)),
+			Shape = Enum.PartType.Ball,
+			Color = Color3.fromRGB(20, 18, 26),
+			Material = Enum.Material.Basalt,
+			Transparency = 0.22,
+			CanCollide = false,
+			CanQuery = false,
+		})
+	end
+end
+
+local function buildDeepSpaceFogVolumes(parent: Instance)
+	local fog = folder("DeepSpaceFogVolumes", parent)
+	local rng = Random.new(3301)
+	for i = 1, 8 do
+		local angle = i / 8 * math.pi * 2
+		local radius = HubLayout.ZoneRadius * rng:NextNumber(0.45, 1.05)
+		part({
+			Name = "FogVolume" .. i,
+			Parent = fog,
+			Size = Vector3.new(rng:NextNumber(40, 90), rng:NextNumber(12, 32), rng:NextNumber(40, 90)),
+			CFrame = CFrame.new(math.cos(angle) * radius, rng:NextNumber(-6, 24), math.sin(angle) * radius),
+			Color = Color3.fromRGB(24, 18, 38),
+			Material = Enum.Material.Glass,
+			Transparency = 0.93,
+			CanCollide = false,
+			CanQuery = false,
+		})
+	end
+end
+
 local function buildDeepSpace(root: Instance)
 	local deep = folder("DeepSpace", root)
 	buildVoidStarDressing(deep)
+	buildAsteroidField(deep)
+	buildParallaxBodies(deep)
+	buildDeepSpaceFogVolumes(deep)
 	part({
 		Name = "ZoneRing",
 		Parent = deep,
@@ -8602,13 +9032,37 @@ local function buildPlot(plots: Instance, index: number)
 		"RefineryDeckSeam"
 	)
 	label(refinery, "REFINERY", 3.5, 14)
+	local machine = folder("PlotMachineShell", plot)
 	part({
-		Name = "RefineryTower",
-		Parent = station,
-		Size = Vector3.new(8, 12, 6),
-		CFrame = plotCFrame * CFrame.new(PlotLayout.RefineryTower),
-		Material = Enum.Material.Metal,
-		Color = Color3.fromRGB(26, 24, 34),
+		Name = "MachineHousing",
+		Parent = machine,
+		Size = Vector3.new(PlotLayout.BaseSize.X * 0.82, 5.5, PlotLayout.BaseSize.Z * 0.62),
+		CFrame = plotCFrame * CFrame.new(0, PlotLayout.SurfaceY + 1.8, 4),
+		Color = Color3.fromRGB(18, 16, 24),
+		Material = Enum.Material.CorrodedMetal,
+		CanCollide = false,
+	})
+	for pi = 1, 4 do
+		part({
+			Name = "MachinePipe" .. pi,
+			Parent = machine,
+			Size = Vector3.new(1.1, 6 + pi * 1.4, 1.1),
+			CFrame = plotCFrame
+				* CFrame.new(-10 + pi * 5.5, PlotLayout.SurfaceY + 5, -8)
+				* CFrame.Angles(math.rad(12 + pi * 4), 0, 0),
+			Color = Color3.fromRGB(24, 22, 30),
+			Material = Enum.Material.Metal,
+			CanCollide = false,
+		})
+	end
+	part({
+		Name = "MachineFunnel",
+		Parent = machine,
+		Size = Vector3.new(7, 4, 7),
+		CFrame = plotCFrame * CFrame.new(PlotLayout.Grinder.X, PlotLayout.SurfaceY + 6, PlotLayout.Grinder.Z),
+		Color = Color3.fromRGB(22, 20, 28),
+		Material = Enum.Material.DiamondPlate,
+		CanCollide = false,
 	})
 	local grinder = part({
 		Name = "GrinderCore",
@@ -8618,6 +9072,16 @@ local function buildPlot(plots: Instance, index: number)
 		Color = Color3.fromRGB(30, 28, 44),
 		Material = Enum.Material.DiamondPlate,
 	})
+	ArtResolve.ApplyMeshPart(grinder, "GrinderCore", station)
+	local refineryTower = part({
+		Name = "RefineryTower",
+		Parent = station,
+		Size = Vector3.new(8, 12, 6),
+		CFrame = plotCFrame * CFrame.new(PlotLayout.RefineryTower),
+		Material = Enum.Material.Metal,
+		Color = Color3.fromRGB(26, 24, 34),
+	})
+	ArtResolve.ApplyMeshPart(refineryTower, "RefineryStack", station)
 	part({
 		Name = "GrinderGlow",
 		Parent = grinder,
@@ -8729,6 +9193,23 @@ local function buildPlot(plots: Instance, index: number)
 			CanCollide = false,
 			CanQuery = false,
 		})
+		if i % 2 == 1 then
+			for rib = 1, 3 do
+				part({
+					Name = "BridgeRib" .. i .. "_" .. rib,
+					Parent = bridge,
+					Size = Vector3.new(6.8, 0.28, 0.55),
+					CFrame = segment.CFrame * CFrame.new(0, -0.35 - rib * 0.22, (rib - 2) * (segmentLength * 0.28)),
+					Color = Color3.fromRGB(16, 14, 22),
+					Material = Enum.Material.Metal,
+					CanCollide = false,
+					CanQuery = false,
+				})
+			end
+		end
+		if i == 1 then
+			ArtResolve.ApplyMeshPart(segment, "EnergyBridgeSegment", bridge)
+		end
 	end
 	return plot
 end
@@ -8756,7 +9237,7 @@ return MapBuilder
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="70">
+        <Item class="ModuleScript" referent="72">
           <Properties>
             <string name="Name">MonetizationService</string>
             <string name="Source"><![CDATA[--!strict
@@ -8970,7 +9451,7 @@ return MonetizationService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="71">
+        <Item class="ModuleScript" referent="73">
           <Properties>
             <string name="Name">PlayerDataService</string>
             <string name="Source"><![CDATA[--!strict
@@ -9602,7 +10083,7 @@ return PlayerDataService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="72">
+        <Item class="ModuleScript" referent="74">
           <Properties>
             <string name="Name">PlotService</string>
             <string name="Source"><![CDATA[--!strict
@@ -9796,7 +10277,7 @@ return PlotService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="73">
+        <Item class="ModuleScript" referent="75">
           <Properties>
             <string name="Name">RebirthService</string>
             <string name="Source"><![CDATA[--!strict
@@ -9875,7 +10356,7 @@ return RebirthService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="74">
+        <Item class="ModuleScript" referent="76">
           <Properties>
             <string name="Name">RelicService</string>
             <string name="Source"><![CDATA[--!strict
@@ -10059,7 +10540,7 @@ return RelicService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="75">
+        <Item class="ModuleScript" referent="77">
           <Properties>
             <string name="Name">RiftService</string>
             <string name="Source"><![CDATA[--!strict
@@ -10164,7 +10645,7 @@ return RiftService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="76">
+        <Item class="ModuleScript" referent="78">
           <Properties>
             <string name="Name">RockService</string>
             <string name="Source"><![CDATA[--!strict
@@ -10457,7 +10938,7 @@ return RockService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="77">
+        <Item class="ModuleScript" referent="79">
           <Properties>
             <string name="Name">SoftContestService</string>
             <string name="Source"><![CDATA[--!strict
@@ -10689,7 +11170,7 @@ return SoftContestService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="78">
+        <Item class="ModuleScript" referent="80">
           <Properties>
             <string name="Name">SquadService</string>
             <string name="Source"><![CDATA[--!strict
@@ -11032,7 +11513,7 @@ return SquadService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="79">
+        <Item class="ModuleScript" referent="81">
           <Properties>
             <string name="Name">StatService</string>
             <string name="Source"><![CDATA[--!strict
@@ -11160,7 +11641,7 @@ return StatService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="80">
+        <Item class="ModuleScript" referent="82">
           <Properties>
             <string name="Name">SummonService</string>
             <string name="Source"><![CDATA[--!strict
@@ -11306,7 +11787,7 @@ return SummonService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="81">
+        <Item class="ModuleScript" referent="83">
           <Properties>
             <string name="Name">TowService</string>
             <string name="Source"><![CDATA[--!strict
@@ -11411,7 +11892,7 @@ return TowService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="82">
+        <Item class="ModuleScript" referent="84">
           <Properties>
             <string name="Name">TutorialService</string>
             <string name="Source"><![CDATA[--!strict
@@ -11513,7 +11994,7 @@ return TutorialService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="83">
+        <Item class="ModuleScript" referent="85">
           <Properties>
             <string name="Name">WarpService</string>
             <string name="Source"><![CDATA[--!strict
@@ -11690,7 +12171,7 @@ return WarpService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="84">
+        <Item class="ModuleScript" referent="86">
           <Properties>
             <string name="Name">WorldEventService</string>
             <string name="Source"><![CDATA[--!strict
@@ -12015,7 +12496,7 @@ return WorldEventService
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="85">
+        <Item class="ModuleScript" referent="87">
           <Properties>
             <string name="Name">WorldState</string>
             <string name="Source"><![CDATA[--!strict
@@ -12106,15 +12587,15 @@ return WorldState
       </Item>
     </Item>
   </Item>
-  <Item class="ServerStorage" referent="86">
+  <Item class="ServerStorage" referent="88">
     <Properties>
       <string name="Name">ServerStorage</string>
     </Properties>
-    <Item class="Folder" referent="87">
+    <Item class="Folder" referent="89">
       <Properties>
         <string name="Name">Voidline</string>
       </Properties>
-      <Item class="ModuleScript" referent="88">
+      <Item class="ModuleScript" referent="90">
         <Properties>
           <string name="Name">README</string>
           <string name="Source"><![CDATA[-- ServerStorage.Voidline holds runtime templates if needed.
@@ -12125,23 +12606,23 @@ return {}
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="89">
+  <Item class="StarterPlayer" referent="91">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="90">
+    <Item class="StarterPlayerScripts" referent="92">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="91">
+      <Item class="Folder" referent="93">
         <Properties>
           <string name="Name">Voidline</string>
         </Properties>
-        <Item class="Folder" referent="92">
+        <Item class="Folder" referent="94">
           <Properties>
             <string name="Name">Client</string>
           </Properties>
-          <Item class="ModuleScript" referent="93">
+          <Item class="ModuleScript" referent="95">
             <Properties>
               <string name="Name">ClientState</string>
               <string name="Source"><![CDATA[--!strict
@@ -12304,7 +12785,7 @@ return ClientState
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="94">
+          <Item class="ModuleScript" referent="96">
             <Properties>
               <string name="Name">Ui</string>
               <string name="Source"><![CDATA[--!strict
@@ -12596,12 +13077,49 @@ function Ui.ClearChildren(parent: Instance, keepClass: string?)
 	end
 end
 
+-- Hotbar/store icon: rbxasset image from ArtConfig with optional glyph fallback label.
+function Ui.ArtIcon(parent: Instance, artGroup: string, artKey: string, glyph: string, size: number?): ImageLabel
+	local dim = size or 28
+	local image = Ui.Make("ImageLabel", {
+		Name = "ArtIcon",
+		BackgroundTransparency = 1,
+		Size = UDim2.fromOffset(dim, dim),
+		Position = UDim2.new(0.5, -dim / 2, 0, 4),
+		Image = (function()
+			local ok, ArtResolve = pcall(function()
+				return require(ReplicatedStorage:WaitForChild("Voidline").Modules.ArtResolve)
+			end)
+			if ok and ArtResolve then
+				return ArtResolve.UiImage(artGroup, artKey)
+			end
+			return "rbxasset://textures/ui/GuiImagePlaceholder.png"
+		end)(),
+		ImageTransparency = 0.12,
+		ScaleType = Enum.ScaleType.Fit,
+		Parent = parent,
+	}) :: ImageLabel
+	Ui.Label({
+		Name = "Glyph",
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.new(0.5, 0, 0, 4 + dim / 2),
+		Size = UDim2.fromOffset(dim, dim),
+		Text = glyph,
+		Font = Ui.Font.Title,
+		TextSize = math.floor(dim * 0.78),
+		TextColor3 = Ui.Colors.GoldBright,
+		TextTransparency = 0.15,
+		BackgroundTransparency = 1,
+		Parent = parent,
+	})
+	return image
+end
+
 return Ui
 ]]></string>
             </Properties>
           </Item>
         </Item>
-        <Item class="LocalScript" referent="95">
+        <Item class="LocalScript" referent="97">
           <Properties>
             <string name="Name">ClientBoot</string>
             <string name="Source"><![CDATA[--!strict
@@ -12778,11 +13296,11 @@ print(("[Voidline] Client online for %s"):format(Players.LocalPlayer.Name))
 ]]></string>
           </Properties>
         </Item>
-        <Item class="Folder" referent="96">
+        <Item class="Folder" referent="98">
           <Properties>
             <string name="Name">Controllers</string>
           </Properties>
-          <Item class="ModuleScript" referent="97">
+          <Item class="ModuleScript" referent="99">
             <Properties>
               <string name="Name">AudioController</string>
               <string name="Source"><![CDATA[--!strict
@@ -13016,7 +13534,7 @@ return AudioController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="98">
+          <Item class="ModuleScript" referent="100">
             <Properties>
               <string name="Name">CameraController</string>
               <string name="Source"><![CDATA[--!strict
@@ -13144,7 +13662,7 @@ return CameraController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="99">
+          <Item class="ModuleScript" referent="101">
             <Properties>
               <string name="Name">DroneController</string>
               <string name="Source"><![CDATA[--!strict
@@ -13869,7 +14387,7 @@ return DroneController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="100">
+          <Item class="ModuleScript" referent="102">
             <Properties>
               <string name="Name">HUDController</string>
               <string name="Source"><![CDATA[--!strict
@@ -14374,7 +14892,7 @@ return HUDController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="101">
+          <Item class="ModuleScript" referent="103">
             <Properties>
               <string name="Name">HotbarController</string>
               <string name="Source"><![CDATA[--!strict
@@ -14463,7 +14981,8 @@ local function slotButton(
 	caption: string,
 	key: string,
 	order: number,
-	onActivate: () -> ()
+	onActivate: () -> (),
+	artKey: string?
 ): TextButton
 	local button = Ui.Button({
 		Name = name,
@@ -14472,16 +14991,20 @@ local function slotButton(
 		LayoutOrder = order,
 		Parent = bar,
 	}, onActivate)
-	Ui.Label({
-		Name = "Glyph",
-		Size = UDim2.new(1, 0, 0, 34),
-		Position = UDim2.fromOffset(0, 4),
-		Text = glyph,
-		Font = Ui.Font.Title,
-		TextSize = 24,
-		TextColor3 = Ui.Colors.GoldBright,
-		Parent = button,
-	})
+	if artKey then
+		Ui.ArtIcon(button, "Hotbar", artKey, glyph, 30)
+	else
+		Ui.Label({
+			Name = "Glyph",
+			Size = UDim2.new(1, 0, 0, 34),
+			Position = UDim2.fromOffset(0, 4),
+			Text = glyph,
+			Font = Ui.Font.Title,
+			TextSize = 24,
+			TextColor3 = Ui.Colors.GoldBright,
+			Parent = button,
+		})
+	end
 	Ui.Label({
 		Name = "Caption",
 		AnchorPoint = Vector2.new(0, 1),
@@ -14534,7 +15057,7 @@ local function refresh()
 	for n, button in formationButtons do
 		local selected = profile.Formation == n
 		button.BackgroundColor3 = if selected then Ui.Colors.Gold else Ui.Colors.GlassLight
-		local glyph = button:FindFirstChild("Glyph") :: TextLabel?
+		local glyph = button:FindFirstChild("Glyph", true) :: TextLabel?
 		if glyph then
 			glyph.TextColor3 = if selected then Ui.Colors.Shadow else Ui.Colors.GoldBright
 		end
@@ -14579,6 +15102,7 @@ function HotbarController.Init(hotbarActions: Actions)
 		LayoutOrder = 1,
 		Parent = bar,
 	}, quickUpgrade)
+	Ui.ArtIcon(upgradeButton, "Hotbar", "Upgrade", "⬆", 26)
 	Ui.Label({
 		Name = "Title",
 		Position = UDim2.fromOffset(0, 6),
@@ -14611,25 +15135,26 @@ function HotbarController.Init(hotbarActions: Actions)
 			1 + n,
 			function()
 				setFormation(n)
-			end
+			end,
+			"Formation" .. n
 		)
 	end
 	slotButton("Store", "⬡", "STORE", "B", 10, function()
 		actions.OpenStore()
-	end)
+	end, "Store")
 	slotButton("Menu", "☰", "CODEX", "C", 11, function()
 		actions.OpenMenu(nil)
-	end)
+	end, "Menu")
 	slotButton("Home", "⌂", "HOME", "H", 12, function()
 		ClientState.Fire("WarpRequest", "Home")
-	end)
+	end, "Home")
 	sellButton = slotButton("Sell", "⇪", "SELL", "R", 13, function()
 		ClientState.Fire("SellOre")
-	end)
+	end, "Sell")
 	if Ui.IsTouch() then
 		slotButton("Clip", "▣", "CLIP", "K", 14, function()
 			actions.ToggleClip()
-		end)
+		end, "Clip")
 	end
 
 	bindKey("VoidlineUpgrade", quickUpgrade, Enum.KeyCode.U)
@@ -14688,7 +15213,7 @@ return HotbarController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="102">
+          <Item class="ModuleScript" referent="104">
             <Properties>
               <string name="Name">InteractController</string>
               <string name="Source"><![CDATA[--!strict
@@ -14808,7 +15333,7 @@ return InteractController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="103">
+          <Item class="ModuleScript" referent="105">
             <Properties>
               <string name="Name">JuiceController</string>
               <string name="Source"><![CDATA[--!strict
@@ -15256,7 +15781,7 @@ return JuiceController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="104">
+          <Item class="ModuleScript" referent="106">
             <Properties>
               <string name="Name">MenuController</string>
               <string name="Source"><![CDATA[--!strict
@@ -16141,7 +16666,7 @@ return MenuController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="105">
+          <Item class="ModuleScript" referent="107">
             <Properties>
               <string name="Name">MovementController</string>
               <string name="Source"><![CDATA[--!strict
@@ -16353,7 +16878,7 @@ return MovementController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="106">
+          <Item class="ModuleScript" referent="108">
             <Properties>
               <string name="Name">OnboardingController</string>
               <string name="Source"><![CDATA[--!strict
@@ -16701,7 +17226,7 @@ return OnboardingController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="107">
+          <Item class="ModuleScript" referent="109">
             <Properties>
               <string name="Name">SettingsController</string>
               <string name="Source"><![CDATA[local Players = game:GetService("Players")
@@ -16812,7 +17337,7 @@ return SettingsController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="108">
+          <Item class="ModuleScript" referent="110">
             <Properties>
               <string name="Name">StationInteractController</string>
               <string name="Source"><![CDATA[local Players = game:GetService("Players")
@@ -16945,7 +17470,7 @@ return StationInteractController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="109">
+          <Item class="ModuleScript" referent="111">
             <Properties>
               <string name="Name">StoreController</string>
               <string name="Source"><![CDATA[--!strict
@@ -17341,7 +17866,7 @@ return StoreController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="110">
+          <Item class="ModuleScript" referent="112">
             <Properties>
               <string name="Name">ThrusterCosmeticController</string>
               <string name="Source"><![CDATA[local Players = game:GetService("Players")
@@ -17417,7 +17942,7 @@ return ThrusterCosmeticController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="111">
+          <Item class="ModuleScript" referent="113">
             <Properties>
               <string name="Name">TowController</string>
               <string name="Source"><![CDATA[--!strict
@@ -17559,7 +18084,7 @@ return TowController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="112">
+          <Item class="ModuleScript" referent="114">
             <Properties>
               <string name="Name">VFXController</string>
               <string name="Source"><![CDATA[--!strict
@@ -17929,7 +18454,7 @@ return VFXController
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="113">
+          <Item class="ModuleScript" referent="115">
             <Properties>
               <string name="Name">WorldController</string>
               <string name="Source"><![CDATA[--!strict
@@ -18291,7 +18816,7 @@ return WorldController
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="114">
+  <Item class="Workspace" referent="116">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">60</float>

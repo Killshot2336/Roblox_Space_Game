@@ -287,4 +287,41 @@ function Ui.ClearChildren(parent: Instance, keepClass: string?)
 	end
 end
 
+-- Hotbar/store icon: rbxasset image from ArtConfig with optional glyph fallback label.
+function Ui.ArtIcon(parent: Instance, artGroup: string, artKey: string, glyph: string, size: number?): ImageLabel
+	local dim = size or 28
+	local image = Ui.Make("ImageLabel", {
+		Name = "ArtIcon",
+		BackgroundTransparency = 1,
+		Size = UDim2.fromOffset(dim, dim),
+		Position = UDim2.new(0.5, -dim / 2, 0, 4),
+		Image = (function()
+			local ok, ArtResolve = pcall(function()
+				return require(ReplicatedStorage:WaitForChild("Voidline").Modules.ArtResolve)
+			end)
+			if ok and ArtResolve then
+				return ArtResolve.UiImage(artGroup, artKey)
+			end
+			return "rbxasset://textures/ui/GuiImagePlaceholder.png"
+		end)(),
+		ImageTransparency = 0.12,
+		ScaleType = Enum.ScaleType.Fit,
+		Parent = parent,
+	}) :: ImageLabel
+	Ui.Label({
+		Name = "Glyph",
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.new(0.5, 0, 0, 4 + dim / 2),
+		Size = UDim2.fromOffset(dim, dim),
+		Text = glyph,
+		Font = Ui.Font.Title,
+		TextSize = math.floor(dim * 0.78),
+		TextColor3 = Ui.Colors.GoldBright,
+		TextTransparency = 0.15,
+		BackgroundTransparency = 1,
+		Parent = parent,
+	})
+	return image
+end
+
 return Ui
