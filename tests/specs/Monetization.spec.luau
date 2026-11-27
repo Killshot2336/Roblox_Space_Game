@@ -59,21 +59,25 @@ tests["dev products are the two Robux-only summons and no shard packs"] = functi
 	expect(n).toBe(2)
 end
 
-tests["game pass ids are wired; summon product ids stay zero until DevProducts exist"] = function()
+tests["game pass and summon product ids are wired from Creator Dashboard"] = function()
 	local world = Harness.new()
 	local MonetizationConfig = world:require("ReplicatedStorage/Voidline/Config/MonetizationConfig")
-	local seen = {}
+	local seenPasses = {}
 	for _, pass in MonetizationConfig.Passes do
 		expect(pass.GamePassId).toBeGreaterThan(0)
-		expect(seen[pass.GamePassId]).toBeNil()
-		seen[pass.GamePassId] = true
+		expect(seenPasses[pass.GamePassId]).toBeNil()
+		seenPasses[pass.GamePassId] = true
 		expect(MonetizationConfig.PassByGamePassId(pass.GamePassId)).toBe(pass)
 	end
+	local byId = {}
 	for _, product in MonetizationConfig.DevProducts do
-		-- Owner created these as Game Passes by mistake; ProductId stays 0 until
-		-- real Developer Products are pasted.
-		expect(product.ProductId).toBe(0)
+		expect(product.ProductId).toBeGreaterThan(0)
+		expect(byId[product.ProductId]).toBeNil()
+		byId[product.ProductId] = product.Id
+		expect(MonetizationConfig.ProductByProductId(product.ProductId)).toBe(product)
 	end
+	expect(byId[3736719622]).toBe("SummonVoidStarfall")
+	expect(byId[3736719712]).toBe("ServerLuckSurge")
 	expect(MonetizationConfig.PassByGamePassId(0)).toBeNil()
 	expect(MonetizationConfig.ProductByProductId(0)).toBeNil()
 end

@@ -1,7 +1,6 @@
 --!strict
--- OWNER TODO: create the 10 game passes and 2 developer products on the
--- Creator Dashboard and paste their IDs below. An ID of 0 means "not wired":
--- the Robux button is hidden for that item and nothing is ever granted for it.
+-- Dashboard IDs are wired. An ID of 0 means "not wired": the Robux button is
+-- hidden for that item and nothing is ever granted for it.
 --
 -- Dashboard name (must match exactly)     | Config `Id` / field              | R$
 -- ----------------------------------------|----------------------------------|----
@@ -128,7 +127,7 @@ MonetizationConfig.DevProducts = {
 		Id = "SummonVoidStarfall",
 		Name = "Summon Void Starfall",
 		Robux = 199,
-		ProductId = 0,
+		ProductId = 3736719622,
 		Blurb = "A meteor shower rains rich rocks on the whole server for 90 s.",
 		RandomOutcome = true,
 		DurationSeconds = 90,
@@ -137,7 +136,7 @@ MonetizationConfig.DevProducts = {
 		Id = "ServerLuckSurge",
 		Name = "Server Luck Surge",
 		Robux = 149,
-		ProductId = 0,
+		ProductId = 3736719712,
 		Blurb = "Everyone in the server finds shards and relics 2x as often for 10 min.",
 		RandomOutcome = false,
 		DurationSeconds = 600,
